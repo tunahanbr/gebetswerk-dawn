@@ -1,0 +1,344 @@
+<section class="gw-hero">
+  <div class="gw-hero__inner">
+
+    {%- comment -%} Eyebrow row {%- endcomment -%}
+    <div class="gw-eyebrow-row">
+      <p class="gw-eyebrow">{{ section.settings.eyebrow_text }}</p>
+      <div class="gw-stars">
+        <span class="gw-stars__icons">
+          {%- for i in (1..5) -%}
+            <svg class="gw-star" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/>
+            </svg>
+          {%- endfor -%}
+        </span>
+        <span class="gw-stars__score">{{ section.settings.rating_score }}</span>
+        <span>· {{ section.settings.rating_count }}</span>
+      </div>
+    </div>
+
+    {%- comment -%} Big hero card {%- endcomment -%}
+    <div class="gw-hero__main">
+      {%- if section.settings.hero_image != blank -%}
+        <img
+          src="{{ section.settings.hero_image | image_url: width: 2000 }}"
+          alt="{{ section.settings.hero_image.alt | escape }}"
+          width="{{ section.settings.hero_image.width }}"
+          height="{{ section.settings.hero_image.height }}"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- else -%}
+        <img src="{{ 'hero-mat.jpg' | asset_url }}" alt="Gebetsteppich" loading="eager" fetchpriority="high" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+      {%- endif -%}
+
+      <div class="gw-hero__gradient"></div>
+
+      {%- comment -%} Content overlay {%- endcomment -%}
+      <div class="gw-hero__content">
+        <p class="gw-hero__sub">{{ section.settings.hero_sub }}</p>
+        <h1 class="gw-hero__heading">{{ section.settings.hero_heading | remove: '<p>' | remove: '</p>' }}</h1>
+        <p class="gw-hero__desc">{{ section.settings.hero_desc }}</p>
+        <div class="gw-hero__buttons">
+          {%- if section.settings.button1_label != blank -%}
+            <a href="{{ section.settings.button1_url }}" class="gw-btn-primary">
+              {{ section.settings.button1_label }}
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.button2_label != blank -%}
+            <a href="{{ section.settings.button2_url }}" class="gw-btn-secondary">
+              {{ section.settings.button2_label }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} Bento cards — only render visible cards {%- endcomment -%}
+    {%- assign visible_cards = 0 -%}
+    {%- if section.settings.show_card1 -%}{%- assign visible_cards = visible_cards | plus: 1 -%}{%- endif -%}
+    {%- if section.settings.show_card2 -%}{%- assign visible_cards = visible_cards | plus: 1 -%}{%- endif -%}
+    {%- if section.settings.show_card3 -%}{%- assign visible_cards = visible_cards | plus: 1 -%}{%- endif -%}
+
+    {%- if visible_cards > 0 -%}
+      <div class="gw-hero__cards gw-hero__cards--{{ visible_cards }}">
+
+        {%- if section.settings.show_card1 -%}
+          <a href="{{ section.settings.card1_url | default: '#' }}" class="gw-card gw-card--wide gw-card--dark">
+            {%- if section.settings.card1_image != blank -%}
+              <img src="{{ section.settings.card1_image | image_url: width: 900 }}" alt="{{ section.settings.card1_title | escape }}" loading="lazy">
+            {%- else -%}
+              <img src="{{ 'hero-hand.jpg' | asset_url }}" alt="Handarbeit" loading="lazy">
+            {%- endif -%}
+            <div class="gw-card__gradient"></div>
+            <div class="gw-card__body">
+              <p class="gw-card__eyebrow">{{ section.settings.card1_eyebrow }}</p>
+              <p class="gw-card__title">{{ section.settings.card1_title }}</p>
+            </div>
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.show_card2 -%}
+          <a href="{{ section.settings.card2_url | default: '#' }}" class="gw-card gw-card--light">
+            {%- if section.settings.card2_image != blank -%}
+              <img src="{{ section.settings.card2_image | image_url: width: 700 }}" alt="{{ section.settings.card2_title | escape }}" loading="lazy">
+            {%- else -%}
+              <img src="{{ 'hero-gift.jpg' | asset_url }}" alt="Geschenkverpackung" loading="lazy">
+            {%- endif -%}
+            <div class="gw-card__body">
+              <p class="gw-card__eyebrow">{{ section.settings.card2_eyebrow }}</p>
+              <p class="gw-card__title">{{ section.settings.card2_title }}</p>
+            </div>
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.show_card3 -%}
+          <a href="{{ section.settings.card3_url | default: '#' }}" class="gw-card gw-card--dark">
+            {%- if section.settings.card3_image != blank -%}
+              <img src="{{ section.settings.card3_image | image_url: width: 700 }}" alt="{{ section.settings.card3_title | escape }}" loading="lazy">
+            {%- else -%}
+              <img src="{{ 'hero-detail.jpg' | asset_url }}" alt="Detail" loading="lazy">
+            {%- endif -%}
+            <div class="gw-card__gradient"></div>
+            <div class="gw-card__body">
+              <p class="gw-card__eyebrow">{{ section.settings.card3_eyebrow }}</p>
+              <p class="gw-card__title">{{ section.settings.card3_title }}</p>
+            </div>
+          </a>
+        {%- endif -%}
+
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Steps strip {%- endcomment -%}
+    <div class="gw-steps">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'step' -%}
+          <div class="gw-step" {{ block.shopify_attributes }}>
+            <div class="gw-step__top">
+              <span class="gw-step__num">0{{ forloop.index }}</span>
+              <svg class="gw-step__arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
+            </div>
+            <p class="gw-step__title">{{ block.settings.step_title }}</p>
+            <p class="gw-step__desc">{{ block.settings.step_desc }}</p>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero – Gebetswerk",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Eyebrow & Bewertung"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_text",
+      "label": "Eyebrow",
+      "default": "Manufaktur · Made in Europe"
+    },
+    {
+      "type": "text",
+      "id": "rating_score",
+      "label": "Bewertungs-Score",
+      "default": "4,9"
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Anzahl Bewertungen",
+      "default": "1.240 Bewertungen"
+    },
+    {
+      "type": "header",
+      "content": "Haupt-Hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero-Bild"
+    },
+    {
+      "type": "text",
+      "id": "hero_sub",
+      "label": "Eyebrow im Hero",
+      "default": "Gebetsteppich für Baba & Anne"
+    },
+    {
+      "type": "richtext",
+      "id": "hero_heading",
+      "label": "Haupt-Überschrift",
+      "default": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
+      "info": "Verwende kursiv für goldene Wörter"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_desc",
+      "label": "Beschreibungstext",
+      "default": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt."
+    },
+    {
+      "type": "text",
+      "id": "button1_label",
+      "label": "Button 1 – Text",
+      "default": "Jetzt personalisieren"
+    },
+    {
+      "type": "url",
+      "id": "button1_url",
+      "label": "Button 1 – Link"
+    },
+    {
+      "type": "text",
+      "id": "button2_label",
+      "label": "Button 2 – Text",
+      "default": "Kollektion ansehen"
+    },
+    {
+      "type": "text",
+      "id": "button2_url",
+      "label": "Button 2 – Link",
+      "default": "#shopify-section-featured_collection"
+    },
+    {
+      "type": "header",
+      "content": "Bento-Karten"
+    },
+    {
+      "type": "paragraph",
+      "content": "Jede Karte kann einzeln ein- oder ausgeblendet werden."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card1",
+      "label": "Karte 1 anzeigen",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "card1_image",
+      "label": "Karte 1 – Bild"
+    },
+    {
+      "type": "text",
+      "id": "card1_eyebrow",
+      "label": "Karte 1 – Eyebrow",
+      "default": "Handarbeit"
+    },
+    {
+      "type": "text",
+      "id": "card1_title",
+      "label": "Karte 1 – Titel",
+      "default": "Bestickt mit echtem Goldfaden"
+    },
+    {
+      "type": "url",
+      "id": "card1_url",
+      "label": "Karte 1 – Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card2",
+      "label": "Karte 2 anzeigen",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "card2_image",
+      "label": "Karte 2 – Bild"
+    },
+    {
+      "type": "text",
+      "id": "card2_eyebrow",
+      "label": "Karte 2 – Eyebrow",
+      "default": "Verpackung"
+    },
+    {
+      "type": "text",
+      "id": "card2_title",
+      "label": "Karte 2 – Titel",
+      "default": "Edler Geschenkkarton"
+    },
+    {
+      "type": "url",
+      "id": "card2_url",
+      "label": "Karte 2 – Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card3",
+      "label": "Karte 3 anzeigen",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "card3_image",
+      "label": "Karte 3 – Bild"
+    },
+    {
+      "type": "text",
+      "id": "card3_eyebrow",
+      "label": "Karte 3 – Eyebrow",
+      "default": "Detail"
+    },
+    {
+      "type": "text",
+      "id": "card3_title",
+      "label": "Karte 3 – Titel",
+      "default": "Jede Linie individuell gestickt"
+    },
+    {
+      "type": "url",
+      "id": "card3_url",
+      "label": "Karte 3 – Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Schritt",
+      "settings": [
+        {
+          "type": "text",
+          "id": "step_title",
+          "label": "Titel",
+          "default": "Design wählen"
+        },
+        {
+          "type": "text",
+          "id": "step_desc",
+          "label": "Beschreibung",
+          "default": "Farbe, Stoff & Stickschrift bestimmen"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero – Gebetswerk",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": { "step_title": "Design wählen", "step_desc": "Farbe, Stoff & Stickschrift bestimmen" }
+        },
+        {
+          "type": "step",
+          "settings": { "step_title": "Personalisieren", "step_desc": "Bis zu zwei Namen und Symbole" }
+        },
+        {
+          "type": "step",
+          "settings": { "step_title": "Lieferung", "step_desc": "Versandfertig in 3–5 Tagen" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

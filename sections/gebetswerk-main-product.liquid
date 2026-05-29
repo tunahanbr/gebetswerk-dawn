@@ -1,0 +1,678 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign inv = current_variant.inventory_quantity | default: 0
+  assign inv_threshold = section.settings.inventory_threshold | default: 10
+-%}
+
+{%- comment -%} Pass all data to JS {%- endcomment -%}
+<script>
+  window.GW_VARIANTS   = {{ product.variants | json }};
+  window.GW_BASE_PRICE = {{ current_variant.price }};
+
+  {%- comment -%} Bead options from editor blocks {%- endcomment -%}
+  window.GW_BEADS = [
+    { id: 'none', label: 'Keine', variantId: null, price: 0 }
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'bead_option' -%}
+        ,{ id: {{ forloop.index | json }}, label: {{ block.settings.name | json }}, variantId: {{ block.settings.variant_id }}, price: {{ block.settings.price_cents }} }
+      {%- endif -%}
+    {%- endfor -%}
+  ];
+
+  {%- comment -%} Personalization pricing from settings {%- endcomment -%}
+  window.GW_PRICES = {
+    name1:    {{ section.settings.price_name1 }},
+    name2:    {{ section.settings.price_name2 }},
+    giftwrap: {{ section.settings.price_giftwrap }}
+  };
+</script>
+
+{%- comment -%} SEO: BreadcrumbList + Product schema {%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"Home","item":"{{ shop.url }}"},
+    {"@type":"ListItem","position":2,"name":"Gebetsteppiche","item":"{{ shop.url }}/collections/all"},
+    {"@type":"ListItem","position":3,"name":{{ product.title | json }},"item":"{{ shop.url }}{{ product.url }}"}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "description": {{ product.description | strip_html | truncate: 300 | json }},
+  "image": {{ product.featured_image | image_url: width: 1200 | json }},
+  "brand": { "@type": "Brand", "name": {{ shop.name | json }} },
+  "sku": {{ current_variant.sku | json }},
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ shop.url }}{{ product.url }}",
+    "priceCurrency": "EUR",
+    "price": {{ current_variant.price | divided_by: 100.0 }},
+    "availability": "{% if current_variant.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "seller": { "@type": "Organization", "name": {{ shop.name | json }} }
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "{{ section.settings.review_count_number }}"
+  }
+}
+</script>
+
+<div class="gw-product-page">
+  <div class="gw-product-page__inner">
+
+    {%- comment -%} Breadcrumb {%- endcomment -%}
+    <nav class="gw-breadcrumb" aria-label="Breadcrumb">
+      <a href="/"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7"/><path d="M5 8v9h4v-5h2v5h4V8"/></svg> Home</a>
+      <span class="gw-breadcrumb__sep">/</span>
+      <a href="/collections/all">Gebetsteppiche</a>
+      <span class="gw-breadcrumb__sep">/</span>
+      <span>{{ product.title }}</span>
+    </nav>
+
+    <div class="gw-product-layout">
+
+      {%- comment -%} ══ GALLERY ══ {%- endcomment -%}
+      <div class="gw-gallery">
+        <div class="gw-gallery__main">
+          {%- assign main_img = current_variant.featured_image | default: product.featured_image -%}
+          <img id="gw-gallery-main-img"
+            src="{{ main_img | image_url: width: 1200 }}"
+            alt="{{ main_img.alt | default: product.title | escape }}"
+            width="1200" loading="eager" fetchpriority="high"
+          >
+
+          {%- comment -%} Live name preview {%- endcomment -%}
+          <div id="gw-preview-overlay" class="gw-gallery__preview-overlay" hidden>
+            <div class="gw-gallery__preview-box">
+              <p class="gw-gallery__preview-label">Vorschau</p>
+              <div id="gw-sym-above" hidden></div>
+              <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
+                <span id="gw-sym-left" hidden style="font-size:22px;"></span>
+                <div>
+                  <p id="gw-preview-name1" class="gw-gallery__preview-name"></p>
+                  <p id="gw-preview-name2" class="gw-gallery__preview-name2" hidden></p>
+                </div>
+                <span id="gw-sym-right" hidden style="font-size:22px;"></span>
+              </div>
+              <div id="gw-sym-below" hidden></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gw-gallery__thumbs">
+          {%- if product.media.size > 0 -%}
+            {%- for media in product.media limit: 4 -%}
+              <button class="gw-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ media.preview_image | image_url: width: 800 }}" aria-label="Bild {{ forloop.index }}">
+                <img src="{{ media.preview_image | image_url: width: 200 }}" alt="{{ media.alt | default: product.title | escape }}" loading="lazy" width="200">
+              </button>
+            {%- endfor -%}
+          {%- else -%}
+            {%- assign fallback_thumbs = 'product-main.jpg,product-thumb1.jpg,product-thumb2.jpg,product-thumb3.jpg' | split: ',' -%}
+            {%- for img in fallback_thumbs -%}
+              <button class="gw-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ img | asset_url }}" aria-label="Bild {{ forloop.index }}">
+                <img src="{{ img | asset_url }}" alt="Produktbild" loading="lazy">
+              </button>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- comment -%} ══ SIDEBAR ══ {%- endcomment -%}
+      <aside class="gw-product-sidebar">
+
+        <span class="gw-product__chip">
+          <svg viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>
+          {{ section.settings.badge_text }}
+        </span>
+
+        <h1 class="gw-product__title">{{ product.title }}</h1>
+
+        <div class="gw-product__rating">
+          <div class="gw-product__rating-stars">
+            {%- for i in (1..5) -%}<svg class="gw-product__rating-star" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
+          </div>
+          <a href="#gw-reviews" class="gw-product__rating-count">{{ section.settings.review_display }}</a>
+        </div>
+
+        <div class="gw-product__price-row">
+          <span id="gw-price" class="gw-product__price">{{ current_variant.price | money }}</span>
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <span class="gw-product__price-original">{{ current_variant.compare_at_price | money }}</span>
+          {%- endif -%}
+        </div>
+        <p id="gw-price-breakdown" class="gw-product__price-breakdown"></p>
+
+        {%- comment -%} Real inventory from Shopify {%- endcomment -%}
+        {%- if current_variant.available -%}
+          {%- if inv > 0 and inv <= inv_threshold -%}
+            <div class="gw-product__urgency" id="gw-urgency">
+              <span class="gw-product__urgency-dot"></span>
+              Nur noch {{ inv }} Stück verfügbar
+            </div>
+          {%- endif -%}
+        {%- else -%}
+          <div class="gw-product__urgency" id="gw-urgency" style="background:#fff1f1;color:#b91c1c;">
+            <span class="gw-product__urgency-dot"></span>
+            Ausverkauft
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Social proof counter {%- endcomment -%}
+        {%- if section.settings.show_social_proof -%}
+          <div class="gw-social-proof">
+            <span class="gw-social-proof__dot"></span>
+            <span id="gw-viewers">{{ section.settings.social_proof_base }}</span> Personen sehen das gerade
+          </div>
+        {%- endif -%}
+
+        <div class="gw-product__countdown">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Bestelle in <strong id="gw-countdown-time">--:--:--</strong> für Versand morgen
+        </div>
+
+        {%- comment -%} ══ PRODUCT FORM ══ {%- endcomment -%}
+        {%- form 'product', product, id: 'gw-product-form', novalidate: 'novalidate' -%}
+
+          <input type="hidden" name="id"       id="gw-variant-id" value="{{ current_variant.id }}">
+          <input type="hidden" name="quantity" id="gw-qty-input"   value="1">
+
+          {%- comment -%} LINE ITEM PROPERTIES — saved with every Shopify order, visible in admin + emails {%- endcomment -%}
+          <input type="hidden" name="properties[Name 1]"           id="prop-name1"      value="">
+          <input type="hidden" name="properties[Name 2]"           id="prop-name2"      value="">
+          <input type="hidden" name="properties[Schriftfarbe]"     id="prop-thread"     value="">
+          <input type="hidden" name="properties[Symbol]"           id="prop-symbol"     value="">
+          <input type="hidden" name="properties[Symbolposition]"   id="prop-symbol-pos" value="">
+          <input type="hidden" name="properties[Gebetskette]"      id="prop-bead"       value="">
+          <input type="hidden" name="properties[Geschenkverpackung]" id="prop-giftwrap" value="">
+
+          {%- comment -%} ─ Color variant picker ─ {%- endcomment -%}
+          {%- if product.variants.size > 1 -%}
+            <div style="margin-bottom:24px;">
+              <p class="gw-product__section-label">Farbe <span id="gw-color-label">{{ current_variant.title }}</span></p>
+              <div class="gw-product__colors">
+                {%- for variant in product.variants -%}
+                  <button type="button"
+                    class="gw-color-swatch{% if variant.id == current_variant.id %} is-active{% endif %}"
+                    data-variant-id="{{ variant.id }}"
+                    data-variant-price="{{ variant.price }}"
+                    data-color-name="{{ variant.title | escape }}"
+                    data-variant-img="{{ variant.featured_image | image_url: width: 800 }}"
+                    data-variant-inventory="{{ variant.inventory_quantity }}"
+                    aria-label="{{ variant.title }}"
+                    title="{{ variant.title }}"
+                    {% unless variant.available %}style="opacity:0.4;" title="{{ variant.title }} – ausverkauft"{% endunless %}
+                  >
+                    {%- if variant.featured_image -%}
+                      <img src="{{ variant.featured_image | image_url: width: 120 }}" alt="{{ variant.title | escape }}" loading="lazy">
+                    {%- else -%}
+                      <img src="{{ 'mat-white.jpg' | asset_url }}" alt="{{ variant.title | escape }}" loading="lazy">
+                    {%- endif -%}
+                  </button>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} ─ Personalization box ─ {%- endcomment -%}
+          <div class="gw-personalize-box">
+            <label class="gw-personalize-toggle">
+              <input type="checkbox" id="gw-personalize-toggle" checked>
+              <div class="gw-personalize-toggle-text">
+                <p>Gebetsteppich personalisieren?</p>
+                <p>Mit gestickten Namen wird dein Geschenk einzigartig. (+{{ section.settings.price_name1 | divided_by: 100.0 | money_without_currency }}€)</p>
+              </div>
+            </label>
+
+            <div id="gw-personalize-fields" class="gw-personalize-fields">
+
+              <div class="gw-form-field">
+                <label class="gw-form-label" for="gw-name1-input">Name 1 * <span style="font-weight:400;color:var(--gw-muted)">(max. 11 Zeichen)</span></label>
+                <div class="gw-form-input-wrap">
+                  <input type="text" id="gw-name1-input" class="gw-form-input" placeholder="z. B. Amina" maxlength="11" autocomplete="off">
+                  <span id="gw-name1-count" class="gw-char-count">0/11</span>
+                </div>
+              </div>
+
+              <div class="gw-option-toggle">
+                <label><input type="checkbox" id="gw-twonames-toggle"> Zweiten Namen hinzufügen</label>
+                <span class="gw-option-price">+ {{ section.settings.price_name2 | divided_by: 100.0 | money_without_currency }}€</span>
+              </div>
+
+              <div id="gw-name2-section" class="gw-form-field" hidden>
+                <label class="gw-form-label" for="gw-name2-input">Name 2</label>
+                <div class="gw-form-input-wrap">
+                  <input type="text" id="gw-name2-input" class="gw-form-input" placeholder="z. B. Yusuf" maxlength="11" autocomplete="off">
+                  <span id="gw-name2-count" class="gw-char-count">0/11</span>
+                </div>
+              </div>
+
+              {%- comment -%} Thread colors from blocks {%- endcomment -%}
+              {%- assign thread_blocks = section.blocks | where: 'type', 'thread_color' -%}
+              {%- if thread_blocks.size > 0 -%}
+                <div class="gw-form-field">
+                  <p class="gw-form-label">Schriftfarbe</p>
+                  <div class="gw-thread-grid">
+                    {%- for block in thread_blocks -%}
+                      <button type="button"
+                        class="gw-thread-btn{% if forloop.first %} is-active{% endif %}"
+                        data-thread="{{ block.settings.id }}"
+                        data-hex="{{ block.settings.hex }}"
+                        data-label="{{ block.settings.name | escape }}"
+                        {{ block.shopify_attributes }}
+                      >
+                        <span class="gw-thread-dot" style="background:{{ block.settings.hex }};"></span>
+                        {{ block.settings.name }}
+                      </button>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              {%- else -%}
+                {%- comment -%} Fallback thread colors {%- endcomment -%}
+                <div class="gw-form-field">
+                  <p class="gw-form-label">Schriftfarbe</p>
+                  <div class="gw-thread-grid">
+                    {%- assign default_threads = 'gold|Gold|#c9a24a,silver|Silber|#c8c8cc,white|Weiß|#f5f1e6,black|Schwarz|#1a1a1a' | split: ',' -%}
+                    {%- for tc in default_threads -%}
+                      {%- assign p = tc | split: '|' -%}
+                      <button type="button" class="gw-thread-btn{% if forloop.first %} is-active{% endif %}" data-thread="{{ p[0] }}" data-hex="{{ p[2] }}" data-label="{{ p[1] }}">
+                        <span class="gw-thread-dot" style="background:{{ p[2] }};"></span>{{ p[1] }}
+                      </button>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              {%- endif -%}
+
+              {%- comment -%} Symbols {%- endcomment -%}
+              <div class="gw-form-field">
+                <p class="gw-form-label">Symbol</p>
+                <div class="gw-symbol-grid">
+                  {%- assign symbols = 'none|Keins|—,moon|Halbmond|☾,heart|Herz|♥,infinity|Unendlich|∞' | split: ',' -%}
+                  {%- for sym in symbols -%}
+                    {%- assign sp = sym | split: '|' -%}
+                    <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}">
+                      <span class="gw-symbol-btn__icon" style="color:var(--gw-gold)">{{ sp[2] }}</span>
+                      <span class="gw-symbol-btn__label">{{ sp[1] }}</span>
+                    </button>
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              <div id="gw-sympos-section" class="gw-form-field" hidden>
+                <p class="gw-form-label">Position des Symbols</p>
+                <div class="gw-sympos-grid">
+                  {%- assign positions = 'above|Über dem Namen|col,below|Unter dem Namen|col-rev,left|Links|row,right|Rechts|row-rev' | split: ',' -%}
+                  {%- for pos in positions -%}
+                    {%- assign pp = pos | split: '|' -%}
+                    <button type="button" class="gw-sympos-btn{% if forloop.first %} is-active{% endif %}" data-sympos="{{ pp[0] }}">
+                      <span>{{ pp[1] }}</span>
+                      <span class="gw-sympos-preview" data-dir="{{ pp[2] }}">
+                        <span style="color:var(--gw-gold);font-size:13px;">☾</span>
+                        <span style="font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--gw-gold);">Aa</span>
+                      </span>
+                    </button>
+                  {%- endfor -%}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {%- comment -%} ─ Beads from editor blocks ─ {%- endcomment -%}
+          {%- assign bead_blocks = section.blocks | where: 'type', 'bead_option' -%}
+          {%- if bead_blocks.size > 0 -%}
+            <div style="margin-bottom:20px;">
+              <p class="gw-product__section-label">Gebetskette dazu? <span>Optional</span></p>
+              <div class="gw-beads-grid">
+
+                {%- comment -%} "Keine" option {%- endcomment -%}
+                <button type="button" class="gw-bead-btn is-active" data-bead="0" data-bead-variant="">
+                  <div class="gw-bead-btn__img"><div class="gw-bead-btn__none">Keine</div></div>
+                  <div class="gw-bead-btn__info">
+                    <span class="gw-bead-btn__name">Keine</span>
+                    <span class="gw-bead-btn__price">—</span>
+                  </div>
+                </button>
+
+                {%- for block in bead_blocks -%}
+                  <button type="button"
+                    class="gw-bead-btn"
+                    data-bead="{{ forloop.index }}"
+                    data-bead-variant="{{ block.settings.variant_id }}"
+                    data-bead-price="{{ block.settings.price_cents }}"
+                    data-bead-label="{{ block.settings.name | escape }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    <div class="gw-bead-btn__img">
+                      {%- if block.settings.image != blank -%}
+                        <img src="{{ block.settings.image | image_url: width: 200 }}" alt="{{ block.settings.name | escape }}" loading="lazy">
+                      {%- elsif block.settings.fallback_image != blank -%}
+                        <img src="{{ block.settings.fallback_image | asset_url }}" alt="{{ block.settings.name | escape }}" loading="lazy">
+                      {%- else -%}
+                        <div class="gw-bead-btn__none">?</div>
+                      {%- endif -%}
+                    </div>
+                    <div class="gw-bead-btn__info">
+                      <span class="gw-bead-btn__name">{{ block.settings.name }}</span>
+                      <span class="gw-bead-btn__price">+{{ block.settings.price_cents | divided_by: 100.0 | money_without_currency }}€</span>
+                    </div>
+                  </button>
+                {%- endfor -%}
+
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} ─ Gift message ─ {%- endcomment -%}
+          {%- if section.settings.show_gift_message -%}
+            <div class="gw-gift-message-wrap">
+              <label class="gw-option-toggle" style="margin-bottom:8px;">
+                <label><input type="checkbox" id="gw-giftmsg-toggle"> Persönliche Nachricht für den Empfänger</label>
+              </label>
+              <div id="gw-giftmsg-section" hidden>
+                <textarea
+                  id="gw-giftmsg-input"
+                  name="properties[Persönliche Nachricht]"
+                  class="gw-form-input"
+                  placeholder="z. B. Alles Gute zum Geburtstag, möge dein Gebet erhört werden."
+                  rows="3"
+                  maxlength="200"
+                  style="border-radius:10px;resize:vertical;padding:10px 14px;height:auto;"
+                ></textarea>
+                <span id="gw-giftmsg-count" style="font-size:11px;color:var(--gw-muted);display:block;text-align:right;margin-top:4px;">0/200</span>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} ─ Gift wrap ─ {%- endcomment -%}
+          <label class="gw-giftwrap-row">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              Mit Geschenkschleife verpacken
+            </span>
+            <span class="gw-giftwrap-right">
+              <span class="gw-giftwrap-price">+{{ section.settings.price_giftwrap | divided_by: 100.0 | money_without_currency }}€</span>
+              <input type="checkbox" id="gw-giftwrap-toggle">
+            </span>
+          </label>
+
+          {%- comment -%} ─ Order confirmation summary ─ {%- endcomment -%}
+          <div id="gw-order-summary" class="gw-order-summary" hidden>
+            <p class="gw-order-summary__label">Deine Bestellung:</p>
+            <ul id="gw-order-summary-list" class="gw-order-summary__list"></ul>
+          </div>
+
+          {%- comment -%} ─ Qty + ATC ─ {%- endcomment -%}
+          <div class="gw-product__actions">
+            <div class="gw-qty">
+              <button type="button" id="gw-qty-minus" class="gw-qty__btn" aria-label="Weniger">−</button>
+              <span id="gw-qty-val" class="gw-qty__val">1</span>
+              <button type="button" id="gw-qty-plus"  class="gw-qty__btn" aria-label="Mehr">+</button>
+            </div>
+            <button type="button" id="gw-atc-btn" class="gw-add-to-cart"{% unless current_variant.available %} disabled{% endunless %}>
+              {% if current_variant.available %}In den Warenkorb · {{ current_variant.price | money }}{% else %}Ausverkauft{% endif %}
+            </button>
+          </div>
+
+          {%- comment -%} Dynamic checkout (Klarna, Shop Pay, PayPal…) {%- endcomment -%}
+          {{ form | payment_button }}
+
+          {%- comment -%} Trust badges {%- endcomment -%}
+          <div class="gw-trust-badges">
+            <div class="gw-trust-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>SSL-gesichert</span>
+            </div>
+            <div class="gw-trust-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>14 Tage Rückgabe</span>
+            </div>
+            <div class="gw-trust-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span>Handgefertigt</span>
+            </div>
+            <div class="gw-trust-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>3–5 Tage</span>
+            </div>
+          </div>
+
+        {%- endform -%}
+
+        {%- comment -%} ─ Shipping info ─ {%- endcomment -%}
+        <div class="gw-product__shipping">
+          <div class="gw-product__shipping-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <span><strong>3–5 Werktage</strong> Lieferzeit · kostenlos ab 100 €</span>
+          </div>
+          <div class="gw-product__shipping-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            <span>In edler Geschenkverpackung mit Goldschleife</span>
+          </div>
+        </div>
+
+        {%- comment -%} ─ Accordions ─ {%- endcomment -%}
+        <div class="gw-product-accordion">
+          {%- if product.description != blank -%}
+            <details open>
+              <summary>Beschreibung & Material</summary>
+              <div class="gw-product-accordion__body">{{ product.description }}</div>
+            </details>
+          {%- endif -%}
+          <details>
+            <summary>Versand & Rückgabe</summary>
+            <p class="gw-product-accordion__body">{{ section.settings.shipping_text }}</p>
+          </details>
+          <details>
+            <summary>Pflege</summary>
+            <p class="gw-product-accordion__body">{{ section.settings.care_text }}</p>
+          </details>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Sticky mobile CTA {%- endcomment -%}
+<div id="gw-sticky-atc" class="gw-sticky-atc" hidden>
+  <div class="gw-sticky-atc__inner">
+    <div>
+      <p class="gw-sticky-atc__title">{{ product.title | truncate: 30 }}</p>
+      <p id="gw-sticky-price" class="gw-sticky-atc__price">{{ current_variant.price | money }}</p>
+    </div>
+    <button type="button" id="gw-sticky-atc-btn" class="gw-add-to-cart" style="flex-shrink:0;height:44px;padding:0 20px;font-size:13px;">
+      In den Warenkorb
+    </button>
+  </div>
+</div>
+
+<script src="{{ 'gebetswerk-product.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Produktseite",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Conversion-Elemente"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_proof",
+      "label": "\"X Personen sehen das gerade\" anzeigen",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "social_proof_base",
+      "label": "Basis-Zahl für Besucher-Counter",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_message",
+      "label": "Persönliche Nachricht-Feld anzeigen",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Produkt-Badge & Bewertung"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge-Text",
+      "default": "Personalisiertes Set"
+    },
+    {
+      "type": "text",
+      "id": "review_display",
+      "label": "Bewertungstext",
+      "default": "2.627 Bewertungen",
+      "info": "Wird als Link zu den Bewertungen angezeigt"
+    },
+    {
+      "type": "number",
+      "id": "review_count_number",
+      "label": "Bewertungsanzahl (für SEO Schema)",
+      "default": 2627
+    },
+    {
+      "type": "header",
+      "content": "Lagerbestand"
+    },
+    {
+      "type": "number",
+      "id": "inventory_threshold",
+      "label": "Lagerbestand-Warnung ab (Stück)",
+      "default": 10,
+      "info": "Zeigt 'Nur noch X Stück' wenn Bestand darunter fällt"
+    },
+    {
+      "type": "header",
+      "content": "Preise (in Cent)"
+    },
+    {
+      "type": "number",
+      "id": "price_name1",
+      "label": "Name 1 – Preis (Cent)",
+      "default": 1000,
+      "info": "1000 = €10,00"
+    },
+    {
+      "type": "number",
+      "id": "price_name2",
+      "label": "Name 2 – Preis (Cent)",
+      "default": 1500,
+      "info": "1500 = €15,00"
+    },
+    {
+      "type": "number",
+      "id": "price_giftwrap",
+      "label": "Geschenkverpackung – Preis (Cent)",
+      "default": 199,
+      "info": "199 = €1,99"
+    },
+    {
+      "type": "header",
+      "content": "Texte"
+    },
+    {
+      "type": "textarea",
+      "id": "shipping_text",
+      "label": "Versand & Rückgabe",
+      "default": "Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands."
+    },
+    {
+      "type": "textarea",
+      "id": "care_text",
+      "label": "Pflegehinweis",
+      "default": "Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "bead_option",
+      "name": "Gebetsketten-Option",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Lulu (Perlweiß)"
+        },
+        {
+          "type": "number",
+          "id": "variant_id",
+          "label": "Shopify Variant ID",
+          "info": "Produkt-Variante ID für Lagerbestand-Tracking. Findest du in Shopify Admin → Produkt URL."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Bild"
+        },
+        {
+          "type": "text",
+          "id": "fallback_image",
+          "label": "Fallback Asset (z.B. beads-pearl.jpg)"
+        },
+        {
+          "type": "number",
+          "id": "price_cents",
+          "label": "Preis (Cent)",
+          "default": 1990,
+          "info": "1990 = €19,90"
+        }
+      ]
+    },
+    {
+      "type": "thread_color",
+      "name": "Schriftfarbe",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "id",
+          "label": "ID (intern)",
+          "default": "gold"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Gold"
+        },
+        {
+          "type": "text",
+          "id": "hex",
+          "label": "Hex-Farbe",
+          "default": "#c9a24a"
+        }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Produktseite",
+    "blocks": [
+      { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
+      { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
+      { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
+      { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
+      { "type": "bead_option",  "settings": { "name": "Lulu (Perlweiß)",    "fallback_image": "beads-pearl.jpg", "price_cents": 1990 } },
+      { "type": "bead_option",  "settings": { "name": "Layl (Onyx)",        "fallback_image": "beads-black.jpg", "price_cents": 1990 } },
+      { "type": "bead_option",  "settings": { "name": "Amber (Bernstein)",  "fallback_image": "beads-wood.jpg",  "price_cents": 2290 } },
+      { "type": "bead_option",  "settings": { "name": "Zaytun (Smaragd)",   "fallback_image": "beads-green.jpg", "price_cents": 2490 } }
+    ]
+  }]
+}
+{% endschema %}

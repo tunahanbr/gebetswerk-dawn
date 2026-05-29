@@ -1,0 +1,227 @@
+<div class="gw-footer-wrap">
+<footer class="gw-footer">
+  <div class="gw-footer__inner">
+    <div class="gw-footer__grid">
+
+      {%- comment -%} Brand + newsletter {%- endcomment -%}
+      <div>
+        <a href="/" class="gw-footer__logo">
+          <span class="gw-footer__logo-mark">{{ section.settings.logo_initials }}</span>
+          <span class="gw-footer__logo-name">{{ section.settings.brand_name }}</span>
+        </a>
+        <p class="gw-footer__tagline">{{ section.settings.tagline }}</p>
+
+        {%- if section.settings.show_newsletter -%}
+          <form class="gw-footer__email-form" action="/contact#contact_form" method="post" accept-charset="UTF-8">
+            <input type="hidden" name="form_type" value="customer">
+            <input type="hidden" name="utf8" value="✓">
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <input
+              type="email"
+              name="contact[email]"
+              class="gw-footer__email-input"
+              placeholder="{{ section.settings.email_placeholder }}"
+              required
+              autocomplete="email"
+            >
+            <button type="submit" class="gw-footer__email-btn">{{ section.settings.email_button }}</button>
+          </form>
+          <p class="gw-footer__email-note">{{ section.settings.email_note }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Nav columns {%- endcomment -%}
+      <div class="gw-footer__nav-grid">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'nav_column' -%}
+            <div {{ block.shopify_attributes }}>
+              <p class="gw-footer__nav-heading">{{ block.settings.heading }}</p>
+              <ul class="gw-footer__nav-list">
+                {%- for i in (1..5) -%}
+                  {%- assign label_key = 'link_' | append: i | append: '_label' -%}
+                  {%- assign url_key   = 'link_' | append: i | append: '_url' -%}
+                  {%- assign label = block.settings[label_key] -%}
+                  {%- assign url   = block.settings[url_key] -%}
+                  {%- if label != blank -%}
+                    <li><a href="{{ url | default: '#' }}">{{ label }}</a></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    </div>
+
+    {%- comment -%} Bottom bar {%- endcomment -%}
+    <div class="gw-footer__bottom">
+      <p>© {{ 'now' | date: '%Y' }} {{ section.settings.brand_name }}. {{ section.settings.copyright_suffix }}</p>
+      <div class="gw-footer__social">
+        {%- if section.settings.instagram != blank -%}
+          <a href="{{ section.settings.instagram }}" aria-label="Instagram" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.facebook != blank -%}
+          <a href="{{ section.settings.facebook }}" aria-label="Facebook" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.email != blank -%}
+          <a href="mailto:{{ section.settings.email }}" aria-label="E-Mail">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+
+  </div>
+</footer>
+</div>
+
+{% schema %}
+{
+  "name": "Footer – Gebetswerk",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Marke"
+    },
+    {
+      "type": "text",
+      "id": "logo_initials",
+      "label": "Logo-Initialen",
+      "default": "GW"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Markenname",
+      "default": "Gebetswerk"
+    },
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Handgefertigte, personalisierte Gebetsteppiche – ein Geschenk, das Generationen bleibt."
+    },
+    {
+      "type": "text",
+      "id": "copyright_suffix",
+      "label": "Copyright-Zusatz",
+      "default": "Mit Liebe gefertigt."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Newsletter anzeigen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "E-Mail Placeholder",
+      "default": "Deine E-Mail"
+    },
+    {
+      "type": "text",
+      "id": "email_button",
+      "label": "Button-Text",
+      "default": "Abonnieren"
+    },
+    {
+      "type": "text",
+      "id": "email_note",
+      "label": "Hinweis unter dem Formular",
+      "default": "10 % Willkommensrabatt für neue Abonnenten."
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "text",
+      "id": "instagram",
+      "label": "Instagram-URL"
+    },
+    {
+      "type": "text",
+      "id": "facebook",
+      "label": "Facebook-URL"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "E-Mail-Adresse"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_column",
+      "name": "Nav-Spalte",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Überschrift",
+          "default": "Shop"
+        },
+        { "type": "text", "id": "link_1_label", "label": "Link 1 – Text" },
+        { "type": "url",  "id": "link_1_url",   "label": "Link 1 – URL" },
+        { "type": "text", "id": "link_2_label", "label": "Link 2 – Text" },
+        { "type": "url",  "id": "link_2_url",   "label": "Link 2 – URL" },
+        { "type": "text", "id": "link_3_label", "label": "Link 3 – Text" },
+        { "type": "url",  "id": "link_3_url",   "label": "Link 3 – URL" },
+        { "type": "text", "id": "link_4_label", "label": "Link 4 – Text" },
+        { "type": "url",  "id": "link_4_url",   "label": "Link 4 – URL" },
+        { "type": "text", "id": "link_5_label", "label": "Link 5 – Text" },
+        { "type": "url",  "id": "link_5_url",   "label": "Link 5 – URL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer – Gebetswerk",
+      "blocks": [
+        {
+          "type": "nav_column",
+          "settings": {
+            "heading": "Shop",
+            "link_1_label": "Gebetsteppiche", "link_1_url": "/collections/all",
+            "link_2_label": "Sets",           "link_2_url": "/collections/all",
+            "link_3_label": "Gebetsketten",   "link_3_url": "/collections/all",
+            "link_4_label": "Geschenkkarten", "link_4_url": "/collections/all"
+          }
+        },
+        {
+          "type": "nav_column",
+          "settings": {
+            "heading": "Service",
+            "link_1_label": "Versand & Lieferung", "link_1_url": "/pages/versand",
+            "link_2_label": "Rückgabe",            "link_2_url": "/pages/rueckgabe",
+            "link_3_label": "FAQ",                 "link_3_url": "/pages/faq",
+            "link_4_label": "Kontakt",             "link_4_url": "/pages/contact"
+          }
+        },
+        {
+          "type": "nav_column",
+          "settings": {
+            "heading": "Über",
+            "link_1_label": "Unsere Geschichte", "link_1_url": "/pages/about",
+            "link_2_label": "Manufaktur",        "link_2_url": "/pages/about",
+            "link_3_label": "Impressum",         "link_3_url": "/pages/impressum",
+            "link_4_label": "AGB",               "link_4_url": "/pages/agb",
+            "link_5_label": "Datenschutz",       "link_5_url": "/pages/datenschutz"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

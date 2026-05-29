@@ -1,0 +1,131 @@
+<section class="gw-faq">
+  <div class="gw-faq__inner">
+    <div class="gw-faq__layout">
+
+      {%- comment -%} Left: intro {%- endcomment -%}
+      <div>
+        <p class="gw-eyebrow">{{ section.settings.eyebrow }}</p>
+        <h2 class="gw-faq__heading">{{ section.settings.heading | remove: '<p>' | remove: '</p>' }}</h2>
+        <p class="gw-faq__sub">{{ section.settings.subtext }}</p>
+        {%- if section.settings.cta_label != blank -%}
+          <a href="{{ section.settings.cta_url | default: '/pages/contact' }}" class="gw-faq__cta">
+            {{ section.settings.cta_label }}
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Right: accordion {%- endcomment -%}
+      <div class="gw-accordion">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'item' -%}
+            <details {{ block.shopify_attributes }}>
+              <summary>{{ block.settings.question }}</summary>
+              <p class="gw-accordion__answer">{{ block.settings.answer }}</p>
+            </details>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Häufige Fragen"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "<p>Alles, was du <em>wissen musst</em>.</p>"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Beschreibungstext",
+      "default": "Du hast eine andere Frage? Schreib uns – wir antworten innerhalb von 24 Stunden."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button-Text",
+      "default": "Kontakt aufnehmen"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button-Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Frage",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Frage",
+          "default": "Wie lange dauert die Produktion?"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Antwort",
+          "default": "Personalisierte Produkte werden innerhalb von 2–3 Werktagen gefertigt."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "question": "Wie lange dauert die Produktion?",
+            "answer": "Personalisierte Gebetsteppiche werden innerhalb von 2–3 Werktagen gefertigt und anschließend verschickt. Insgesamt erhältst du dein Paket meist innerhalb von 3–5 Werktagen."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "question": "Welche Namen und Schriften kann ich wählen?",
+            "answer": "Du kannst lateinische sowie arabische Namen mit bis zu 11 Zeichen bestellen. Wähle zwischen vier eleganten Schriftarten und drei Goldtönen."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "question": "Kann ich den Teppich waschen?",
+            "answer": "Ja – schonend bei 30 °C im Wäschesack. Die Goldstickerei bleibt dauerhaft erhalten."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "question": "Welche Bezahlmöglichkeiten gibt es?",
+            "answer": "Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna (3 zinsfreie Raten)."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "question": "Versendet ihr international?",
+            "answer": "Ja, wir liefern in die gesamte EU, in die Schweiz und nach UK. Versand ab 100 € kostenlos in DE."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

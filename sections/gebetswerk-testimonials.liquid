@@ -1,0 +1,158 @@
+<section class="gw-testimonials">
+  <div class="gw-testimonials__inner">
+
+    <div class="gw-testimonials__header">
+      <div>
+        <p class="gw-eyebrow">{{ section.settings.eyebrow }}</p>
+        <h2 class="gw-testimonials__title">{{ section.settings.heading | remove: '<p>' | remove: '</p>' }}</h2>
+      </div>
+      {%- if section.settings.link_label != blank -%}
+        <a href="{{ section.settings.link_url | default: '#' }}" class="gw-testimonials__link">
+          {{ section.settings.link_label }} →
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="gw-testimonials__grid">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'review' -%}
+          <article class="gw-review" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              <div class="gw-review__img">
+                <img
+                  src="{{ block.settings.image | image_url: width: 600 }}"
+                  alt="{{ block.settings.title | escape }}"
+                  loading="lazy"
+                >
+              </div>
+            {%- elsif block.settings.fallback_image != blank -%}
+              <div class="gw-review__img">
+                <img src="{{ block.settings.fallback_image | asset_url }}" alt="{{ block.settings.title | escape }}" loading="lazy">
+              </div>
+            {%- endif -%}
+            <div class="gw-review__body">
+              <div class="gw-review__stars">
+                {%- for i in (1..5) -%}
+                  <svg class="gw-review__star" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>
+                {%- endfor -%}
+              </div>
+              <h3 class="gw-review__title">{{ block.settings.title }}</h3>
+              <p class="gw-review__text">{{ block.settings.text }}</p>
+              <div class="gw-review__footer">
+                <span class="gw-review__name">{{ block.settings.name }}</span>
+                <span class="gw-review__verified">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                  Verifiziert
+                </span>
+              </div>
+            </div>
+          </article>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bewertungen",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Kundenbewertungen"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "<p>4,9 von 5 — <em>1.240 Bewertungen</em></p>"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link-Text",
+      "default": "Alle Bewertungen"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link-URL"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Bewertung",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        },
+        {
+          "type": "text",
+          "id": "fallback_image",
+          "label": "Fallback-Bild (Asset-Name)",
+          "info": "z.B. testimonial-1.jpg — wird verwendet wenn kein Bild hochgeladen"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titel",
+          "default": "Wunderschönes Geschenk"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Bewertungstext",
+          "default": "Beschreibung der Erfahrung des Kunden."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Kundenname"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bewertungen",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "fallback_image": "testimonial-1.jpg",
+            "title": "Geschenk für Mama",
+            "text": "Der Teppich ist atemberaubend schön – die Stickerei mit dem Namen meiner Mutter brachte sie zum Weinen. Ein Geschenk, das man nie vergisst.",
+            "name": "Selma K."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "fallback_image": "testimonial-2.jpg",
+            "title": "Sieht so unfassbar schön aus",
+            "text": "Hochwertige Verarbeitung, schneller Versand, edle Verpackung. Genau wie auf den Bildern.",
+            "name": "Yusuf A."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "fallback_image": "testimonial-3.jpg",
+            "title": "Großartige Qualität",
+            "text": "Sehr gut, wunderschöne Farbe und der Goldfaden ist wirklich Gold. Werde wieder bestellen!",
+            "name": "Nadina K."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

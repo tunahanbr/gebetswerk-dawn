@@ -1,0 +1,189 @@
+<section class="gw-feature">
+  <div class="gw-feature__inner">
+
+    <div class="gw-feature__intro">
+      <p class="gw-eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="gw-feature__heading">{{ section.settings.heading | remove: '<p>' | remove: '</p>' }}</h2>
+    </div>
+
+    <div class="gw-feature__grid">
+
+      {%- comment -%} Left column – features 1 & 2 {%- endcomment -%}
+      <div class="gw-feature__col gw-feature__col--left">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'feature' and forloop.index <= 2 -%}
+            <div class="gw-feature__item" {{ block.shopify_attributes }}>
+              <div class="gw-feature__icon">
+                {%- render 'gw-icon', name: block.settings.icon -%}
+              </div>
+              <h3 class="gw-feature__item-title">{{ block.settings.title }}</h3>
+              <p class="gw-feature__item-text">{{ block.settings.text }}</p>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Center image {%- endcomment -%}
+      <div class="gw-feature__image-wrap">
+        {%- if section.settings.image != blank -%}
+          <img
+            src="{{ section.settings.image | image_url: width: 900 }}"
+            alt="{{ section.settings.image.alt | escape }}"
+            loading="lazy"
+          >
+        {%- else -%}
+          <img src="{{ 'product-main.jpg' | asset_url }}" alt="Gebetsteppich" loading="lazy">
+        {%- endif -%}
+        <div class="gw-feature__image-badge">
+          <div class="gw-feature__badge-label">
+            <p class="gw-feature__badge-eyebrow">{{ section.settings.badge_eyebrow }}</p>
+            <p class="gw-feature__badge-name">{{ section.settings.badge_name }}</p>
+          </div>
+          {%- if section.settings.badge_price != blank -%}
+            <a href="{{ section.settings.badge_link | default: '/collections/all' }}" class="gw-feature__badge-price">
+              {{ section.settings.badge_price }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- comment -%} Right column – features 3 & 4 {%- endcomment -%}
+      <div class="gw-feature__col gw-feature__col--right">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'feature' and forloop.index > 2 -%}
+            <div class="gw-feature__item" {{ block.shopify_attributes }}>
+              <div class="gw-feature__icon">
+                {%- render 'gw-icon', name: block.settings.icon -%}
+              </div>
+              <h3 class="gw-feature__item-title">{{ block.settings.title }}</h3>
+              <p class="gw-feature__item-text">{{ block.settings.text }}</p>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Produkt-Features",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Gebetsteppich mit Namen & Farbe"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "<p>Ein Geschenk, das <em>Bedeutung</em> trägt.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Produktbild (Mitte)"
+    },
+    {
+      "type": "text",
+      "id": "badge_eyebrow",
+      "label": "Badge – Eyebrow",
+      "default": "Bestseller"
+    },
+    {
+      "type": "text",
+      "id": "badge_name",
+      "label": "Badge – Produktname",
+      "default": "Klassik · Creme"
+    },
+    {
+      "type": "text",
+      "id": "badge_price",
+      "label": "Badge – Preis",
+      "default": "ab €49,90"
+    },
+    {
+      "type": "url",
+      "id": "badge_link",
+      "label": "Badge – Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "sparkles", "label": "Funken" },
+            { "value": "feather",  "label": "Feder" },
+            { "value": "shield",   "label": "Schild" },
+            { "value": "gift",     "label": "Geschenk" },
+            { "value": "star",     "label": "Stern" },
+            { "value": "heart",    "label": "Herz" }
+          ],
+          "default": "sparkles"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titel",
+          "default": "Feature-Titel"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Beschreibung",
+          "default": "Beschreibung des Features."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produkt-Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "sparkles",
+            "title": "Echte Goldstickerei",
+            "text": "Feiner Metallfaden, von erfahrenen Stickern Stich für Stich gesetzt."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "feather",
+            "title": "Samtweicher Griff",
+            "text": "Hochwertiger Mikrofaser-Velours – knieschonend und langlebig."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Lebenslange Qualität",
+            "text": "Farbecht, formstabil und waschbar bei 30 °C – für Generationen."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "gift",
+            "title": "Geschenkfertig verpackt",
+            "text": "Edler Karton mit Goldschleife – ideal für besondere Momente."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
