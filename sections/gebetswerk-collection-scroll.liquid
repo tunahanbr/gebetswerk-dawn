@@ -1,0 +1,452 @@
+{%- liquid
+  assign col    = section.settings.collection
+  assign limit  = section.settings.products_to_show | default: 20
+  assign prefix = section.settings.name_prefix | default: 'Personalisierter Gebetsteppich'
+  assign suffix = section.settings.name_suffix | default: '· Geschenk'
+-%}
+
+<section class="gw-cscroll" id="shopify-section-featured_collection">
+
+  <div class="gw-cscroll__header">
+    <div class="gw-cscroll__header-inner">
+      {%- if section.settings.title != blank -%}
+        <h2 class="gw-cscroll__title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      <div class="gw-cscroll__controls">
+        <button class="gw-cscroll__arrow gw-cscroll__prev" id="gw-prev-{{ section.id }}" aria-label="Zurück" disabled>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 16l-6-6 6-6"/></svg>
+        </button>
+        <button class="gw-cscroll__arrow gw-cscroll__next" id="gw-next-{{ section.id }}" aria-label="Weiter">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4l6 6-6 6"/></svg>
+        </button>
+        {%- if section.settings.show_view_all and col != blank -%}
+          <a href="{{ col.url }}" class="gw-cscroll__viewall">
+            Alle ansehen
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <div class="gw-cscroll__track-wrap">
+    <div class="gw-cscroll__track">
+
+      {%- if col != blank -%}
+        {%- assign card_count = 0 -%}
+
+        {%- for product in col.products -%}
+          {%- if card_count >= limit -%}{%- break -%}{%- endif -%}
+
+          {%- comment -%} Find the colour option {%- endcomment -%}
+          {%- assign color_opt = nil -%}
+          {%- for opt in product.options_with_values -%}
+            {%- assign opt_lower = opt.name | downcase -%}
+            {%- if opt_lower == 'farbe' or opt_lower == 'color' or opt_lower == 'colour' or opt_lower == 'farben' -%}
+              {%- assign color_opt = opt -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- if color_opt != nil -%}
+            {%- comment -%} One card per colour value {%- endcomment -%}
+            {%- for color_val in color_opt.values -%}
+              {%- if card_count >= limit -%}{%- break -%}{%- endif -%}
+
+              {%- comment -%} Find first variant matching this colour {%- endcomment -%}
+              {%- assign card_variant = nil -%}
+              {%- for v in product.variants -%}
+                {%- if v.options contains color_val -%}
+                  {%- assign card_variant = v -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+
+              {%- if card_variant == nil -%}{%- continue -%}{%- endif -%}
+
+              {%- comment -%} Image: prefer variant image, fall back to product media {%- endcomment -%}
+              {%- if card_variant.featured_image -%}
+                {%- assign card_img = card_variant.featured_image -%}
+              {%- else -%}
+                {%- assign card_img = product.featured_media -%}
+              {%- endif -%}
+
+              {%- comment -%} Hover image: next product media {%- endcomment -%}
+              {%- assign hover_img = product.media[1] -%}
+
+              {%- assign card_url   = product.url | append: '?variant=' | append: card_variant.id -%}
+              {%- assign card_title = prefix | append: ' – ' | append: color_val | append: ' ' | append: suffix -%}
+              {%- assign card_price = card_variant.price -%}
+
+              <a
+                href="{{ card_url }}"
+                class="gw-cscroll__card"
+                aria-label="{{ card_title | escape }}"
+                title="{{ card_title | escape }}"
+              >
+                <div class="gw-cscroll__img-wrap">
+                  {%- if card_img -%}
+                    <img
+                      src="{{ card_img | image_url: width: 600 }}"
+                      alt="{{ card_title | escape }}"
+                      width="600"
+                      loading="lazy"
+                    >
+                    {%- if hover_img and hover_img != card_img -%}
+                      <img
+                        src="{{ hover_img | image_url: width: 600 }}"
+                        alt="{{ card_title | escape }}"
+                        width="600"
+                        loading="lazy"
+                        class="gw-cscroll__img-hover"
+                      >
+                    {%- endif -%}
+                  {%- else -%}
+                    {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-cscroll__placeholder' }}
+                  {%- endif -%}
+                </div>
+
+                <div class="gw-cscroll__info">
+                  <p class="gw-cscroll__color-label">{{ color_val }}</p>
+                  <p class="gw-cscroll__name">{{ card_title }}</p>
+                  <p class="gw-cscroll__price">{{ card_price | money }}</p>
+                </div>
+              </a>
+
+              {%- assign card_count = card_count | plus: 1 -%}
+            {%- endfor -%}
+
+          {%- else -%}
+            {%- comment -%} No colour option — show product as single card {%- endcomment -%}
+            <a href="{{ product.url }}" class="gw-cscroll__card" aria-label="{{ product.title | escape }}">
+              <div class="gw-cscroll__img-wrap">
+                {%- if product.featured_media -%}
+                  <img
+                    src="{{ product.featured_media | image_url: width: 600 }}"
+                    alt="{{ product.featured_media.alt | escape }}"
+                    width="600"
+                    loading="lazy"
+                  >
+                  {%- if product.media[1] -%}
+                    <img
+                      src="{{ product.media[1] | image_url: width: 600 }}"
+                      alt="{{ product.title | escape }}"
+                      width="600"
+                      loading="lazy"
+                      class="gw-cscroll__img-hover"
+                    >
+                  {%- endif -%}
+                {%- else -%}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-cscroll__placeholder' }}
+                {%- endif -%}
+              </div>
+              <div class="gw-cscroll__info">
+                <p class="gw-cscroll__name">{{ product.title }}</p>
+                <p class="gw-cscroll__price">
+                  {%- if product.price_varies -%}ab {% endif %}{{ product.price | money }}
+                </p>
+              </div>
+            </a>
+            {%- assign card_count = card_count | plus: 1 -%}
+          {%- endif -%}
+
+        {%- endfor -%}
+
+      {%- else -%}
+        {%- comment -%} Placeholder cards when no collection is set {%- endcomment -%}
+        {%- assign placeholder_colors = 'Weiß,Creme,Sand,Dunkelblau,Bordeaux,Schwarz' | split: ',' -%}
+        {%- for color_val in placeholder_colors -%}
+          <div class="gw-cscroll__card gw-cscroll__card--placeholder">
+            <div class="gw-cscroll__img-wrap">
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-cscroll__placeholder' }}
+            </div>
+            <div class="gw-cscroll__info">
+              <p class="gw-cscroll__color-label">{{ color_val }}</p>
+              <p class="gw-cscroll__name">{{ prefix }} – {{ color_val }} {{ suffix }}</p>
+              <p class="gw-cscroll__price">ab 49,90 €</p>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+
+    </div>
+  </div>
+
+</section>
+
+<style>
+/* ── Collection Colour-Scroll ─────────────────────────────────── */
+.gw-cscroll {
+  padding: 64px 0 0;
+}
+
+.gw-cscroll__header {
+  padding: 0 20px 28px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+@media (min-width: 750px) { .gw-cscroll__header { padding: 0 40px 32px; } }
+
+.gw-cscroll__header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.gw-cscroll__title {
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(24px, 3vw, 36px);
+  letter-spacing: -0.02em;
+  color: var(--gw-ink);
+  margin: 0;
+}
+
+.gw-cscroll__viewall {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gw-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.gw-cscroll__viewall:hover { opacity: 0.6; }
+.gw-cscroll__viewall svg { width: 14px; height: 14px; }
+
+/* ── Scrollable track ─────────────────────────────────────────── */
+/* Wrapper eingeengt auf ~85% — damit man sieht, dass es mehr gibt */
+.gw-cscroll__track-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 0 20px 36px;
+  cursor: grab;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+.gw-cscroll__track-wrap:active { cursor: grabbing; }
+@media (min-width: 750px) { .gw-cscroll__track-wrap { padding: 0 40px 44px; } }
+.gw-cscroll__track-wrap::-webkit-scrollbar { display: none; }
+
+.gw-cscroll__track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+}
+
+/* ── Card — Breite so, dass ~3.5 Karten sichtbar sind ────────── */
+.gw-cscroll__card {
+  /* Mobile: 2 sichtbar + halbe */
+  flex: 0 0 calc((100vw - 56px) / 2.4);
+  scroll-snap-align: start;
+  text-decoration: none;
+  color: var(--gw-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (min-width: 750px) {
+  /* Tablet: 3 sichtbar + halbe */
+  .gw-cscroll__card { flex: 0 0 calc((min(1320px, 100vw) - 96px) / 3.6); }
+}
+@media (min-width: 1200px) {
+  /* Desktop: 4 sichtbar + Anfang des 5. */
+  .gw-cscroll__card { flex: 0 0 calc((min(1320px, 100vw) - 96px) / 4.3); }
+}
+
+/* ── Image ────────────────────────────────────────────────────── */
+.gw-cscroll__img-wrap {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--gw-sand);
+  aspect-ratio: 3/4;
+  flex-shrink: 0;
+}
+.gw-cscroll__img-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.35s ease, transform 0.55s ease;
+}
+.gw-cscroll__img-hover {
+  opacity: 0;
+}
+.gw-cscroll__card:hover .gw-cscroll__img-wrap > img:not(.gw-cscroll__img-hover) { opacity: 0; transform: scale(1.04); }
+.gw-cscroll__card:hover .gw-cscroll__img-hover { opacity: 1; transform: scale(1.04); }
+
+.gw-cscroll__placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Info ─────────────────────────────────────────────────────── */
+.gw-cscroll__info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 2px;
+}
+
+/* Colour label — prominent, readable */
+.gw-cscroll__color-label {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gw-muted);
+  margin: 0;
+}
+
+/* SEO title — visually hidden but in DOM for crawlers */
+.gw-cscroll__name {
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  color: var(--gw-ink);
+  margin: 0;
+  line-height: 1.3;
+
+  /* One line on card, full text in DOM/title attr */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gw-cscroll__price {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--gw-muted);
+  margin: 0;
+  margin-top: 2px;
+}
+
+/* ── Arrow controls ───────────────────────────────────────── */
+.gw-cscroll__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Trennlinie zwischen Pfeilen und "Alle ansehen" */
+.gw-cscroll__viewall {
+  margin-left: 16px;
+  padding-left: 20px;
+  border-left: 1px solid var(--gw-border);
+}
+
+.gw-cscroll__arrow {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--gw-border);
+  background: var(--gw-ivory);
+  color: var(--gw-ink);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  padding: 0;
+  flex-shrink: 0;
+}
+.gw-cscroll__arrow:hover:not(:disabled) {
+  background: var(--gw-ink);
+  border-color: var(--gw-ink);
+  color: var(--gw-ivory);
+}
+.gw-cscroll__arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.gw-cscroll__arrow svg { width: 16px; height: 16px; }
+</style>
+
+<script>
+(function() {
+  var wrap  = document.querySelector('#shopify-section-featured_collection .gw-cscroll__track-wrap');
+  var prev  = document.getElementById('gw-prev-{{ section.id }}');
+  var next  = document.getElementById('gw-next-{{ section.id }}');
+  if (!wrap || !prev || !next) return;
+
+  var STEP = 260; // card width + gap
+
+  function update() {
+    prev.disabled = wrap.scrollLeft <= 1;
+    next.disabled = wrap.scrollLeft >= wrap.scrollWidth - wrap.clientWidth - 1;
+  }
+
+  prev.addEventListener('click', function() { wrap.scrollBy({ left: -STEP * 3, behavior: 'smooth' }); });
+  next.addEventListener('click', function() { wrap.scrollBy({ left:  STEP * 3, behavior: 'smooth' }); });
+  wrap.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Kollektion – Farbscroll",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Überschrift",
+      "default": "Unsere Gebetsteppiche"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Kollektion"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Max. Karten anzeigen",
+      "min": 4,
+      "max": 60,
+      "step": 2,
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "SEO-Kartentitel"
+    },
+    {
+      "type": "text",
+      "id": "name_prefix",
+      "label": "Präfix (vor Farbe)",
+      "default": "Personalisierter Gebetsteppich",
+      "info": "Wird zu: Personalisierter Gebetsteppich – Weiß · Geschenk"
+    },
+    {
+      "type": "text",
+      "id": "name_suffix",
+      "label": "Suffix (nach Farbe)",
+      "default": "· Geschenk für Mama & Baba"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "\"Alle ansehen\" anzeigen",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kollektion – Farbscroll"
+    }
+  ]
+}
+{% endschema %}

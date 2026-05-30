@@ -27,7 +27,7 @@
         "hero_heading": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
         "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt.",
         "button1_label": "Jetzt personalisieren",
-        "button1_url": "/collections/all",
+        "button1_url": "/products/gebetsteppich",
         "button2_label": "Kollektion ansehen",
         "button2_url": "#shopify-section-featured_collection",
         "show_card1": true,
@@ -42,36 +42,13 @@
       }
     },
     "featured_collection": {
-      "type": "featured-collection",
+      "type": "gebetswerk-collection-scroll",
       "settings": {
         "title": "Unsere Gebetsteppiche",
-        "heading_size": "h2",
         "collection": "all",
-        "products_to_show": 12,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "show_view_all": true,
-        "view_all_style": "link",
-        "swipe_on_mobile": true,
-        "image_ratio": "portrait",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "columns_mobile": "2",
-        "padding_top": 60,
-        "padding_bottom": 0
+        "products_to_show": 20,
+        "show_view_all": true
       }
-    },
-    "gebetswerk_trust": {
-      "type": "gebetswerk-trust",
-      "blocks": {
-        "trust-1": { "type": "item", "settings": { "icon": "truck",       "title": "Schneller Versand",       "text": "Kostenlos ab 100 € (DE)" } },
-        "trust-2": { "type": "item", "settings": { "icon": "credit-card", "title": "3× zinsfrei mit Klarna", "text": "Bequem in Raten zahlen" } },
-        "trust-3": { "type": "item", "settings": { "icon": "heart",       "title": "Persönlicher Service",   "text": "Auch telefonisch erreichbar" } },
-        "trust-4": { "type": "item", "settings": { "icon": "shield",      "title": "Zufriedenheitsgarantie", "text": "14 Tage Rückgaberecht*" } }
-      },
-      "block_order": ["trust-1", "trust-2", "trust-3", "trust-4"],
-      "settings": { "footnote": "*personalisierte Artikel sind ausgeschlossen" }
     },
     "gebetswerk_product_feature": {
       "type": "gebetswerk-product-feature",
@@ -151,7 +128,6 @@
   },
   "order": [
     "gebetswerk_hero",
-    "gebetswerk_trust",
     "featured_collection",
     "gebetswerk_product_feature",
     "gebetswerk_testimonials",

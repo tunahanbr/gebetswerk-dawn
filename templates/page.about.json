@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "gebetswerk_about": {
+      "type": "gebetswerk-about",
+      "blocks": {
+        "val-1": { "type": "value", "settings": { "icon": "sparkles", "title": "Echte Goldstickerei", "text": "Feiner Metallfaden, von erfahrenen Stickern Stich für Stich gesetzt." } },
+        "val-2": { "type": "value", "settings": { "icon": "shield",   "title": "Lebenslange Qualität", "text": "Farbecht, formstabil und waschbar bei 30 °C – für Generationen." } },
+        "val-3": { "type": "value", "settings": { "icon": "heart",    "title": "Mit Liebe gemacht",    "text": "Jedes Stück entsteht mit dem Bewusstsein, dass es ein besonderes Geschenk sein wird." } },
+        "val-4": { "type": "value", "settings": { "icon": "gift",     "title": "Geschenkfertig",       "text": "Edler Karton mit Goldschleife – bereit zum Verschenken." } }
+      },
+      "block_order": ["val-1", "val-2", "val-3", "val-4"],
+      "settings": {}
+    }
+  },
+  "order": ["gebetswerk_about"]
+}

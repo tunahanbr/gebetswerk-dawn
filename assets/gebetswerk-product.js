@@ -6,9 +6,10 @@
   'use strict';
 
   /* ── Data from Liquid ─────────────────────────────────────── */
-  const VARIANTS = window.GW_VARIANTS   || [];
-  const BEADS    = window.GW_BEADS      || [];
-  const PRICES   = window.GW_PRICES     || { name1: 1000, name2: 1500, giftwrap: 199 };
+  const VARIANTS       = window.GW_VARIANTS       || [];
+  const BEADS          = window.GW_BEADS          || [];
+  const PRICES         = window.GW_PRICES         || { name1: 1000, name2: 1500, giftwrap: 199 };
+  const ADDON_VARIANTS = window.GW_ADDON_VARIANTS || { name1: 0, name2: 0, giftwrap: 0 };
 
   /* ── State ────────────────────────────────────────────────── */
   const state = {
@@ -41,6 +42,7 @@
     if (state.personalize) {
       t += PRICES.name1;
       if (state.twoNames) t += PRICES.name2;
+      if (state.symbol !== 'none') t += PRICES.symbol || 0;
     }
     t += state.beadPrice;
     if (state.giftWrap) t += PRICES.giftwrap;
@@ -69,6 +71,36 @@
       });
     }
 
+    /* Add personalization surcharges as separate line items so cart total is correct */
+    if (state.personalize && ADDON_VARIANTS.name1) {
+      items.push({
+        id:       ADDON_VARIANTS.name1,
+        quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1 || '—' }
+      });
+      if (state.twoNames && ADDON_VARIANTS.name2) {
+        items.push({
+          id:       ADDON_VARIANTS.name2,
+          quantity: state.qty,
+          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2 || '—' }
+        });
+      }
+    }
+    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol) {
+      items.push({
+        id:       ADDON_VARIANTS.symbol,
+        quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId }
+      });
+    }
+    if (state.giftWrap && ADDON_VARIANTS.giftwrap) {
+      items.push({
+        id:       ADDON_VARIANTS.giftwrap,
+        quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId }
+      });
+    }
+
     try {
       const res = await fetch('/cart/add.js', {
         method: 'POST',
@@ -87,9 +119,12 @@
       document.dispatchEvent(new CustomEvent('cart:open',   { bubbles: true }));
       document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
 
-      /* Fallback: update cart bubble count manually */
-      const bubbles = document.querySelectorAll('.cart-count-bubble span, [data-cart-count]');
-      bubbles.forEach(b => { b.textContent = cartRes.item_count; });
+      /* Fallback: update cart bubble count — only real rug items, no add-ons */
+      const realCount = cartRes.items
+        .filter(i => i.product_title !== 'Aufpreise' && !(i.properties && '_Zugehöriger Teppich' in i.properties))
+        .reduce((sum, i) => sum + i.quantity, 0);
+      document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => { b.textContent = realCount; });
+      document.querySelectorAll('.cart-count-bubble').forEach(b => { b.hidden = realCount === 0; });
 
       /* If Dawn's notification didn't fire, show brief success state */
       const btn = $('gw-atc-btn');
@@ -108,10 +143,10 @@
     } catch (e) {
       console.error('Cart error:', e);
       alert('Netzwerkfehler. Bitte erneut versuchen.');
+    } finally {
+      state.loading = false;
+      setButtonLoading(false);
     }
-
-    state.loading = false;
-    setButtonLoading(false);
   }
 
   function setButtonLoading(loading) {
@@ -136,7 +171,7 @@
       if (state.symbol !== 'none') {
         const symLabels = { moon:'Halbmond', heart:'Herz', infinity:'Unendlichkeit' };
         props['Symbol'] = symLabels[state.symbol] || state.symbol;
-        const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts' };
+        const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts', between:'Zwischen den Namen' };
         props['Symbolposition'] = posLabels[state.symbolPos];
       }
     }
@@ -170,6 +205,8 @@
       if (state.qty > 1)   parts.push('× ' + state.qty);
       breakdown.textContent = parts.join(' · ');
     }
+
+    updateOrderSummary();
   }
 
   /* ── Live preview overlay ─────────────────────────────────── */
@@ -247,9 +284,9 @@
     const inv = parseInt(btn.dataset.variantInventory) || 0;
     const urgency = $('gw-urgency');
     if (!urgency) return;
-    const threshold = parseInt(urgency.closest('[data-threshold]')?.dataset.threshold || 10);
     if (inv > 0 && inv <= 10) {
-      urgency.querySelector('span:last-child') && (urgency.querySelector('span:last-child').textContent = 'Nur noch ' + inv + ' Stück verfügbar');
+      const textEl = document.getElementById('gw-urgency-text');
+      if (textEl) textEl.textContent = 'Nur noch ' + inv + ' Stück verfügbar';
       urgency.hidden = false;
     } else {
       urgency.hidden = inv > 10;
@@ -284,6 +321,33 @@
         .map(n => String(n).padStart(2,'0')).join(':');
     }
     tick(); setInterval(tick, 1000);
+  }
+
+  /* ── Order summary ────────────────────────────────────────── */
+  function updateOrderSummary() {
+    const summary = $('gw-order-summary');
+    const list    = $('gw-order-summary-list');
+    if (!summary || !list) return;
+
+    const lines = [];
+    const colorLabel = document.querySelector('[data-variant-id].is-active')?.dataset.colorName || '';
+    if (colorLabel) lines.push('Farbe: ' + colorLabel);
+    if (state.personalize && state.name1) {
+      lines.push('Name 1: ' + state.name1);
+      if (state.twoNames && state.name2) lines.push('Name 2: ' + state.name2);
+      lines.push('Schrift: ' + state.threadLabel);
+      if (state.symbol !== 'none') {
+        const symLabels = { moon:'Halbmond ☾', heart:'Herz ♥', infinity:'Unendlichkeit ∞' };
+        lines.push('Symbol: ' + (symLabels[state.symbol] || state.symbol));
+        const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts', between:'Zwischen den Namen' };
+        lines.push('Position: ' + (posLabels[state.symbolPos] || state.symbolPos));
+      }
+    }
+    if (state.beadIndex > 0) lines.push('Gebetskette: ' + state.beadLabel);
+    if (state.giftWrap) lines.push('Geschenkschleife inklusive');
+
+    summary.hidden = lines.length === 0;
+    list.innerHTML = lines.map(l => '<li>' + l + '</li>').join('');
   }
 
   /* ── Init ─────────────────────────────────────────────────── */
@@ -323,6 +387,14 @@
     twoTog?.addEventListener('change', e => {
       state.twoNames = e.target.checked;
       if (name2Sec) name2Sec.hidden = !state.twoNames;
+      const betweenBtn = $('gw-sympos-between');
+      if (betweenBtn) betweenBtn.hidden = true;
+      if (!state.twoNames && state.symbolPos === 'between') {
+        state.symbolPos = 'left';
+        document.querySelectorAll('[data-sympos]').forEach(b => b.classList.remove('is-active'));
+        const leftBtn = document.querySelector('[data-sympos="left"]');
+        if (leftBtn) leftBtn.classList.add('is-active');
+      }
       updatePrice(); updatePreview();
     });
     if (name2Sec) name2Sec.hidden = true;
@@ -331,6 +403,16 @@
     $('gw-name2-input')?.addEventListener('input', e => {
       state.name2 = e.target.value = e.target.value.slice(0, 11);
       const c = $('gw-name2-count'); if (c) c.textContent = state.name2.length + '/11';
+      const betweenBtn = $('gw-sympos-between');
+      if (betweenBtn) {
+        betweenBtn.hidden = !state.name2;
+        if (!state.name2 && state.symbolPos === 'between') {
+          state.symbolPos = 'left';
+          document.querySelectorAll('[data-sympos]').forEach(b => b.classList.remove('is-active'));
+          const leftBtn = document.querySelector('[data-sympos="left"]');
+          if (leftBtn) leftBtn.classList.add('is-active');
+        }
+      }
       updatePreview();
     });
 
@@ -354,7 +436,12 @@
         btn.classList.add('is-active');
         const posSection = $('gw-sympos-section');
         if (posSection) posSection.hidden = state.symbol === 'none';
-        updatePreview();
+        const priceTag = $('gw-symbol-price-tag');
+        if (priceTag) priceTag.hidden = state.symbol === 'none';
+        if (state.symbol === 'none' && state.symbolPos === 'between') {
+          state.symbolPos = 'left';
+        }
+        updatePrice(); updatePreview();
       });
     });
 
@@ -391,10 +478,14 @@
     /* Color variants */
     document.querySelectorAll('[data-variant-id]').forEach(btn => {
       btn.addEventListener('click', () => selectVariant(btn));
-      /* Show color name on hover */
       btn.addEventListener('mouseenter', () => {
         const label = $('gw-color-label');
         if (label) label.textContent = btn.dataset.colorName;
+      });
+      btn.addEventListener('mouseleave', () => {
+        const label = $('gw-color-label');
+        const active = document.querySelector('[data-variant-id].is-active');
+        if (label && active) label.textContent = active.dataset.colorName;
       });
     });
 
@@ -415,34 +506,6 @@
       if (c) c.textContent = giftMsgInput.value.length + '/200';
     });
 
-    /* Order summary — updates whenever state changes */
-    function updateOrderSummary() {
-      const summary = $('gw-order-summary');
-      const list    = $('gw-order-summary-list');
-      if (!summary || !list) return;
-
-      const lines = [];
-      const colorLabel = document.querySelector('[data-variant-id].is-active')?.dataset.colorName || '';
-      if (colorLabel) lines.push('Farbe: ' + colorLabel);
-      if (state.personalize && state.name1) {
-        lines.push('Name: ' + state.name1 + (state.twoNames && state.name2 ? ' & ' + state.name2 : ''));
-        lines.push('Schrift: ' + state.threadLabel);
-        if (state.symbol !== 'none') {
-          const symLabels = { moon:'Halbmond ☾', heart:'Herz ♥', infinity:'Unendlichkeit ∞' };
-          lines.push('Symbol: ' + (symLabels[state.symbol] || state.symbol));
-        }
-      }
-      if (state.beadIndex > 0) lines.push('Gebetskette: ' + state.beadLabel);
-      if (state.giftWrap) lines.push('Geschenkschleife inklusive');
-
-      summary.hidden = lines.length === 0;
-      list.innerHTML = lines.map(l => '<li>' + l + '</li>').join('');
-    }
-
-    /* Patch all state-changing functions to also update summary */
-    const origUpdatePrice = updatePrice;
-    function patchedUpdatePrice() { origUpdatePrice(); updateOrderSummary(); }
-
     /* Social proof live counter (subtle fluctuation) */
     const viewersEl = $('gw-viewers');
     if (viewersEl) {
@@ -457,12 +520,15 @@
 
     /* Init */
     if (VARIANTS[0]) {
-      const firstBtn = document.querySelector('[data-variant-id]');
-      if (firstBtn) selectVariant(firstBtn);
+      const urlVariantId = new URLSearchParams(window.location.search).get('variant');
+      let initBtn = urlVariantId
+        ? document.querySelector('[data-variant-id="' + urlVariantId + '"]')
+        : null;
+      if (!initBtn) initBtn = document.querySelector('[data-variant-id]');
+      if (initBtn) selectVariant(initBtn);
       else { state.variantPrice = VARIANTS[0].price; }
     }
     updatePrice();
-    updateOrderSummary();
     updateSymbols();
     updatePreview();
     initStickyAtc();
@@ -480,4 +546,7 @@
   } else {
     init();
   }
+
+  /* Re-init after Shopify Theme Editor / Hot Reload replaces the section HTML */
+  document.addEventListener('shopify:section:load', init);
 })();

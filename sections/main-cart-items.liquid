@@ -25,7 +25,12 @@
 
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
 
-<cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
+{%- assign gw_real_count = 0 -%}
+{%- for item in cart.items -%}
+  {%- unless item.product.title == 'Aufpreise' -%}{%- assign gw_real_count = gw_real_count | plus: 1 -%}{%- endunless -%}
+{%- endfor -%}
+
+<cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty or gw_real_count == 0 %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
     <div class="title-wrapper-with-link">
       <h1 class="title title--primary">{{ 'sections.cart.title' | t }}</h1>
@@ -51,7 +56,7 @@
     <form action="{{ routes.cart_url }}" class="cart__contents critical-hidden" method="post" id="cart">
       <div class="cart__items" id="main-cart-items" data-id="{{ section.id }}">
         <div class="js-contents">
-          {%- if cart != empty -%}
+          {%- if gw_real_count > 0 -%}
             <table class="cart-items">
               <caption class="visually-hidden">
                 {{ 'sections.cart.title' | t }}
@@ -78,7 +83,14 @@
               </thead>
 
               <tbody>
+                {%- comment -%} Find last non-Aufpreise item for fallback orphan display {%- endcomment -%}
+                {%- assign last_rug_index = 0 -%}
                 {%- for item in cart.items -%}
+                  {%- unless item.product.title == 'Aufpreise' -%}{%- assign last_rug_index = item.index -%}{%- endunless -%}
+                {%- endfor -%}
+
+                {%- for item in cart.items -%}
+                  {%- if item.product.title == 'Aufpreise' -%}{%- continue -%}{%- endif -%}
                   <tr
                     class="cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}"
                     id="CartItem-{{ item.index | plus: 1 }}"
@@ -131,41 +143,73 @@
                         </div>
                       {%- endif -%}
 
-                      {%- if item.product.has_only_default_variant == false
-                        or item.properties.size != 0
-                        or item.selling_plan_allocation != null
-                      -%}
-                        <dl>
-                          {%- if item.product.has_only_default_variant == false -%}
-                            {%- for option in item.options_with_values -%}
-                              <div class="product-option">
-                                <dt>{{ option.name }}:</dt>
-                                <dd>{{ option.value }}</dd>
-                              </div>
-                            {%- endfor -%}
-                          {%- endif -%}
+                      {%- comment -%} Addon-Summe vorab berechnen {%- endcomment -%}
+                      {%- assign item_vid = item.variant_id | append: '' -%}
+                      {%- assign gw_addon_total = 0 -%}
+                      {%- for addon in cart.items -%}
+                        {%- unless addon.product.title == 'Aufpreise' -%}{%- continue -%}{%- endunless -%}
+                        {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
+                        {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
+                          {%- assign gw_addon_total = gw_addon_total | plus: addon.final_price -%}
+                        {%- endif -%}
+                      {%- endfor -%}
 
-                          {%- for property in item.properties -%}
-                            {%- assign property_first_char = property.first | slice: 0 -%}
-                            {%- if property.last != blank and property_first_char != '_' -%}
-                              <div class="product-option">
-                                <dt>{{ property.first }}:</dt>
-                                <dd>
-                                  {%- if property.last contains '/uploads/' -%}
-                                    <a href="{{ property.last }}" class="link" target="_blank">
-                                      {{ property.last | split: '/' | last }}
-                                    </a>
-                                  {%- else -%}
-                                    {{ property.last }}
-                                  {%- endif -%}
-                                </dd>
-                              </div>
-                            {%- endif -%}
+                      {%- comment -%} Reihenfolge: Farbe → Schriftfarbe → Personalisierung → 2. Name → Symbol → Symbolposition → Geschenkschleife {%- endcomment -%}
+
+                      {%- if item.product.has_only_default_variant == false -%}
+                        <dl>
+                          {%- for option in item.options_with_values -%}
+                            <div class="product-option"><dt>{{ option.name }}:</dt><dd>{{ option.value }}</dd></div>
                           {%- endfor -%}
                         </dl>
+                      {%- endif -%}
 
+                      {%- if item.selling_plan_allocation != null -%}
                         <p class="product-option">{{ item.selling_plan_allocation.selling_plan.name }}</p>
                       {%- endif -%}
+
+                      {%- if item.properties['Schriftfarbe'] != blank -%}
+                        <p class="product-option">Schriftfarbe: {{ item.properties['Schriftfarbe'] }}</p>
+                      {%- endif -%}
+
+                      {%- for addon in cart.items -%}
+                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Name 1' -%}{%- continue -%}{%- endunless -%}
+                        {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
+                        {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
+                          {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
+                          <div class="gw-cart-addon-inline">1. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      {%- for addon in cart.items -%}
+                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == '2. Name' -%}{%- continue -%}{%- endunless -%}
+                        {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
+                        {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
+                          {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
+                          <div class="gw-cart-addon-inline">2. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      {%- for addon in cart.items -%}
+                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Symbol' -%}{%- continue -%}{%- endunless -%}
+                        {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
+                        {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
+                          {%- assign sym_type = item.properties['Symbol'] | default: '' -%}
+                          <div class="gw-cart-addon-inline">Symbol{%- if sym_type != '' -%} · {{ sym_type }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      {%- if item.properties['Symbolposition'] != blank -%}
+                        <p class="product-option">Symbolposition: {{ item.properties['Symbolposition'] }}</p>
+                      {%- endif -%}
+
+                      {%- for addon in cart.items -%}
+                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Geschenkverpackung' -%}{%- continue -%}{%- endunless -%}
+                        {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
+                        {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
+                          <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_price | money }}</span></div>
+                        {%- endif -%}
+                      {%- endfor -%}
 
                       <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                         {%- for discount in item.line_level_discount_allocations -%}
@@ -177,6 +221,7 @@
                       </ul>
                     </td>
 
+                    {%- assign gw_combined_price = item.final_line_price | plus: gw_addon_total -%}
                     <td class="cart-item__totals right medium-hide large-up-hide">
                       {%- render 'loading-spinner' -%}
                       <div class="cart-item__price-wrapper">
@@ -187,19 +232,19 @@
                             </dt>
                             <dd>
                               <s class="cart-item__old-price price price--end">
-                                {{ item.original_line_price | money }}
+                                {{ item.original_line_price | plus: gw_addon_total | money }}
                               </s>
                             </dd>
                             <dt class="visually-hidden">
                               {{ 'products.product.price.sale_price' | t }}
                             </dt>
                             <dd class="price price--end">
-                              {{ item.final_line_price | money }}
+                              {{ gw_combined_price | money }}
                             </dd>
                           </dl>
                         {%- else -%}
                           <span class="price price--end">
-                            {{ item.original_line_price | money }}
+                            {{ gw_combined_price | money }}
                           </span>
                         {%- endif -%}
 
@@ -436,6 +481,8 @@
                       </div>
                     </td>
                   </tr>
+
+
                 {%- endfor -%}
               </tbody>
             </table>
@@ -456,6 +503,16 @@
     </form>
   </div>
 </cart-items>
+
+<script>
+(function () {
+  if ({{ gw_real_count }} > 0) return;
+  if ({{ cart.item_count }} === 0) return;
+  fetch('/cart/clear.js', { method: 'POST' })
+    .then(function () { window.location.reload(); })
+    .catch(function () {});
+})();
+</script>
 
 {% schema %}
 {

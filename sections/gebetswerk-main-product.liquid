@@ -2,28 +2,46 @@
   assign current_variant = product.selected_or_first_available_variant
   assign inv = current_variant.inventory_quantity | default: 0
   assign inv_threshold = section.settings.inventory_threshold | default: 10
+  assign beads_product = all_products[section.settings.beads_product]
 -%}
+
+{%- assign raw_p1 = section.settings.price_name1 | plus: 0 -%}
+{%- assign raw_p2 = section.settings.price_name2 | plus: 0 -%}
+{%- assign raw_pg = section.settings.price_giftwrap | plus: 0 -%}
+
+{%- if raw_p1 < 100 -%}{%- assign price_name1 = raw_p1 | times: 100 -%}{%- else -%}{%- assign price_name1 = raw_p1 -%}{%- endif -%}
+{%- if raw_p2 < 100 -%}{%- assign price_name2 = raw_p2 | times: 100 -%}{%- else -%}{%- assign price_name2 = raw_p2 -%}{%- endif -%}
+{%- if raw_pg < 100 -%}{%- assign price_giftwrap = raw_pg | times: 100 -%}{%- else -%}{%- assign price_giftwrap = raw_pg -%}{%- endif -%}
 
 {%- comment -%} Pass all data to JS {%- endcomment -%}
 <script>
   window.GW_VARIANTS   = {{ product.variants | json }};
   window.GW_BASE_PRICE = {{ current_variant.price }};
 
-  {%- comment -%} Bead options from editor blocks {%- endcomment -%}
+  {%- comment -%} Bead options from selected product variants {%- endcomment -%}
   window.GW_BEADS = [
     { id: 'none', label: 'Keine', variantId: null, price: 0 }
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'bead_option' -%}
-        ,{ id: {{ forloop.index | json }}, label: {{ block.settings.name | json }}, variantId: {{ block.settings.variant_id }}, price: {{ block.settings.price_cents }} }
-      {%- endif -%}
-    {%- endfor -%}
+    {%- if beads_product != blank -%}
+      {%- for variant in beads_product.variants -%}
+        ,{ id: {{ forloop.index | json }}, label: {{ variant.title | json }}, variantId: {{ variant.id }}, price: {{ variant.price }} }
+      {%- endfor -%}
+    {%- endif -%}
   ];
 
-  {%- comment -%} Personalization pricing from settings {%- endcomment -%}
+  {%- comment -%} Personalization pricing — hardcoded in cents {%- endcomment -%}
   window.GW_PRICES = {
-    name1:    {{ section.settings.price_name1 }},
-    name2:    {{ section.settings.price_name2 }},
-    giftwrap: {{ section.settings.price_giftwrap }}
+    name1:    {{ section.settings.price_name1    | default: 1000 }},
+    name2:    {{ section.settings.price_name2    | default: 1500 }},
+    giftwrap: {{ section.settings.price_giftwrap | default: 199 }},
+    symbol:   {{ section.settings.price_symbol   | default: 400 }}
+  };
+
+  {%- comment -%} Add-on variant IDs — separate Shopify line items for correct cart total {%- endcomment -%}
+  window.GW_ADDON_VARIANTS = {
+    name1:    {{ section.settings.addon_name1_variant_id    | default: 0 }},
+    name2:    {{ section.settings.addon_name2_variant_id    | default: 0 }},
+    giftwrap: {{ section.settings.addon_giftwrap_variant_id | default: 0 }},
+    symbol:   {{ section.settings.addon_symbol_variant_id   | default: 0 }}
   };
 </script>
 
@@ -88,22 +106,6 @@
             width="1200" loading="eager" fetchpriority="high"
           >
 
-          {%- comment -%} Live name preview {%- endcomment -%}
-          <div id="gw-preview-overlay" class="gw-gallery__preview-overlay" hidden>
-            <div class="gw-gallery__preview-box">
-              <p class="gw-gallery__preview-label">Vorschau</p>
-              <div id="gw-sym-above" hidden></div>
-              <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                <span id="gw-sym-left" hidden style="font-size:22px;"></span>
-                <div>
-                  <p id="gw-preview-name1" class="gw-gallery__preview-name"></p>
-                  <p id="gw-preview-name2" class="gw-gallery__preview-name2" hidden></p>
-                </div>
-                <span id="gw-sym-right" hidden style="font-size:22px;"></span>
-              </div>
-              <div id="gw-sym-below" hidden></div>
-            </div>
-          </div>
         </div>
 
         <div class="gw-gallery__thumbs">
@@ -147,30 +149,22 @@
             <span class="gw-product__price-original">{{ current_variant.compare_at_price | money }}</span>
           {%- endif -%}
         </div>
-        <p id="gw-price-breakdown" class="gw-product__price-breakdown"></p>
 
         {%- comment -%} Real inventory from Shopify {%- endcomment -%}
         {%- if current_variant.available -%}
           {%- if inv > 0 and inv <= inv_threshold -%}
             <div class="gw-product__urgency" id="gw-urgency">
               <span class="gw-product__urgency-dot"></span>
-              Nur noch {{ inv }} Stück verfügbar
+              <span id="gw-urgency-text">Nur noch {{ inv }} Stück verfügbar</span>
             </div>
           {%- endif -%}
         {%- else -%}
           <div class="gw-product__urgency" id="gw-urgency" style="background:#fff1f1;color:#b91c1c;">
             <span class="gw-product__urgency-dot"></span>
-            Ausverkauft
+            <span id="gw-urgency-text">Ausverkauft</span>
           </div>
         {%- endif -%}
 
-        {%- comment -%} Social proof counter {%- endcomment -%}
-        {%- if section.settings.show_social_proof -%}
-          <div class="gw-social-proof">
-            <span class="gw-social-proof__dot"></span>
-            <span id="gw-viewers">{{ section.settings.social_proof_base }}</span> Personen sehen das gerade
-          </div>
-        {%- endif -%}
 
         <div class="gw-product__countdown">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -226,7 +220,7 @@
               <input type="checkbox" id="gw-personalize-toggle" checked>
               <div class="gw-personalize-toggle-text">
                 <p>Gebetsteppich personalisieren?</p>
-                <p>Mit gestickten Namen wird dein Geschenk einzigartig. (+{{ section.settings.price_name1 | divided_by: 100.0 | money_without_currency }}€)</p>
+                <p>Mit gestickten Namen wird dein Geschenk einzigartig. (+€10,00)</p>
               </div>
             </label>
 
@@ -242,7 +236,7 @@
 
               <div class="gw-option-toggle">
                 <label><input type="checkbox" id="gw-twonames-toggle"> Zweiten Namen hinzufügen</label>
-                <span class="gw-option-price">+ {{ section.settings.price_name2 | divided_by: 100.0 | money_without_currency }}€</span>
+                <span class="gw-option-price">+ €15,00</span>
               </div>
 
               <div id="gw-name2-section" class="gw-form-field" hidden>
@@ -261,14 +255,15 @@
                   <div class="gw-thread-grid">
                     {%- for block in thread_blocks -%}
                       <button type="button"
-                        class="gw-thread-btn{% if forloop.first %} is-active{% endif %}"
+                        class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}"
                         data-thread="{{ block.settings.id }}"
                         data-hex="{{ block.settings.hex }}"
                         data-label="{{ block.settings.name | escape }}"
+                        title="{{ block.settings.name }}"
+                        aria-label="{{ block.settings.name }}"
                         {{ block.shopify_attributes }}
                       >
-                        <span class="gw-thread-dot" style="background:{{ block.settings.hex }};"></span>
-                        {{ block.settings.name }}
+                        <span class="gw-thread-swatch__dot" style="background:{{ block.settings.hex }};"></span>
                       </button>
                     {%- endfor -%}
                   </div>
@@ -281,8 +276,8 @@
                     {%- assign default_threads = 'gold|Gold|#c9a24a,silver|Silber|#c8c8cc,white|Weiß|#f5f1e6,black|Schwarz|#1a1a1a' | split: ',' -%}
                     {%- for tc in default_threads -%}
                       {%- assign p = tc | split: '|' -%}
-                      <button type="button" class="gw-thread-btn{% if forloop.first %} is-active{% endif %}" data-thread="{{ p[0] }}" data-hex="{{ p[2] }}" data-label="{{ p[1] }}">
-                        <span class="gw-thread-dot" style="background:{{ p[2] }};"></span>{{ p[1] }}
+                      <button type="button" class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}" data-thread="{{ p[0] }}" data-hex="{{ p[2] }}" data-label="{{ p[1] }}" title="{{ p[1] }}" aria-label="{{ p[1] }}">
+                        <span class="gw-thread-swatch__dot" style="background:{{ p[2] }};"></span>
                       </button>
                     {%- endfor -%}
                   </div>
@@ -291,7 +286,10 @@
 
               {%- comment -%} Symbols {%- endcomment -%}
               <div class="gw-form-field">
-                <p class="gw-form-label">Symbol</p>
+                <div class="gw-option-toggle" style="margin-bottom:8px;">
+                  <p class="gw-form-label" style="margin-bottom:0;">Symbol</p>
+                  <span class="gw-option-price" id="gw-symbol-price-tag" hidden>+{{ section.settings.price_symbol | default: 400 | money_without_currency }}€</span>
+                </div>
                 <div class="gw-symbol-grid">
                   {%- assign symbols = 'none|Keins|—,moon|Halbmond|☾,heart|Herz|♥,infinity|Unendlich|∞' | split: ',' -%}
                   {%- for sym in symbols -%}
@@ -307,31 +305,40 @@
               <div id="gw-sympos-section" class="gw-form-field" hidden>
                 <p class="gw-form-label">Position des Symbols</p>
                 <div class="gw-sympos-grid">
-                  {%- assign positions = 'above|Über dem Namen|col,below|Unter dem Namen|col-rev,left|Links|row,right|Rechts|row-rev' | split: ',' -%}
-                  {%- for pos in positions -%}
-                    {%- assign pp = pos | split: '|' -%}
-                    <button type="button" class="gw-sympos-btn{% if forloop.first %} is-active{% endif %}" data-sympos="{{ pp[0] }}">
-                      <span>{{ pp[1] }}</span>
-                      <span class="gw-sympos-preview" data-dir="{{ pp[2] }}">
-                        <span style="color:var(--gw-gold);font-size:13px;">☾</span>
-                        <span style="font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--gw-gold);">Aa</span>
-                      </span>
-                    </button>
-                  {%- endfor -%}
+                  <button type="button" class="gw-sympos-btn is-active" data-sympos="left">
+                    <span>Links</span>
+                    <span class="gw-sympos-preview" data-dir="row">
+                      <span style="color:var(--gw-gold);font-size:13px;">☾</span>
+                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--gw-gold);">Aa</span>
+                    </span>
+                  </button>
+                  <button type="button" class="gw-sympos-btn" data-sympos="right">
+                    <span>Rechts</span>
+                    <span class="gw-sympos-preview" data-dir="row-rev">
+                      <span style="color:var(--gw-gold);font-size:13px;">☾</span>
+                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--gw-gold);">Aa</span>
+                    </span>
+                  </button>
+                  <button type="button" class="gw-sympos-btn" id="gw-sympos-between" data-sympos="between" hidden>
+                    <span>Zwischen den Namen</span>
+                    <span class="gw-sympos-preview" style="flex-direction:column;gap:2px;align-items:center;">
+                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:9px;color:var(--gw-gold);">Aa</span>
+                      <span style="color:var(--gw-gold);font-size:11px;">☾</span>
+                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:9px;color:var(--gw-gold);">Bb</span>
+                    </span>
+                  </button>
                 </div>
               </div>
 
             </div>
           </div>
 
-          {%- comment -%} ─ Beads from editor blocks ─ {%- endcomment -%}
-          {%- assign bead_blocks = section.blocks | where: 'type', 'bead_option' -%}
-          {%- if bead_blocks.size > 0 -%}
+          {%- comment -%} ─ Beads from product variants ─ {%- endcomment -%}
+          {%- if beads_product != blank -%}
             <div style="margin-bottom:20px;">
               <p class="gw-product__section-label">Gebetskette dazu? <span>Optional</span></p>
               <div class="gw-beads-grid">
 
-                {%- comment -%} "Keine" option {%- endcomment -%}
                 <button type="button" class="gw-bead-btn is-active" data-bead="0" data-bead-variant="">
                   <div class="gw-bead-btn__img"><div class="gw-bead-btn__none">Keine</div></div>
                   <div class="gw-bead-btn__info">
@@ -340,52 +347,30 @@
                   </div>
                 </button>
 
-                {%- for block in bead_blocks -%}
+                {%- for variant in beads_product.variants -%}
                   <button type="button"
                     class="gw-bead-btn"
                     data-bead="{{ forloop.index }}"
-                    data-bead-variant="{{ block.settings.variant_id }}"
-                    data-bead-price="{{ block.settings.price_cents }}"
-                    data-bead-label="{{ block.settings.name | escape }}"
-                    {{ block.shopify_attributes }}
+                    data-bead-variant="{{ variant.id }}"
+                    data-bead-price="{{ variant.price }}"
+                    data-bead-label="{{ variant.title | escape }}"
                   >
                     <div class="gw-bead-btn__img">
-                      {%- if block.settings.image != blank -%}
-                        <img src="{{ block.settings.image | image_url: width: 200 }}" alt="{{ block.settings.name | escape }}" loading="lazy">
-                      {%- elsif block.settings.fallback_image != blank -%}
-                        <img src="{{ block.settings.fallback_image | asset_url }}" alt="{{ block.settings.name | escape }}" loading="lazy">
+                      {%- if variant.featured_image -%}
+                        <img src="{{ variant.featured_image | image_url: width: 200 }}" alt="{{ variant.title | escape }}" loading="lazy">
+                      {%- elsif beads_product.featured_image -%}
+                        <img src="{{ beads_product.featured_image | image_url: width: 200 }}" alt="{{ variant.title | escape }}" loading="lazy">
                       {%- else -%}
                         <div class="gw-bead-btn__none">?</div>
                       {%- endif -%}
                     </div>
                     <div class="gw-bead-btn__info">
-                      <span class="gw-bead-btn__name">{{ block.settings.name }}</span>
-                      <span class="gw-bead-btn__price">+{{ block.settings.price_cents | divided_by: 100.0 | money_without_currency }}€</span>
+                      <span class="gw-bead-btn__name">{{ variant.title }}</span>
+                      <span class="gw-bead-btn__price">+{{ variant.price | money_without_currency }}€</span>
                     </div>
                   </button>
                 {%- endfor -%}
 
-              </div>
-            </div>
-          {%- endif -%}
-
-          {%- comment -%} ─ Gift message ─ {%- endcomment -%}
-          {%- if section.settings.show_gift_message -%}
-            <div class="gw-gift-message-wrap">
-              <label class="gw-option-toggle" style="margin-bottom:8px;">
-                <label><input type="checkbox" id="gw-giftmsg-toggle"> Persönliche Nachricht für den Empfänger</label>
-              </label>
-              <div id="gw-giftmsg-section" hidden>
-                <textarea
-                  id="gw-giftmsg-input"
-                  name="properties[Persönliche Nachricht]"
-                  class="gw-form-input"
-                  placeholder="z. B. Alles Gute zum Geburtstag, möge dein Gebet erhört werden."
-                  rows="3"
-                  maxlength="200"
-                  style="border-radius:10px;resize:vertical;padding:10px 14px;height:auto;"
-                ></textarea>
-                <span id="gw-giftmsg-count" style="font-size:11px;color:var(--gw-muted);display:block;text-align:right;margin-top:4px;">0/200</span>
               </div>
             </div>
           {%- endif -%}
@@ -397,7 +382,7 @@
               Mit Geschenkschleife verpacken
             </span>
             <span class="gw-giftwrap-right">
-              <span class="gw-giftwrap-price">+{{ section.settings.price_giftwrap | divided_by: 100.0 | money_without_currency }}€</span>
+              <span class="gw-giftwrap-price">+€1,99</span>
               <input type="checkbox" id="gw-giftwrap-toggle">
             </span>
           </label>
@@ -517,12 +502,6 @@
       "default": 12
     },
     {
-      "type": "checkbox",
-      "id": "show_gift_message",
-      "label": "Persönliche Nachricht-Feld anzeigen",
-      "default": true
-    },
-    {
       "type": "header",
       "content": "Produkt-Badge & Bewertung"
     },
@@ -582,6 +561,55 @@
       "info": "199 = €1,99"
     },
     {
+      "type": "number",
+      "id": "price_symbol",
+      "label": "Symbol – Preis (Cent)",
+      "default": 400,
+      "info": "400 = €4,00"
+    },
+    {
+      "type": "header",
+      "content": "Add-on Variant IDs (für korrekten Warenkorb-Preis)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Erstelle im Shopify Admin ein verstecktes Produkt 'Aufpreise' und trage die Variant IDs hier ein. So zeigt der Warenkorb den echten Gesamtpreis."
+    },
+    {
+      "type": "number",
+      "id": "addon_name1_variant_id",
+      "label": "Personalisierung Name 1 – Variant ID",
+      "info": "Variant ID des €10-Aufpreis-Produkts"
+    },
+    {
+      "type": "number",
+      "id": "addon_name2_variant_id",
+      "label": "2. Name – Variant ID",
+      "info": "Variant ID des €15-Aufpreis-Produkts"
+    },
+    {
+      "type": "number",
+      "id": "addon_giftwrap_variant_id",
+      "label": "Geschenkverpackung – Variant ID",
+      "info": "Variant ID des €1,99-Aufpreis-Produkts"
+    },
+    {
+      "type": "number",
+      "id": "addon_symbol_variant_id",
+      "label": "Symbol – Variant ID",
+      "info": "Variant ID des €4,00-Aufpreis-Produkts"
+    },
+    {
+      "type": "header",
+      "content": "Gebetsketten"
+    },
+    {
+      "type": "product",
+      "id": "beads_product",
+      "label": "Gebetsketten-Produkt",
+      "info": "Die Varianten dieses Produkts werden als Optionen angezeigt. Preis und Lagerbestand kommen direkt aus dem Produkt."
+    },
+    {
       "type": "header",
       "content": "Texte"
     },
@@ -599,42 +627,6 @@
     }
   ],
   "blocks": [
-    {
-      "type": "bead_option",
-      "name": "Gebetsketten-Option",
-      "limit": 8,
-      "settings": [
-        {
-          "type": "text",
-          "id": "name",
-          "label": "Name",
-          "default": "Lulu (Perlweiß)"
-        },
-        {
-          "type": "number",
-          "id": "variant_id",
-          "label": "Shopify Variant ID",
-          "info": "Produkt-Variante ID für Lagerbestand-Tracking. Findest du in Shopify Admin → Produkt URL."
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Bild"
-        },
-        {
-          "type": "text",
-          "id": "fallback_image",
-          "label": "Fallback Asset (z.B. beads-pearl.jpg)"
-        },
-        {
-          "type": "number",
-          "id": "price_cents",
-          "label": "Preis (Cent)",
-          "default": 1990,
-          "info": "1990 = €19,90"
-        }
-      ]
-    },
     {
       "type": "thread_color",
       "name": "Schriftfarbe",
@@ -667,11 +659,7 @@
       { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
       { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
       { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
-      { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
-      { "type": "bead_option",  "settings": { "name": "Lulu (Perlweiß)",    "fallback_image": "beads-pearl.jpg", "price_cents": 1990 } },
-      { "type": "bead_option",  "settings": { "name": "Layl (Onyx)",        "fallback_image": "beads-black.jpg", "price_cents": 1990 } },
-      { "type": "bead_option",  "settings": { "name": "Amber (Bernstein)",  "fallback_image": "beads-wood.jpg",  "price_cents": 2290 } },
-      { "type": "bead_option",  "settings": { "name": "Zaytun (Smaragd)",   "fallback_image": "beads-green.jpg", "price_cents": 2490 } }
+      { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } }
     ]
   }]
 }

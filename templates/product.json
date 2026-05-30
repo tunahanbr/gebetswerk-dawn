@@ -1,46 +1,153 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "gebetswerk-main-product",
+      "blocks": {
+        "bead-1": {
+          "type": "bead_option",
+          "settings": {
+            "name": "Perlen · Weiß",
+            "variant_id": 0,
+            "fallback_image": "bead-white.jpg",
+            "price_cents": 1490
+          }
+        },
+        "bead-2": {
+          "type": "bead_option",
+          "settings": {
+            "name": "Perlen · Schwarz",
+            "variant_id": 0,
+            "fallback_image": "bead-black.jpg",
+            "price_cents": 1490
+          }
+        },
+        "bead-3": {
+          "type": "bead_option",
+          "settings": {
+            "name": "Perlen · Gold",
+            "variant_id": 0,
+            "fallback_image": "bead-gold.jpg",
+            "price_cents": 1490
+          }
+        }
+      },
+      "block_order": [
+        "bead-1",
+        "bead-2",
+        "bead-3"
+      ],
       "settings": {
-        "review_count": "2.627 Bewertungen",
-        "stock_text": "Nur noch 7 Stück verfügbar",
+        "price_name1": 1000,
+        "price_name2": 1500,
+        "price_giftwrap": 199,
+        "addon_name1_variant_id": 53088151535952,
+        "addon_name2_variant_id": 53088151568720,
+        "addon_giftwrap_variant_id": 53088151601488,
+        "addon_symbol_variant_id": 53088243745104,
         "shipping_text": "Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.",
         "care_text": "Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln."
       }
     },
-    "gebetswerk_trust": {
-      "type": "gebetswerk-trust",
-      "blocks": {
-        "t1": { "type": "item", "settings": { "icon": "truck",       "title": "Schneller Versand",       "text": "Kostenlos ab 100 € (DE)" } },
-        "t2": { "type": "item", "settings": { "icon": "credit-card", "title": "3× zinsfrei mit Klarna", "text": "Bequem in Raten zahlen" } },
-        "t3": { "type": "item", "settings": { "icon": "heart",       "title": "Persönlicher Service",   "text": "Auch telefonisch erreichbar" } },
-        "t4": { "type": "item", "settings": { "icon": "shield",      "title": "Zufriedenheitsgarantie", "text": "14 Tage Rückgaberecht*" } }
-      },
-      "block_order": ["t1","t2","t3","t4"],
-      "settings": { "footnote": "*personalisierte Artikel sind ausgeschlossen" }
-    },
     "gebetswerk_testimonials": {
       "type": "gebetswerk-testimonials",
       "blocks": {
-        "r1": { "type": "review", "settings": { "fallback_image": "testimonial-1.jpg", "title": "Geschenk für Mama",          "text": "Der Teppich ist atemberaubend schön – die Stickerei mit dem Namen meiner Mutter brachte sie zum Weinen.", "name": "Selma K." } },
-        "r2": { "type": "review", "settings": { "fallback_image": "testimonial-2.jpg", "title": "Sieht so unfassbar schön aus","text": "Hochwertige Verarbeitung, schneller Versand, edle Verpackung. Genau wie auf den Bildern.", "name": "Yusuf A." } },
-        "r3": { "type": "review", "settings": { "fallback_image": "testimonial-3.jpg", "title": "Großartige Qualität",        "text": "Sehr gut, wunderschöne Farbe und der Goldfaden ist wirklich Gold. Werde wieder bestellen!", "name": "Nadina K." } }
+        "r1": {
+          "type": "review",
+          "settings": {
+            "fallback_image": "testimonial-1.jpg",
+            "title": "Geschenk für Mama",
+            "text": "Der Teppich ist atemberaubend schön – die Stickerei mit dem Namen meiner Mutter brachte sie zum Weinen.",
+            "name": "Selma K."
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "fallback_image": "testimonial-2.jpg",
+            "title": "Sieht so unfassbar schön aus",
+            "text": "Hochwertige Verarbeitung, schneller Versand, edle Verpackung. Genau wie auf den Bildern.",
+            "name": "Yusuf A."
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "fallback_image": "testimonial-3.jpg",
+            "title": "Großartige Qualität",
+            "text": "Sehr gut, wunderschöne Farbe und der Goldfaden ist wirklich Gold. Werde wieder bestellen!",
+            "name": "Nadina K."
+          }
+        }
       },
-      "block_order": ["r1","r2","r3"],
-      "settings": { "eyebrow": "Kundenbewertungen", "heading": "<p>4,9 von 5 — <em>1.240 Bewertungen</em></p>", "link_label": "" }
+      "block_order": [
+        "r1",
+        "r2",
+        "r3"
+      ],
+      "settings": {
+        "eyebrow": "Kundenbewertungen",
+        "heading": "<p>4,9 von 5 — <em>1.240 Bewertungen</em></p>",
+        "link_label": ""
+      }
     },
     "gebetswerk_faq": {
       "type": "gebetswerk-faq",
       "blocks": {
-        "f1": { "type": "item", "settings": { "question": "Wie lange dauert die Produktion?",         "answer": "Personalisierte Gebetsteppiche werden innerhalb von 2–3 Werktagen gefertigt und anschließend verschickt." } },
-        "f2": { "type": "item", "settings": { "question": "Welche Namen und Schriften kann ich wählen?","answer": "Du kannst lateinische sowie arabische Namen mit bis zu 11 Zeichen bestellen. Wähle zwischen vier Schriftarten und drei Goldtönen." } },
-        "f3": { "type": "item", "settings": { "question": "Kann ich den Teppich waschen?",            "answer": "Ja – schonend bei 30 °C im Wäschesack. Die Goldstickerei bleibt dauerhaft erhalten." } },
-        "f4": { "type": "item", "settings": { "question": "Welche Bezahlmöglichkeiten gibt es?",      "answer": "Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna (3 zinsfreie Raten)." } }
+        "f1": {
+          "type": "item",
+          "settings": {
+            "question": "Wie lange dauert die Produktion?",
+            "answer": "Personalisierte Gebetsteppiche werden innerhalb von 2–3 Werktagen gefertigt und anschließend verschickt."
+          }
+        },
+        "f2": {
+          "type": "item",
+          "settings": {
+            "question": "Welche Namen und Schriften kann ich wählen?",
+            "answer": "Du kannst lateinische sowie arabische Namen mit bis zu 11 Zeichen bestellen. Wähle zwischen vier Schriftarten und drei Goldtönen."
+          }
+        },
+        "f3": {
+          "type": "item",
+          "settings": {
+            "question": "Kann ich den Teppich waschen?",
+            "answer": "Ja – schonend bei 30 °C im Wäschesack. Die Goldstickerei bleibt dauerhaft erhalten."
+          }
+        },
+        "f4": {
+          "type": "item",
+          "settings": {
+            "question": "Welche Bezahlmöglichkeiten gibt es?",
+            "answer": "Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna (3 zinsfreie Raten)."
+          }
+        }
       },
-      "block_order": ["f1","f2","f3","f4"],
-      "settings": { "eyebrow": "Häufige Fragen", "heading": "<p>Alles, was du <em>wissen musst</em>.</p>", "subtext": "Du hast eine andere Frage? Schreib uns – wir antworten innerhalb von 24 Stunden.", "cta_label": "Kontakt aufnehmen" }
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "settings": {
+        "eyebrow": "Häufige Fragen",
+        "heading": "<p>Alles, was du <em>wissen musst</em>.</p>",
+        "subtext": "Du hast eine andere Frage? Schreib uns – wir antworten innerhalb von 24 Stunden.",
+        "cta_label": "Kontakt aufnehmen"
+      }
     }
   },
-  "order": ["main", "gebetswerk_trust", "gebetswerk_testimonials", "gebetswerk_faq"]
+  "order": [
+    "main",
+    "gebetswerk_testimonials",
+    "gebetswerk_faq"
+  ]
 }
