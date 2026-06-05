@@ -108,6 +108,7 @@
                 <div class="gw-cscroll__info">
                   <p class="gw-cscroll__color-label">{{ color_val }}</p>
                   <p class="gw-cscroll__name">{{ card_title }}</p>
+                  <div class="gw-cscroll__rating"><div class="jdgm-prev-badge" data-id="{{ product.id }}"></div></div>
                   <p class="gw-cscroll__price">{{ card_price | money }}</p>
                 </div>
               </a>
@@ -141,6 +142,7 @@
               </div>
               <div class="gw-cscroll__info">
                 <p class="gw-cscroll__name">{{ product.title }}</p>
+                <div class="gw-cscroll__rating"><div class="jdgm-prev-badge" data-id="{{ product.id }}"></div></div>
                 <p class="gw-cscroll__price">
                   {%- if product.price_varies -%}ab {% endif %}{{ product.price | money }}
                 </p>
@@ -324,6 +326,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.gw-cscroll__rating {
+  min-height: 16px;
+  margin-bottom: 1px;
+}
+.gw-cscroll__rating .jdgm-prev-badge:empty { display: none; }
 
 .gw-cscroll__price {
   font-family: 'Inter', system-ui, sans-serif;

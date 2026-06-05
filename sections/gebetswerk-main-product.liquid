@@ -15,8 +15,23 @@
 
 {%- comment -%} Pass all data to JS {%- endcomment -%}
 <script>
-  window.GW_VARIANTS   = {{ product.variants | json }};
-  window.GW_BASE_PRICE = {{ current_variant.price }};
+  window.GW_VARIANTS            = {{ product.variants | json }};
+  window.GW_BASE_PRICE          = {{ current_variant.price }};
+  window.GW_COUNTDOWN_HOUR      = {{ section.settings.countdown_cutoff_hour | default: 17 }};
+
+  {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
+  window.GW_SYMBOLS = [
+    {%- if symbol_blocks.size > 0 -%}
+      {%- for block in symbol_blocks -%}
+        { id: {{ block.settings.symbol_id | json }}, label: {{ block.settings.label | json }}, icon: {{ block.settings.icon | json }} }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    {%- else -%}
+      { id: 'none', label: 'Keins', icon: '—' },
+      { id: 'moon', label: 'Halbmond', icon: '☾' },
+      { id: 'heart', label: 'Herz', icon: '♥' },
+      { id: 'infinity', label: 'Unendlich', icon: '∞' }
+    {%- endif -%}
+  ];
 
   {%- comment -%} Bead options from selected product variants {%- endcomment -%}
   window.GW_BEADS = [
@@ -137,10 +152,14 @@
         <h1 class="gw-product__title">{{ product.title }}</h1>
 
         <div class="gw-product__rating">
-          <div class="gw-product__rating-stars">
-            {%- for i in (1..5) -%}<svg class="gw-product__rating-star" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
+          {%- comment -%} Judge.me star badge — overrides fallback once app is installed {%- endcomment -%}
+          <div class="jdgm-prev-badge gw-product__jdgm-badge" data-id="{{ product.id }}"></div>
+          <div class="gw-product__rating-fallback">
+            <div class="gw-product__rating-stars">
+              {%- for i in (1..5) -%}<svg class="gw-product__rating-star" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
+            </div>
+            <a href="#gw-reviews" class="gw-product__rating-count">{{ section.settings.review_display }}</a>
           </div>
-          <a href="#gw-reviews" class="gw-product__rating-count">{{ section.settings.review_display }}</a>
         </div>
 
         <div class="gw-product__price-row">
@@ -219,8 +238,8 @@
             <label class="gw-personalize-toggle">
               <input type="checkbox" id="gw-personalize-toggle" checked>
               <div class="gw-personalize-toggle-text">
-                <p>Gebetsteppich personalisieren?</p>
-                <p>Mit gestickten Namen wird dein Geschenk einzigartig. (+€10,00)</p>
+                <p>{{ section.settings.personalize_title | default: 'Gebetsteppich personalisieren?' }}</p>
+                <p>{{ section.settings.personalize_desc | default: 'Mit gestickten Namen wird dein Geschenk einzigartig.' }} (+{{ section.settings.price_name1 | default: 1000 | money_without_currency }}€)</p>
               </div>
             </label>
 
@@ -284,21 +303,33 @@
                 </div>
               {%- endif -%}
 
-              {%- comment -%} Symbols {%- endcomment -%}
+              {%- comment -%} Symbols — from blocks or fallback {%- endcomment -%}
+              {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
               <div class="gw-form-field">
                 <div class="gw-option-toggle" style="margin-bottom:8px;">
                   <p class="gw-form-label" style="margin-bottom:0;">Symbol</p>
                   <span class="gw-option-price" id="gw-symbol-price-tag" hidden>+{{ section.settings.price_symbol | default: 400 | money_without_currency }}€</span>
                 </div>
                 <div class="gw-symbol-grid">
-                  {%- assign symbols = 'none|Keins|—,moon|Halbmond|☾,heart|Herz|♥,infinity|Unendlich|∞' | split: ',' -%}
-                  {%- for sym in symbols -%}
-                    {%- assign sp = sym | split: '|' -%}
-                    <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}">
-                      <span class="gw-symbol-btn__icon" style="color:var(--gw-gold)">{{ sp[2] }}</span>
-                      <span class="gw-symbol-btn__label">{{ sp[1] }}</span>
-                    </button>
-                  {%- endfor -%}
+                  {%- if symbol_blocks.size > 0 -%}
+                    {%- for block in symbol_blocks -%}
+                      <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}"
+                        data-symbol="{{ block.settings.symbol_id }}"
+                        {{ block.shopify_attributes }}>
+                        <span class="gw-symbol-btn__icon" style="color:var(--gw-gold)">{{ block.settings.icon }}</span>
+                        <span class="gw-symbol-btn__label">{{ block.settings.label }}</span>
+                      </button>
+                    {%- endfor -%}
+                  {%- else -%}
+                    {%- assign fallback_symbols = 'none|Keins|—,moon|Halbmond|☾,heart|Herz|♥,infinity|Unendlich|∞' | split: ',' -%}
+                    {%- for sym in fallback_symbols -%}
+                      {%- assign sp = sym | split: '|' -%}
+                      <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}">
+                        <span class="gw-symbol-btn__icon" style="color:var(--gw-gold)">{{ sp[2] }}</span>
+                        <span class="gw-symbol-btn__label">{{ sp[1] }}</span>
+                      </button>
+                    {%- endfor -%}
+                  {%- endif -%}
                 </div>
               </div>
 
@@ -321,7 +352,7 @@
                   </button>
                   <button type="button" class="gw-sympos-btn" id="gw-sympos-between" data-sympos="between" hidden>
                     <span>Zwischen den Namen</span>
-                    <span class="gw-sympos-preview" style="flex-direction:column;gap:2px;align-items:center;">
+                    <span class="gw-sympos-preview" data-dir="row">
                       <span style="font-family:'Fraunces',serif;font-style:italic;font-size:9px;color:var(--gw-gold);">Aa</span>
                       <span style="color:var(--gw-gold);font-size:11px;">☾</span>
                       <span style="font-family:'Fraunces',serif;font-style:italic;font-size:9px;color:var(--gw-gold);">Bb</span>
@@ -333,59 +364,231 @@
             </div>
           </div>
 
-          {%- comment -%} ─ Beads from product variants ─ {%- endcomment -%}
-          {%- if beads_product != blank -%}
-            <div style="margin-bottom:20px;">
-              <p class="gw-product__section-label">Gebetskette dazu? <span>Optional</span></p>
-              <div class="gw-beads-grid">
+          {%- comment -%} ══ DYNAMISCHE ADD-ONS ══ {%- endcomment -%}
+          {%- assign rendered_choice_groups = '' -%}
+          {%- for block in section.blocks -%}
 
-                <button type="button" class="gw-bead-btn is-active" data-bead="0" data-bead-variant="">
-                  <div class="gw-bead-btn__img"><div class="gw-bead-btn__none">Keine</div></div>
-                  <div class="gw-bead-btn__info">
-                    <span class="gw-bead-btn__name">Keine</span>
-                    <span class="gw-bead-btn__price">—</span>
-                  </div>
-                </button>
-
-                {%- for variant in beads_product.variants -%}
-                  <button type="button"
-                    class="gw-bead-btn"
-                    data-bead="{{ forloop.index }}"
-                    data-bead-variant="{{ variant.id }}"
-                    data-bead-price="{{ variant.price }}"
-                    data-bead-label="{{ variant.title | escape }}"
-                  >
-                    <div class="gw-bead-btn__img">
-                      {%- if variant.featured_image -%}
-                        <img src="{{ variant.featured_image | image_url: width: 200 }}" alt="{{ variant.title | escape }}" loading="lazy">
-                      {%- elsif beads_product.featured_image -%}
-                        <img src="{{ beads_product.featured_image | image_url: width: 200 }}" alt="{{ variant.title | escape }}" loading="lazy">
-                      {%- else -%}
-                        <div class="gw-bead-btn__none">?</div>
-                      {%- endif -%}
-                    </div>
-                    <div class="gw-bead-btn__info">
-                      <span class="gw-bead-btn__name">{{ variant.title }}</span>
-                      <span class="gw-bead-btn__price">+{{ variant.price | money_without_currency }}€</span>
-                    </div>
-                  </button>
-                {%- endfor -%}
-
+            {%- comment -%} ── Textfeld ── {%- endcomment -%}
+            {%- if block.type == 'opt_text' -%}
+              <div class="gw-form-field" {{ block.shopify_attributes }}>
+                <label class="gw-form-label" for="addon-{{ block.id }}">
+                  {{ block.settings.label }}
+                  {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-option-price" style="margin-left:4px;font-size:12px;">(+{{ block.settings.surcharge_cents | money_without_currency }}€)</span>{%- endif -%}
+                  {%- if block.settings.required -%}<span style="color:var(--gw-gold)"> *</span>{%- endif -%}
+                </label>
+                <div class="gw-form-input-wrap">
+                  <input type="text" id="addon-{{ block.id }}" class="gw-form-input"
+                    placeholder="{{ block.settings.placeholder | escape }}"
+                    {%- if block.settings.max_chars > 0 %}maxlength="{{ block.settings.max_chars }}"{%- endif %}
+                    data-addon="text" data-block="{{ block.id }}"
+                    data-fkey="{{ block.settings.field_key | escape }}"
+                    data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
+                    data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
+                    autocomplete="off">
+                  {%- if block.settings.show_char_counter and block.settings.max_chars > 0 -%}
+                    <span class="gw-char-count" data-counter="{{ block.id }}">0/{{ block.settings.max_chars }}</span>
+                  {%- endif -%}
+                </div>
               </div>
-            </div>
-          {%- endif -%}
 
-          {%- comment -%} ─ Gift wrap ─ {%- endcomment -%}
-          <label class="gw-giftwrap-row">
-            <span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-              Mit Geschenkschleife verpacken
-            </span>
-            <span class="gw-giftwrap-right">
-              <span class="gw-giftwrap-price">+€1,99</span>
-              <input type="checkbox" id="gw-giftwrap-toggle">
-            </span>
-          </label>
+            {%- comment -%} ── Checkbox ── {%- endcomment -%}
+            {%- elsif block.type == 'opt_checkbox' -%}
+              <label class="gw-giftwrap-row" {{ block.shopify_attributes }}>
+                <span>
+                  {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
+                  {{ block.settings.label }}
+                  {%- if block.settings.description != blank -%}
+                    <span style="display:block;font-size:12px;color:var(--gw-muted);margin-top:2px;">{{ block.settings.description }}</span>
+                  {%- endif -%}
+                </span>
+                <span class="gw-giftwrap-right">
+                  {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-giftwrap-price">+{{ block.settings.surcharge_cents | money }}</span>{%- endif -%}
+                  <input type="checkbox" id="addon-{{ block.id }}"
+                    data-addon="checkbox" data-block="{{ block.id }}"
+                    data-fkey="{{ block.settings.field_key | escape }}"
+                    data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
+                    data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
+                    {% if block.settings.default_checked %}checked{% endif %}>
+                </span>
+              </label>
+
+            {%- comment -%} ── Auswahl-Gruppe ── {%- endcomment -%}
+            {%- elsif block.type == 'opt_choice' -%}
+              {%- assign gid = block.settings.group_id -%}
+              {%- unless rendered_choice_groups contains gid -%}
+                {%- assign rendered_choice_groups = rendered_choice_groups | append: gid | append: '§' -%}
+                {%- assign dt = block.settings.display_type | default: 'buttons' -%}
+                {%- assign glabel = block.settings.group_label | default: gid -%}
+                {%- assign fkey = block.settings.field_key | default: glabel -%}
+                <div class="gw-form-field" data-addon="choice-group" data-gid="{{ gid }}" data-fkey="{{ fkey | escape }}" {{ block.shopify_attributes }}>
+                  <p class="gw-form-label">{{ glabel }}</p>
+                  {%- if dt == 'dropdown' -%}
+                    <select class="gw-form-input" data-addon="choice-select" data-gid="{{ gid }}">
+                      {%- for inner in section.blocks -%}
+                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                          <option value="{{ inner.settings.choice_value | escape }}"
+                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
+                            {% if inner.settings.is_default %}selected{% endif %}>
+                            {{ inner.settings.choice_label }}{% if inner.settings.surcharge_cents > 0 %} (+{{ inner.settings.surcharge_cents | money_without_currency }}€){% endif %}
+                          </option>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </select>
+                  {%- elsif dt == 'swatches' -%}
+                    <div class="gw-thread-grid">
+                      {%- for inner in section.blocks -%}
+                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                          <button type="button"
+                            class="gw-thread-swatch{% if inner.settings.is_default %} is-active{% endif %}"
+                            data-addon="choice-btn" data-gid="{{ gid }}"
+                            data-val="{{ inner.settings.choice_value | escape }}"
+                            data-lbl="{{ inner.settings.choice_label | escape }}"
+                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
+                            title="{{ inner.settings.choice_label }}" aria-label="{{ inner.settings.choice_label }}"
+                            {{ inner.shopify_attributes }}>
+                            <span class="gw-thread-swatch__dot" style="background:{{ inner.settings.hex_color | default: '#ccc' }};"></span>
+                          </button>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  {%- elsif dt == 'images' -%}
+                    <div class="gw-beads-grid">
+                      {%- for inner in section.blocks -%}
+                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                          <button type="button"
+                            class="gw-bead-btn{% if inner.settings.is_default %} is-active{% endif %}"
+                            data-addon="choice-btn" data-gid="{{ gid }}"
+                            data-val="{{ inner.settings.choice_value | escape }}"
+                            data-lbl="{{ inner.settings.choice_label | escape }}"
+                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
+                            {{ inner.shopify_attributes }}>
+                            <div class="gw-bead-btn__img">
+                              {%- if inner.settings.choice_image != blank -%}
+                                <img src="{{ inner.settings.choice_image | image_url: width: 200 }}" alt="{{ inner.settings.choice_label | escape }}" loading="lazy">
+                              {%- elsif inner.settings.hex_color != blank -%}
+                                <div style="width:100%;height:100%;background:{{ inner.settings.hex_color }};border-radius:4px;"></div>
+                              {%- else -%}
+                                <div class="gw-bead-btn__none">{{ inner.settings.choice_label | slice: 0 }}</div>
+                              {%- endif -%}
+                            </div>
+                            <div class="gw-bead-btn__info">
+                              <span class="gw-bead-btn__name">{{ inner.settings.choice_label }}</span>
+                              <span class="gw-bead-btn__price">{% if inner.settings.surcharge_cents > 0 %}+{{ inner.settings.surcharge_cents | money_without_currency }}€{% else %}—{% endif %}</span>
+                            </div>
+                          </button>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  {%- else -%}
+                    <div class="gw-sympos-grid" style="flex-wrap:wrap;gap:8px;">
+                      {%- for inner in section.blocks -%}
+                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                          <button type="button"
+                            class="gw-sympos-btn{% if inner.settings.is_default %} is-active{% endif %}"
+                            data-addon="choice-btn" data-gid="{{ gid }}"
+                            data-val="{{ inner.settings.choice_value | escape }}"
+                            data-lbl="{{ inner.settings.choice_label | escape }}"
+                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
+                            {{ inner.shopify_attributes }}>
+                            {{ inner.settings.choice_label }}
+                            {%- if inner.settings.surcharge_cents > 0 -%}<span style="font-size:11px;opacity:0.7;"> +{{ inner.settings.surcharge_cents | money_without_currency }}€</span>{%- endif -%}
+                          </button>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endunless -%}
+
+            {%- comment -%} ── Produkt-Auswahl ── {%- endcomment -%}
+            {%- elsif block.type == 'opt_product' -%}
+              {%- assign linked_product = all_products[block.settings.product] -%}
+              {%- if linked_product != blank -%}
+                {%- assign opt_dt = block.settings.display_type | default: 'image_grid' -%}
+                <div class="gw-form-field" {{ block.shopify_attributes }}>
+                  <p class="gw-product__section-label">{{ block.settings.label }} <span>Optional</span></p>
+                  {%- if opt_dt == 'dropdown' -%}
+                    <select class="gw-form-input"
+                      data-addon="product-select" data-block="{{ block.id }}"
+                      data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
+                      data-separate="{{ block.settings.separate_line_item }}">
+                      {%- if block.settings.include_none -%}
+                        <option value="" data-price="0" data-variant="0">{{ block.settings.none_label | default: 'Keine' }}</option>
+                      {%- endif -%}
+                      {%- for v in linked_product.variants -%}
+                        <option value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
+                          {{ v.title }} (+{{ v.price | money_without_currency }}€)
+                        </option>
+                      {%- endfor -%}
+                    </select>
+                  {%- elsif opt_dt == 'list' -%}
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      {%- if block.settings.include_none -%}
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                          <input type="radio" name="opt-p-{{ block.id }}" value="" data-price="0" data-variant="0"
+                            data-addon="product-radio" data-block="{{ block.id }}"
+                            data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
+                            data-separate="{{ block.settings.separate_line_item }}" checked>
+                          {{ block.settings.none_label | default: 'Keine' }}
+                        </label>
+                      {%- endif -%}
+                      {%- for v in linked_product.variants -%}
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                          <input type="radio" name="opt-p-{{ block.id }}" value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}"
+                            data-addon="product-radio" data-block="{{ block.id }}"
+                            data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
+                            data-separate="{{ block.settings.separate_line_item }}">
+                          {{ v.title }} (+{{ v.price | money_without_currency }}€)
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  {%- else -%}
+                    <div class="gw-beads-grid">
+                      {%- if block.settings.include_none -%}
+                        <button type="button" class="gw-bead-btn is-active"
+                          data-addon="product-card" data-block="{{ block.id }}"
+                          data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
+                          data-separate="{{ block.settings.separate_line_item }}"
+                          data-val="" data-price="0" data-variant="0">
+                          <div class="gw-bead-btn__img"><div class="gw-bead-btn__none">{{ block.settings.none_label | default: 'Keine' | slice: 0 }}</div></div>
+                          <div class="gw-bead-btn__info">
+                            <span class="gw-bead-btn__name">{{ block.settings.none_label | default: 'Keine' }}</span>
+                            <span class="gw-bead-btn__price">—</span>
+                          </div>
+                        </button>
+                      {%- endif -%}
+                      {%- for v in linked_product.variants -%}
+                        <button type="button" class="gw-bead-btn"
+                          data-addon="product-card" data-block="{{ block.id }}"
+                          data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
+                          data-separate="{{ block.settings.separate_line_item }}"
+                          data-val="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
+                          <div class="gw-bead-btn__img">
+                            {%- if v.featured_image -%}
+                              <img src="{{ v.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy">
+                            {%- elsif linked_product.featured_image -%}
+                              <img src="{{ linked_product.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy">
+                            {%- else -%}
+                              <div class="gw-bead-btn__none">?</div>
+                            {%- endif -%}
+                          </div>
+                          <div class="gw-bead-btn__info">
+                            <span class="gw-bead-btn__name">{{ v.title }}</span>
+                            <span class="gw-bead-btn__price">+{{ v.price | money_without_currency }}€</span>
+                          </div>
+                        </button>
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+            {%- endif -%}
+          {%- endfor -%}
 
           {%- comment -%} ─ Order confirmation summary ─ {%- endcomment -%}
           <div id="gw-order-summary" class="gw-order-summary" hidden>
@@ -405,60 +608,84 @@
             </button>
           </div>
 
-          {%- comment -%} Dynamic checkout (Klarna, Shop Pay, PayPal…) {%- endcomment -%}
-          {{ form | payment_button }}
+          {%- comment -%} ─ Zweiten Teppich hinzufügen ─ {%- endcomment -%}
+          <button type="button" id="gw-reset-btn" class="gw-reset-btn" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+            Weiteren Teppich personalisieren
+          </button>
 
-          {%- comment -%} Trust badges {%- endcomment -%}
-          <div class="gw-trust-badges">
-            <div class="gw-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>SSL-gesichert</span>
+          {%- comment -%}
+            Kein payment_button — Dynamic Checkout (Klarna, Shop Pay usw.) würde die
+            Gebetskette und alle Add-ons überspringen, da er nicht durch unsere Cart API läuft.
+            Stattdessen: eigener "Jetzt kaufen"-Button → addToCart() → /checkout
+          {%- endcomment -%}
+          {%- if current_variant.available -%}
+            <button type="button" id="gw-buy-now-btn" class="gw-buy-now-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+              Jetzt kaufen
+            </button>
+          {%- endif -%}
+
+          {%- comment -%} Trust badges — from blocks {%- endcomment -%}
+          {%- assign trust_blocks = section.blocks | where: 'type', 'trust_badge' -%}
+          {%- if trust_blocks.size > 0 -%}
+            <div class="gw-trust-badges">
+              {%- for block in trust_blocks -%}
+                <div class="gw-trust-badge" {{ block.shopify_attributes }}>
+                  {%- case block.settings.icon -%}
+                    {%- when 'lock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    {%- when 'star' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    {%- when 'gift' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    {%- when 'check' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  {%- endcase -%}
+                  <span>{{ block.settings.label }}</span>
+                </div>
+              {%- endfor -%}
             </div>
-            <div class="gw-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              <span>14 Tage Rückgabe</span>
-            </div>
-            <div class="gw-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span>Handgefertigt</span>
-            </div>
-            <div class="gw-trust-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>3–5 Tage</span>
-            </div>
-          </div>
+          {%- endif -%}
 
         {%- endform -%}
 
         {%- comment -%} ─ Shipping info ─ {%- endcomment -%}
-        <div class="gw-product__shipping">
-          <div class="gw-product__shipping-row">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            <span><strong>3–5 Werktage</strong> Lieferzeit · kostenlos ab 100 €</span>
+        {%- if section.settings.shipping_row1 != blank or section.settings.shipping_row2 != blank -%}
+          <div class="gw-product__shipping">
+            {%- if section.settings.shipping_row1 != blank -%}
+              <div class="gw-product__shipping-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <span>{{ section.settings.shipping_row1 }}</span>
+              </div>
+            {%- endif -%}
+            {%- if section.settings.shipping_row2 != blank -%}
+              <div class="gw-product__shipping-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <span>{{ section.settings.shipping_row2 }}</span>
+              </div>
+            {%- endif -%}
           </div>
-          <div class="gw-product__shipping-row">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            <span>In edler Geschenkverpackung mit Goldschleife</span>
-          </div>
-        </div>
+        {%- endif -%}
 
-        {%- comment -%} ─ Accordions ─ {%- endcomment -%}
-        <div class="gw-product-accordion">
-          {%- if product.description != blank -%}
-            <details open>
-              <summary>Beschreibung & Material</summary>
-              <div class="gw-product-accordion__body">{{ product.description }}</div>
-            </details>
-          {%- endif -%}
-          <details>
-            <summary>Versand & Rückgabe</summary>
-            <p class="gw-product-accordion__body">{{ section.settings.shipping_text }}</p>
-          </details>
-          <details>
-            <summary>Pflege</summary>
-            <p class="gw-product-accordion__body">{{ section.settings.care_text }}</p>
-          </details>
-        </div>
+        {%- comment -%} ─ Accordions: Produktbeschreibung immer oben, dann Blocks ─ {%- endcomment -%}
+        {%- assign accordion_blocks = section.blocks | where: 'type', 'accordion' -%}
+        {%- if product.description != blank or accordion_blocks.size > 0 -%}
+          <div class="gw-product-accordion">
+            {%- if product.description != blank -%}
+              <details open>
+                <summary>Beschreibung & Material</summary>
+                <div class="gw-product-accordion__body">{{ product.description }}</div>
+              </details>
+            {%- endif -%}
+            {%- for block in accordion_blocks -%}
+              <details {{ block.shopify_attributes }}>
+                <summary>{{ block.settings.title }}</summary>
+                <div class="gw-product-accordion__body">{{ block.settings.content }}</div>
+              </details>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
 
       </aside>
     </div>
@@ -487,168 +714,341 @@
   "settings": [
     {
       "type": "header",
-      "content": "Conversion-Elemente"
+      "content": "✏️ Personalisierungsbox"
     },
     {
-      "type": "checkbox",
-      "id": "show_social_proof",
-      "label": "\"X Personen sehen das gerade\" anzeigen",
-      "default": true
+      "type": "text",
+      "id": "personalize_title",
+      "label": "Checkbox-Titel",
+      "default": "Gebetsteppich personalisieren?",
+      "info": "Große Schrift in der Personalisierungs-Checkbox"
     },
     {
-      "type": "number",
-      "id": "social_proof_base",
-      "label": "Basis-Zahl für Besucher-Counter",
-      "default": 12
+      "type": "text",
+      "id": "personalize_desc",
+      "label": "Beschreibungstext",
+      "default": "Mit gestickten Namen wird dein Geschenk einzigartig.",
+      "info": "Der Aufpreis (+€10,00) wird automatisch aus den Preisen unten berechnet"
     },
     {
       "type": "header",
-      "content": "Produkt-Badge & Bewertung"
+      "content": "⭐ Badge & Bewertung"
     },
     {
       "type": "text",
       "id": "badge_text",
-      "label": "Badge-Text",
-      "default": "Personalisiertes Set"
+      "label": "Badge-Text (über dem Produkttitel)",
+      "default": "Personalisiertes Set",
+      "info": "Kleines goldenes Label, z. B. 'Bestseller' oder 'Neu'"
     },
     {
       "type": "text",
       "id": "review_display",
       "label": "Bewertungstext",
       "default": "2.627 Bewertungen",
-      "info": "Wird als Link zu den Bewertungen angezeigt"
+      "info": "Wird neben den Sternen als klickbarer Link angezeigt"
     },
     {
       "type": "number",
       "id": "review_count_number",
-      "label": "Bewertungsanzahl (für SEO Schema)",
-      "default": 2627
+      "label": "Bewertungsanzahl (nur für Google-SEO)",
+      "default": 2627,
+      "info": "Muss mit dem Bewertungstext übereinstimmen"
     },
     {
       "type": "header",
-      "content": "Lagerbestand"
+      "content": "📦 Versand-Hinweise (unter dem Preis)"
+    },
+    {
+      "type": "text",
+      "id": "shipping_row1",
+      "label": "Versandzeile 1",
+      "default": "3–5 Werktage Lieferzeit · kostenlos ab 100 €",
+      "info": "Erscheint mit LKW-Icon. Leer lassen → wird ausgeblendet"
+    },
+    {
+      "type": "text",
+      "id": "shipping_row2",
+      "label": "Versandzeile 2",
+      "default": "In edler Geschenkverpackung mit Goldschleife",
+      "info": "Erscheint mit Paket-Icon. Leer lassen → wird ausgeblendet"
+    },
+    {
+      "type": "header",
+      "content": "⏰ Countdown-Timer"
+    },
+    {
+      "type": "number",
+      "id": "countdown_cutoff_hour",
+      "label": "Versand-Cutoff-Uhrzeit (Stunde, 24h)",
+      "default": 17,
+      "info": "Timer zählt bis zu dieser Uhrzeit herunter, z. B. 17 = 17:00 Uhr"
+    },
+    {
+      "type": "header",
+      "content": "📊 Lagerbestand-Warnung"
     },
     {
       "type": "number",
       "id": "inventory_threshold",
-      "label": "Lagerbestand-Warnung ab (Stück)",
+      "label": "Warnung anzeigen ab (Stück)",
       "default": 10,
-      "info": "Zeigt 'Nur noch X Stück' wenn Bestand darunter fällt"
+      "info": "Zeigt 'Nur noch X Stück verfügbar' wenn der Bestand darunter fällt"
     },
     {
       "type": "header",
-      "content": "Preise (in Cent)"
+      "content": "💰 Aufpreise für Personalisierung"
+    },
+    {
+      "type": "paragraph",
+      "content": "Preise in Cent eingeben: 1000 = €10,00 · 199 = €1,99"
     },
     {
       "type": "number",
       "id": "price_name1",
-      "label": "Name 1 – Preis (Cent)",
-      "default": 1000,
-      "info": "1000 = €10,00"
+      "label": "Aufpreis: 1. Name",
+      "default": 1000
     },
     {
       "type": "number",
       "id": "price_name2",
-      "label": "Name 2 – Preis (Cent)",
-      "default": 1500,
-      "info": "1500 = €15,00"
+      "label": "Aufpreis: 2. Name (zusätzlich)",
+      "default": 1500
     },
     {
       "type": "number",
       "id": "price_giftwrap",
-      "label": "Geschenkverpackung – Preis (Cent)",
-      "default": 199,
-      "info": "199 = €1,99"
+      "label": "Aufpreis: Geschenkverpackung",
+      "default": 199
     },
     {
       "type": "number",
       "id": "price_symbol",
-      "label": "Symbol – Preis (Cent)",
-      "default": 400,
-      "info": "400 = €4,00"
+      "label": "Aufpreis: Symbol",
+      "default": 400
     },
     {
       "type": "header",
-      "content": "Add-on Variant IDs (für korrekten Warenkorb-Preis)"
+      "content": "🔧 Technisch: Aufpreis-Variant IDs"
     },
     {
       "type": "paragraph",
-      "content": "Erstelle im Shopify Admin ein verstecktes Produkt 'Aufpreise' und trage die Variant IDs hier ein. So zeigt der Warenkorb den echten Gesamtpreis."
+      "content": "Für korrekten Warenkorb-Gesamtpreis: Im Shopify Admin ein verstecktes Produkt 'Aufpreise' erstellen. Die Variant ID jeder Option hier eintragen."
     },
     {
       "type": "number",
       "id": "addon_name1_variant_id",
-      "label": "Personalisierung Name 1 – Variant ID",
-      "info": "Variant ID des €10-Aufpreis-Produkts"
+      "label": "Variant ID → 1. Name (€10)",
+      "info": "Shopify Admin → Produkte → Aufpreise → Variante kopieren"
     },
     {
       "type": "number",
       "id": "addon_name2_variant_id",
-      "label": "2. Name – Variant ID",
-      "info": "Variant ID des €15-Aufpreis-Produkts"
+      "label": "Variant ID → 2. Name (€15)"
     },
     {
       "type": "number",
       "id": "addon_giftwrap_variant_id",
-      "label": "Geschenkverpackung – Variant ID",
-      "info": "Variant ID des €1,99-Aufpreis-Produkts"
+      "label": "Variant ID → Geschenkverpackung (€1,99)"
     },
     {
       "type": "number",
       "id": "addon_symbol_variant_id",
-      "label": "Symbol – Variant ID",
-      "info": "Variant ID des €4,00-Aufpreis-Produkts"
+      "label": "Variant ID → Symbol (€4,00)"
     },
     {
       "type": "header",
-      "content": "Gebetsketten"
+      "content": "📿 Gebetsketten"
     },
     {
       "type": "product",
       "id": "beads_product",
-      "label": "Gebetsketten-Produkt",
-      "info": "Die Varianten dieses Produkts werden als Optionen angezeigt. Preis und Lagerbestand kommen direkt aus dem Produkt."
-    },
-    {
-      "type": "header",
-      "content": "Texte"
-    },
-    {
-      "type": "textarea",
-      "id": "shipping_text",
-      "label": "Versand & Rückgabe",
-      "default": "Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands."
-    },
-    {
-      "type": "textarea",
-      "id": "care_text",
-      "label": "Pflegehinweis",
-      "default": "Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln."
+      "label": "Gebetsketten-Produkt auswählen",
+      "info": "Jede Variante dieses Produkts wird als wählbare Option angezeigt. Preis & Lagerbestand kommen automatisch aus Shopify."
     }
   ],
   "blocks": [
     {
       "type": "thread_color",
-      "name": "Schriftfarbe",
+      "name": "🎨 Schriftfarbe",
       "limit": 8,
       "settings": [
         {
           "type": "text",
           "id": "id",
-          "label": "ID (intern)",
-          "default": "gold"
+          "label": "ID (intern, keine Leerzeichen)",
+          "default": "gold",
+          "info": "Wird intern gespeichert, z. B. 'gold', 'silber', 'weiss'"
         },
         {
           "type": "text",
           "id": "name",
-          "label": "Name",
+          "label": "Anzeigename",
           "default": "Gold"
         },
         {
           "type": "text",
           "id": "hex",
-          "label": "Hex-Farbe",
-          "default": "#c9a24a"
+          "label": "Farbe als Hex-Code",
+          "default": "#c9a24a",
+          "info": "z. B. #c9a24a für Gold. Hex-Codes findest du auf htmlcolorcodes.com"
+        }
+      ]
+    },
+    {
+      "type": "trust_badge",
+      "name": "✅ Vertrauens-Badge",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "lock",   "label": "🔒 Schloss (Sicherheit)" },
+            { "value": "shield", "label": "🛡️ Schild (Garantie)" },
+            { "value": "heart",  "label": "❤️ Herz (Handarbeit)" },
+            { "value": "clock",  "label": "🕐 Uhr (Lieferzeit)" },
+            { "value": "truck",  "label": "🚚 LKW (Versand)" },
+            { "value": "star",   "label": "⭐ Stern (Bewertung)" },
+            { "value": "gift",   "label": "🎁 Geschenk (Verpackung)" },
+            { "value": "check",  "label": "✓ Haken (Bestätigung)" }
+          ],
+          "default": "check"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Text",
+          "default": "SSL-gesichert"
+        }
+      ]
+    },
+    {
+      "type": "opt_text",
+      "name": "📝 Textfeld",
+      "settings": [
+        { "type": "text",     "id": "label",         "label": "Bezeichnung",                    "default": "Zusatz-Name" },
+        { "type": "text",     "id": "field_key",      "label": "Schlüssel (erscheint in Bestellung)", "default": "Zusatz-Name", "info": "z.B. 'Gravur', 'Name 3', 'Wunschtext'" },
+        { "type": "text",     "id": "placeholder",    "label": "Platzhaltertext",                "default": "z.B. Amina" },
+        { "type": "number",   "id": "max_chars",      "label": "Max. Zeichen (0 = unbegrenzt)",  "default": 20 },
+        { "type": "checkbox", "id": "show_char_counter", "label": "Zeichenzähler anzeigen",      "default": true },
+        { "type": "checkbox", "id": "required",       "label": "Pflichtfeld",                    "default": false },
+        { "type": "number",   "id": "surcharge_cents","label": "Aufpreis in Cent (0 = kostenlos)","default": 0, "info": "Wird nur berechnet wenn das Feld ausgefüllt ist. 1000 = €10,00" },
+        { "type": "number",   "id": "addon_variant_id","label": "Aufpreis-Variant ID",            "default": 0, "info": "Optional: Shopify-Variant-ID für separaten Warenkorb-Artikel" }
+      ]
+    },
+    {
+      "type": "opt_checkbox",
+      "name": "☑️ Checkbox-Option",
+      "settings": [
+        { "type": "text",     "id": "label",         "label": "Beschriftung",                   "default": "Geschenkverpackung" },
+        { "type": "text",     "id": "icon",          "label": "Icon / Emoji (optional)",         "info": "Erscheint vor dem Text, z.B. 🎁" },
+        { "type": "text",     "id": "description",   "label": "Erklärungstext (optional)" },
+        { "type": "text",     "id": "field_key",     "label": "Schlüssel (Bestellung)",          "default": "Geschenkverpackung" },
+        { "type": "checkbox", "id": "default_checked","label": "Standard: aktiviert",            "default": false },
+        { "type": "number",   "id": "surcharge_cents","label": "Aufpreis in Cent",               "default": 199, "info": "199 = €1,99" },
+        { "type": "number",   "id": "addon_variant_id","label": "Aufpreis-Variant ID",           "default": 0, "info": "Shopify-Variant-ID des Aufpreis-Produkts (z.B. aus 'Aufpreise'-Produkt)" }
+      ]
+    },
+    {
+      "type": "opt_choice",
+      "name": "🔘 Auswahl-Option",
+      "settings": [
+        { "type": "header", "content": "Gruppe" },
+        { "type": "text",     "id": "group_id",      "label": "Gruppen-ID",                     "default": "gruppe1", "info": "Keine Leerzeichen. Gleiche ID = gehört zur selben Auswahl" },
+        { "type": "text",     "id": "group_label",   "label": "Gruppenname (Überschrift)",       "info": "Nur beim ersten Block der Gruppe nötig" },
+        { "type": "text",     "id": "field_key",     "label": "Schlüssel (Bestellung)",          "info": "Nur beim ersten Block nötig. z.B. 'Material', 'Größe'" },
+        { "type": "select",   "id": "display_type",  "label": "Darstellungsart",                 "info": "Nur beim ersten Block relevant",
+          "options": [
+            { "value": "buttons", "label": "Buttons" },
+            { "value": "images",  "label": "Bildkarten" },
+            { "value": "swatches","label": "Farbfelder" },
+            { "value": "dropdown","label": "Dropdown" }
+          ], "default": "buttons" },
+        { "type": "header", "content": "Diese einzelne Option" },
+        { "type": "text",       "id": "choice_label", "label": "Bezeichnung",                   "default": "Option 1" },
+        { "type": "text",       "id": "choice_value", "label": "Wert (in Bestellung gespeichert)","default": "option1" },
+        { "type": "image_picker","id": "choice_image","label": "Bild (für Bildkarten-Darstellung)" },
+        { "type": "text",       "id": "hex_color",    "label": "Farbe #Hex (für Farbfelder)",   "info": "z.B. #c9a24a für Gold" },
+        { "type": "checkbox",   "id": "is_default",   "label": "Standard-Auswahl",              "default": false },
+        { "type": "number",     "id": "surcharge_cents","label": "Aufpreis in Cent",             "default": 0 },
+        { "type": "number",     "id": "addon_variant_id","label": "Aufpreis-Variant ID",         "default": 0 }
+      ]
+    },
+    {
+      "type": "opt_product",
+      "name": "🛍️ Produkt-Auswahl",
+      "settings": [
+        { "type": "text",     "id": "label",           "label": "Bezeichnung",                  "default": "Gebetskette dazu?" },
+        { "type": "text",     "id": "field_key",       "label": "Schlüssel (Bestellung)",       "default": "Gebetskette" },
+        { "type": "product",  "id": "product",         "label": "Shopify-Produkt auswählen",    "info": "Alle Varianten dieses Produkts werden als Optionen angezeigt" },
+        { "type": "select",   "id": "display_type",    "label": "Darstellungsart",
+          "options": [
+            { "value": "image_grid", "label": "Bildkarten (Raster)" },
+            { "value": "dropdown",   "label": "Dropdown" },
+            { "value": "list",       "label": "Radio-Liste" }
+          ], "default": "image_grid" },
+        { "type": "checkbox", "id": "include_none",    "label": "'Keine'-Option anzeigen",      "default": true },
+        { "type": "text",     "id": "none_label",      "label": "Text der 'Keine'-Option",      "default": "Keine" },
+        { "type": "checkbox", "id": "separate_line_item","label": "Als eigenen Warenkorb-Artikel buchen", "default": true, "info": "Empfohlen wenn das Produkt echten Lagerbestand hat (z.B. Gebetsketten)" }
+      ]
+    },
+    {
+      "type": "symbol",
+      "name": "☾ Symbol-Option",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Das erste Symbol gilt als 'Kein Symbol' (Standardauswahl). Empfohlen: als erstes einen 'Keins'-Eintrag anlegen."
+        },
+        {
+          "type": "select",
+          "id": "symbol_id",
+          "label": "Symbol-ID (technisch)",
+          "info": "Legt fest was in der Bestellung gespeichert wird. 'none' = kein Symbol, kein Aufpreis.",
+          "options": [
+            { "value": "none",     "label": "none – Kein Symbol (kostenlos)" },
+            { "value": "moon",     "label": "moon – Halbmond" },
+            { "value": "heart",    "label": "heart – Herz" },
+            { "value": "infinity", "label": "infinity – Unendlichkeit" },
+            { "value": "star",     "label": "star – Stern" },
+            { "value": "sun",      "label": "sun – Sonne" }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Anzeigename",
+          "default": "Keins",
+          "info": "Wird dem Kunden angezeigt und in der Bestellung gespeichert"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon / Zeichen",
+          "default": "—",
+          "info": "Emoji oder Unicode-Zeichen, z. B. ☾ ♥ ∞ ★ ☀"
+        }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "📋 Info-Klappbox",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Überschrift",
+          "default": "Versand & Rückgabe"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Inhalt",
+          "default": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht.</p>"
         }
       ]
     }
@@ -659,7 +1059,13 @@
       { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
       { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
       { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
-      { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } }
+      { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
+      { "type": "trust_badge", "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
+      { "type": "trust_badge", "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
+      { "type": "trust_badge", "settings": { "icon": "heart",  "label": "Handgefertigt" } },
+      { "type": "trust_badge", "settings": { "icon": "clock",  "label": "3–5 Tage" } },
+      { "type": "accordion", "settings": { "title": "Versand & Rückgabe", "content": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.</p>" } },
+      { "type": "accordion", "settings": { "title": "Pflege", "content": "<p>Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln.</p>" } }
     ]
   }]
 }

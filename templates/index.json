@@ -3,6 +3,18 @@
     "gebetswerk_hero": {
       "type": "gebetswerk-hero",
       "blocks": {
+        "card-1": {
+          "type": "bento_card",
+          "settings": { "card_eyebrow": "Handarbeit", "card_title": "Bestickt mit echtem Goldfaden", "card_style": "dark" }
+        },
+        "card-2": {
+          "type": "bento_card",
+          "settings": { "card_eyebrow": "Verpackung", "card_title": "Edler Geschenkkarton", "card_style": "light" }
+        },
+        "card-3": {
+          "type": "bento_card",
+          "settings": { "card_eyebrow": "Detail", "card_title": "Jede Linie individuell gestickt", "card_style": "dark" }
+        },
         "step-1": {
           "type": "step",
           "settings": { "step_title": "Design wählen", "step_desc": "Farbe, Stoff & Stickschrift bestimmen" }
@@ -16,29 +28,18 @@
           "settings": { "step_title": "Lieferung", "step_desc": "Versandfertig in 3–5 Tagen" }
         }
       },
-      "block_order": ["step-1", "step-2", "step-3"],
+      "block_order": ["card-1", "card-2", "card-3", "step-1", "step-2", "step-3"],
       "settings": {
         "eyebrow_text": "Manufaktur · Made in Europe",
         "rating_score": "4,9",
         "rating_count": "1.240 Bewertungen",
-        "proof_label": "+2.400 Familien",
-        "proof_sub": "vertrauen uns",
         "hero_sub": "Gebetsteppich für Baba & Anne",
         "hero_heading": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
         "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt.",
         "button1_label": "Jetzt personalisieren",
         "button1_url": "/products/gebetsteppich",
         "button2_label": "Kollektion ansehen",
-        "button2_url": "#shopify-section-featured_collection",
-        "show_card1": true,
-        "show_card2": true,
-        "show_card3": true,
-        "card1_eyebrow": "Handarbeit",
-        "card1_title": "Bestickt mit echtem Goldfaden",
-        "card2_eyebrow": "Verpackung",
-        "card2_title": "Edler Geschenkkarton",
-        "card3_eyebrow": "Detail",
-        "card3_title": "Jede Linie individuell gestickt"
+        "button2_url": "#shopify-section-featured_collection"
       }
     },
     "featured_collection": {

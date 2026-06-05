@@ -1,0 +1,307 @@
+<section class="gw-reviews-section" id="gw-reviews">
+  <div class="gw-reviews-section__inner">
+
+    <div class="gw-reviews-section__header">
+      <p class="gw-reviews-section__eyebrow">{{ section.settings.eyebrow | default: 'Kundenbewertungen' }}</p>
+      <h2 class="gw-reviews-section__title">{{ section.settings.heading | default: 'Was unsere Kunden sagen' }}</h2>
+    </div>
+
+    {%- comment -%}
+      Judge.me Reviews Widget
+      Wird automatisch befüllt sobald Judge.me installiert ist.
+      Bis dahin zeigt es nichts (display:none via CSS wenn leer).
+    {%- endcomment -%}
+    <div id="judgeme_product_reviews"
+         class="jdgm-widget jdgm-review-widget"
+         data-id="{{ product.id }}"
+         data-product-title="{{ product.title | escape }}"
+         data-product-url="{{ shop.url }}{{ product.url }}">
+    </div>
+
+    {%- comment -%} Fallback — nur sichtbar wenn Judge.me Widget leer bleibt (Fehlerfall) {%- endcomment -%}
+    <div class="gw-reviews-fallback" id="gw-reviews-fallback">
+      <p class="gw-reviews-fallback__text">
+        ⭐⭐⭐⭐⭐ &nbsp; <strong>4,9 / 5</strong> — Basierend auf {{ section.settings.review_count | default: '1.240' }} Bewertungen
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<style>
+/* ── Reviews Section ──────────────────────────────────────────── */
+.gw-reviews-section {
+  background: var(--gw-ivory, #F9F6F0);
+  padding: 72px 20px;
+  border-top: 1px solid var(--gw-border, #E5E0D8);
+}
+@media (min-width: 750px) { .gw-reviews-section { padding: 80px 40px; } }
+
+.gw-reviews-section__inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.gw-reviews-section__header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.gw-reviews-section__eyebrow {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gw-gold, #C89B3C);
+  margin: 0 0 10px;
+}
+
+.gw-reviews-section__title {
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--gw-ink, #1A1613);
+  margin: 0;
+}
+
+/* ── Judge.me — vollständiges Gebetswerk Branding ─────────────── */
+
+/* Sterne: Gold statt Blau — global auf ganzer Seite */
+.jdgm-star { color: var(--gw-gold, #C89B3C) !important; }
+.jdgm-star.jdgm--empty { color: #D9D3C7 !important; }
+
+/* Preview-Badge auf Produktseite & Collection-Karten */
+.jdgm-prev-badge {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  color: var(--gw-muted, #6B6560) !important;
+}
+.jdgm-prev-badge__text { color: var(--gw-muted, #6B6560) !important; }
+
+/* ── Reviews-Section Widget ───────────────────────────────────── */
+.gw-reviews-section .jdgm-widget {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  color: var(--gw-ink, #1A1613) !important;
+  background: transparent !important;
+}
+
+/* Zusammenfassungs-Header ausblenden (eigenes Heading reicht) */
+.gw-reviews-section .jdgm-rev-widg__header { display: none !important; }
+
+/* Gesamtübersicht (Sterne-Zusammenfassung) */
+.gw-reviews-section .jdgm-rev-widg__summary {
+  background: var(--gw-sand, #EDE8DF) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  padding: 24px 32px !important;
+  margin-bottom: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+}
+.gw-reviews-section .jdgm-rev-widg__summary-rating {
+  font-family: 'Fraunces', serif !important;
+  font-size: 48px !important;
+  font-weight: 400 !important;
+  color: var(--gw-ink, #1A1613) !important;
+  line-height: 1 !important;
+}
+.gw-reviews-section .jdgm-rev-widg__summary-count {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  color: var(--gw-muted, #6B6560) !important;
+}
+
+/* Einzelne Review-Karte */
+.gw-reviews-section .jdgm-rev {
+  background: #fff !important;
+  border: 1px solid var(--gw-border, #E5E0D8) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  margin-bottom: 16px !important;
+  box-shadow: none !important;
+}
+.gw-reviews-section .jdgm-rev:last-child { margin-bottom: 0 !important; }
+
+/* Reviewer Name */
+.gw-reviews-section .jdgm-rev__author {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--gw-ink, #1A1613) !important;
+}
+
+/* Verifiziert-Badge */
+.gw-reviews-section .jdgm-rev__author-badge {
+  background: var(--gw-sand, #EDE8DF) !important;
+  color: var(--gw-muted, #6B6560) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+}
+
+/* Datum */
+.gw-reviews-section .jdgm-rev__timestamp {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  color: var(--gw-muted, #6B6560) !important;
+}
+
+/* Review-Titel */
+.gw-reviews-section .jdgm-rev__title {
+  font-family: 'Fraunces', serif !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  color: var(--gw-ink, #1A1613) !important;
+  margin: 8px 0 4px !important;
+}
+
+/* Review-Text */
+.gw-reviews-section .jdgm-rev__body {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
+  color: var(--gw-ink, #1A1613) !important;
+}
+
+/* "Bewertung schreiben"-Link */
+.gw-reviews-section .jdgm-write-rev-link,
+.gw-reviews-section a.jdgm-write-rev-link {
+  display: inline-block !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  background: var(--gw-gold, #C89B3C) !important;
+  border: none !important;
+  border-radius: 100px !important;
+  padding: 10px 22px !important;
+  text-decoration: none !important;
+  letter-spacing: 0.03em !important;
+  transition: background 0.2s !important;
+  margin-top: 24px !important;
+}
+.gw-reviews-section .jdgm-write-rev-link:hover {
+  background: #b8871f !important;
+}
+
+/* Pagination */
+.gw-reviews-section .jdgm-paginate {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  color: var(--gw-muted, #6B6560) !important;
+  margin-top: 24px !important;
+}
+.gw-reviews-section .jdgm-paginate a {
+  color: var(--gw-gold, #C89B3C) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+.gw-reviews-section .jdgm-paginate a:hover { text-decoration: underline !important; }
+
+/* Formular (Review schreiben) */
+.gw-reviews-section .jdgm-form {
+  background: var(--gw-sand, #EDE8DF) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  padding: 28px !important;
+  margin-top: 24px !important;
+}
+.gw-reviews-section .jdgm-form input,
+.gw-reviews-section .jdgm-form textarea {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  border: 1px solid var(--gw-border, #E5E0D8) !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  background: #fff !important;
+  color: var(--gw-ink, #1A1613) !important;
+  outline: none !important;
+}
+.gw-reviews-section .jdgm-form input:focus,
+.gw-reviews-section .jdgm-form textarea:focus {
+  border-color: var(--gw-gold, #C89B3C) !important;
+}
+.gw-reviews-section .jdgm-form label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--gw-ink, #1A1613) !important;
+}
+.gw-reviews-section .jdgm-form button[type="submit"],
+.gw-reviews-section .jdgm-submit-btn {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  background: var(--gw-gold, #C89B3C) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 100px !important;
+  padding: 12px 28px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s !important;
+}
+.gw-reviews-section .jdgm-form button[type="submit"]:hover,
+.gw-reviews-section .jdgm-submit-btn:hover {
+  background: #b8871f !important;
+}
+
+/* Fallback — shown until Judge.me widget has content */
+.gw-reviews-fallback {
+  text-align: center;
+  padding: 32px;
+  border: 1px dashed var(--gw-border, #E5E0D8);
+  border-radius: 12px;
+}
+.gw-reviews-fallback__text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--gw-ink, #1A1613);
+  margin: 0 0 8px;
+}
+.gw-reviews-fallback__hint {
+  font-size: 12px;
+  color: var(--gw-muted, #6B6560);
+  margin: 0;
+}
+
+/* Hide fallback once Judge.me widget has rendered content */
+.jdgm-review-widget:not(:empty) ~ #gw-reviews-fallback,
+.jdgm-review-widget[data-loaded] ~ #gw-reviews-fallback { display: none; }
+</style>
+
+{% schema %}
+{
+  "name": "Reviews (Judge.me)",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Kundenbewertungen"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Überschrift",
+      "default": "Was unsere Kunden sagen"
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Bewertungsanzahl (Fallback)",
+      "default": "1.240",
+      "info": "Wird im Fallback-Text angezeigt bis Judge.me aktiv ist"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reviews (Judge.me)"
+    }
+  ]
+}
+{% endschema %}

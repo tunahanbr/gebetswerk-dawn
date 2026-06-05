@@ -53,77 +53,67 @@
       </div>
     </div>
 
-    {%- comment -%} Bento cards — only render visible cards {%- endcomment -%}
-    {%- assign visible_cards = 0 -%}
-    {%- if section.settings.show_card1 -%}{%- assign visible_cards = visible_cards | plus: 1 -%}{%- endif -%}
-    {%- if section.settings.show_card2 -%}{%- assign visible_cards = visible_cards | plus: 1 -%}{%- endif -%}
-    {%- if section.settings.show_card3 -%}{%- assign visible_cards = visible_cards | plus: 1 -%}{%- endif -%}
+    {%- comment -%} Bento cards — rendered from blocks, not clickable unless URL is set {%- endcomment -%}
+    {%- assign card_blocks = section.blocks | where: 'type', 'bento_card' -%}
+    {%- if card_blocks.size > 0 -%}
+      <div class="gw-hero__cards gw-hero__cards--{{ card_blocks.size | at_most: 3 }}">
+        {%- for block in card_blocks limit: 3 -%}
+          {%- assign card_style = block.settings.card_style -%}
+          {%- assign has_url = false -%}
+          {%- if block.settings.card_url != blank -%}{%- assign has_url = true -%}{%- endif -%}
 
-    {%- if visible_cards > 0 -%}
-      <div class="gw-hero__cards gw-hero__cards--{{ visible_cards }}">
+          {%- if has_url -%}
+            <a href="{{ block.settings.card_url }}" class="gw-card gw-card--{{ card_style }}{%- if forloop.first %} gw-card--wide{%- endif %}" {{ block.shopify_attributes }}>
+          {%- else -%}
+            <div class="gw-card gw-card--{{ card_style }}{%- if forloop.first %} gw-card--wide{%- endif %}" {{ block.shopify_attributes }}>
+          {%- endif -%}
 
-        {%- if section.settings.show_card1 -%}
-          <a href="{{ section.settings.card1_url | default: '#' }}" class="gw-card gw-card--wide gw-card--dark">
-            {%- if section.settings.card1_image != blank -%}
-              <img src="{{ section.settings.card1_image | image_url: width: 900 }}" alt="{{ section.settings.card1_title | escape }}" loading="lazy">
-            {%- else -%}
-              <img src="{{ 'hero-hand.jpg' | asset_url }}" alt="Handarbeit" loading="lazy">
+            {%- if block.settings.card_image != blank -%}
+              <img src="{{ block.settings.card_image | image_url: width: 900 }}" alt="{{ block.settings.card_title | escape }}" loading="lazy">
             {%- endif -%}
-            <div class="gw-card__gradient"></div>
+            {%- if card_style == 'dark' -%}<div class="gw-card__gradient"></div>{%- endif -%}
             <div class="gw-card__body">
-              <p class="gw-card__eyebrow">{{ section.settings.card1_eyebrow }}</p>
-              <p class="gw-card__title">{{ section.settings.card1_title }}</p>
+              {%- if block.settings.card_eyebrow != blank -%}
+                <p class="gw-card__eyebrow">{{ block.settings.card_eyebrow }}</p>
+              {%- endif -%}
+              {%- if block.settings.card_title != blank -%}
+                <p class="gw-card__title">{{ block.settings.card_title }}</p>
+              {%- endif -%}
             </div>
-          </a>
-        {%- endif -%}
 
-        {%- if section.settings.show_card2 -%}
-          <a href="{{ section.settings.card2_url | default: '#' }}" class="gw-card gw-card--light">
-            {%- if section.settings.card2_image != blank -%}
-              <img src="{{ section.settings.card2_image | image_url: width: 700 }}" alt="{{ section.settings.card2_title | escape }}" loading="lazy">
-            {%- else -%}
-              <img src="{{ 'hero-gift.jpg' | asset_url }}" alt="Geschenkverpackung" loading="lazy">
-            {%- endif -%}
-            <div class="gw-card__body">
-              <p class="gw-card__eyebrow">{{ section.settings.card2_eyebrow }}</p>
-              <p class="gw-card__title">{{ section.settings.card2_title }}</p>
-            </div>
-          </a>
-        {%- endif -%}
-
-        {%- if section.settings.show_card3 -%}
-          <a href="{{ section.settings.card3_url | default: '#' }}" class="gw-card gw-card--dark">
-            {%- if section.settings.card3_image != blank -%}
-              <img src="{{ section.settings.card3_image | image_url: width: 700 }}" alt="{{ section.settings.card3_title | escape }}" loading="lazy">
-            {%- else -%}
-              <img src="{{ 'hero-detail.jpg' | asset_url }}" alt="Detail" loading="lazy">
-            {%- endif -%}
-            <div class="gw-card__gradient"></div>
-            <div class="gw-card__body">
-              <p class="gw-card__eyebrow">{{ section.settings.card3_eyebrow }}</p>
-              <p class="gw-card__title">{{ section.settings.card3_title }}</p>
-            </div>
-          </a>
-        {%- endif -%}
-
+          {%- if has_url -%}</a>{%- else -%}</div>{%- endif -%}
+        {%- endfor -%}
       </div>
     {%- endif -%}
 
-    {%- comment -%} Steps strip {%- endcomment -%}
-    <div class="gw-steps">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'step' -%}
-          <div class="gw-step" {{ block.shopify_attributes }}>
-            <div class="gw-step__top">
-              <span class="gw-step__num">0{{ forloop.index }}</span>
-              <svg class="gw-step__arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
+    {%- comment -%} Steps strip — eigener Zähler, unabhängig von Bento-Karten {%- endcomment -%}
+    {%- assign step_count = 0 -%}
+    {%- assign has_steps = false -%}
+    {%- for block in section.blocks -%}{%- if block.type == 'step' -%}{%- assign has_steps = true -%}{%- endif -%}{%- endfor -%}
+    {%- if has_steps -%}
+      <div class="gw-steps">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'step' -%}
+            {%- assign step_count = step_count | plus: 1 -%}
+            {%- if block.settings.step_number != blank -%}
+              {%- assign display_num = block.settings.step_number -%}
+            {%- elsif step_count < 10 -%}
+              {%- assign display_num = step_count | prepend: '0' -%}
+            {%- else -%}
+              {%- assign display_num = step_count -%}
+            {%- endif -%}
+            <div class="gw-step" {{ block.shopify_attributes }}>
+              <div class="gw-step__top">
+                <span class="gw-step__num">{{ display_num }}</span>
+                <svg class="gw-step__arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
+              </div>
+              <p class="gw-step__title">{{ block.settings.step_title }}</p>
+              <p class="gw-step__desc">{{ block.settings.step_desc }}</p>
             </div>
-            <p class="gw-step__title">{{ block.settings.step_title }}</p>
-            <p class="gw-step__desc">{{ block.settings.step_desc }}</p>
-          </div>
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
 
   </div>
 </section>
@@ -135,13 +125,72 @@
   "settings": [
     {
       "type": "header",
-      "content": "Eyebrow & Bewertung"
+      "content": "🖼️ Hero-Bild & Text"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hintergrundbild",
+      "info": "Empfohlen: mind. 2000 px breit"
+    },
+    {
+      "type": "text",
+      "id": "hero_sub",
+      "label": "Kleiner Text über der Überschrift",
+      "default": "Gebetsteppich für Baba & Anne"
+    },
+    {
+      "type": "richtext",
+      "id": "hero_heading",
+      "label": "Haupt-Überschrift",
+      "default": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
+      "info": "Kursiv = goldene Schrift"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_desc",
+      "label": "Beschreibungstext",
+      "default": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt."
+    },
+    {
+      "type": "header",
+      "content": "🔘 Buttons"
+    },
+    {
+      "type": "text",
+      "id": "button1_label",
+      "label": "Button 1 – Beschriftung",
+      "default": "Jetzt personalisieren",
+      "info": "Leer lassen → Button wird ausgeblendet"
+    },
+    {
+      "type": "url",
+      "id": "button1_url",
+      "label": "Button 1 – Link"
+    },
+    {
+      "type": "text",
+      "id": "button2_label",
+      "label": "Button 2 – Beschriftung",
+      "default": "Kollektion ansehen",
+      "info": "Leer lassen → Button wird ausgeblendet"
+    },
+    {
+      "type": "text",
+      "id": "button2_url",
+      "label": "Button 2 – Link",
+      "default": "#shopify-section-featured_collection"
+    },
+    {
+      "type": "header",
+      "content": "⭐ Vertrauensleiste"
     },
     {
       "type": "text",
       "id": "eyebrow_text",
-      "label": "Eyebrow",
-      "default": "Manufaktur · Made in Europe"
+      "label": "Qualitäts-Label",
+      "default": "Manufaktur · Made in Europe",
+      "info": "Erscheint mit Haken-Icon links in der Vertrauensleiste"
     },
     {
       "type": "text",
@@ -152,158 +201,66 @@
     {
       "type": "text",
       "id": "rating_count",
-      "label": "Anzahl Bewertungen",
+      "label": "Bewertungsanzahl",
       "default": "1.240 Bewertungen"
-    },
-    {
-      "type": "header",
-      "content": "Haupt-Hero"
-    },
-    {
-      "type": "image_picker",
-      "id": "hero_image",
-      "label": "Hero-Bild"
-    },
-    {
-      "type": "text",
-      "id": "hero_sub",
-      "label": "Eyebrow im Hero",
-      "default": "Gebetsteppich für Baba & Anne"
-    },
-    {
-      "type": "richtext",
-      "id": "hero_heading",
-      "label": "Haupt-Überschrift",
-      "default": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
-      "info": "Verwende kursiv für goldene Wörter"
-    },
-    {
-      "type": "textarea",
-      "id": "hero_desc",
-      "label": "Beschreibungstext",
-      "default": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt."
-    },
-    {
-      "type": "text",
-      "id": "button1_label",
-      "label": "Button 1 – Text",
-      "default": "Jetzt personalisieren"
-    },
-    {
-      "type": "url",
-      "id": "button1_url",
-      "label": "Button 1 – Link"
-    },
-    {
-      "type": "text",
-      "id": "button2_label",
-      "label": "Button 2 – Text",
-      "default": "Kollektion ansehen"
-    },
-    {
-      "type": "text",
-      "id": "button2_url",
-      "label": "Button 2 – Link",
-      "default": "#shopify-section-featured_collection"
-    },
-    {
-      "type": "header",
-      "content": "Bento-Karten"
-    },
-    {
-      "type": "paragraph",
-      "content": "Jede Karte kann einzeln ein- oder ausgeblendet werden."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_card1",
-      "label": "Karte 1 anzeigen",
-      "default": true
-    },
-    {
-      "type": "image_picker",
-      "id": "card1_image",
-      "label": "Karte 1 – Bild"
-    },
-    {
-      "type": "text",
-      "id": "card1_eyebrow",
-      "label": "Karte 1 – Eyebrow",
-      "default": "Handarbeit"
-    },
-    {
-      "type": "text",
-      "id": "card1_title",
-      "label": "Karte 1 – Titel",
-      "default": "Bestickt mit echtem Goldfaden"
-    },
-    {
-      "type": "url",
-      "id": "card1_url",
-      "label": "Karte 1 – Link"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_card2",
-      "label": "Karte 2 anzeigen",
-      "default": true
-    },
-    {
-      "type": "image_picker",
-      "id": "card2_image",
-      "label": "Karte 2 – Bild"
-    },
-    {
-      "type": "text",
-      "id": "card2_eyebrow",
-      "label": "Karte 2 – Eyebrow",
-      "default": "Verpackung"
-    },
-    {
-      "type": "text",
-      "id": "card2_title",
-      "label": "Karte 2 – Titel",
-      "default": "Edler Geschenkkarton"
-    },
-    {
-      "type": "url",
-      "id": "card2_url",
-      "label": "Karte 2 – Link"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_card3",
-      "label": "Karte 3 anzeigen",
-      "default": true
-    },
-    {
-      "type": "image_picker",
-      "id": "card3_image",
-      "label": "Karte 3 – Bild"
-    },
-    {
-      "type": "text",
-      "id": "card3_eyebrow",
-      "label": "Karte 3 – Eyebrow",
-      "default": "Detail"
-    },
-    {
-      "type": "text",
-      "id": "card3_title",
-      "label": "Karte 3 – Titel",
-      "default": "Jede Linie individuell gestickt"
-    },
-    {
-      "type": "url",
-      "id": "card3_url",
-      "label": "Karte 3 – Link"
     }
   ],
   "blocks": [
     {
-      "type": "step",
-      "name": "Schritt",
+      "type": "bento_card",
+      "name": "📦 Bento-Karte",
+      "limit": 3,
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Die erste Karte wird automatisch breiter dargestellt. Maximal 3 Karten."
+        },
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Bild"
+        },
+        {
+          "type": "text",
+          "id": "card_eyebrow",
+          "label": "Kleiner Text (oben)",
+          "default": "Handarbeit",
+          "info": "Kurzes Label über dem Titel"
+        },
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Titel",
+          "default": "Bestickt mit echtem Goldfaden"
+        },
+        {
+          "type": "select",
+          "id": "card_style",
+          "label": "Farb-Stil",
+          "options": [
+            { "value": "dark", "label": "Dunkel (Gold-Text)" },
+            { "value": "light", "label": "Hell (dunkler Text)" }
+          ],
+          "default": "dark"
+        },
+        {
+          "type": "url",
+          "id": "card_url",
+          "label": "Link (optional)",
+          "info": "Leer lassen → Karte ist nicht anklickbar"
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "✅ Prozess-Schritt",
+      "settings": [
+        {
+          "type": "text",
+          "id": "step_number",
+          "label": "Schrittnummer",
+          "info": "Leer lassen → automatisch (01, 02, 03…). Eigene Zahl eingeben, z. B. '01' oder '1'"
+        },
         {
           "type": "text",
           "id": "step_title",
@@ -323,6 +280,18 @@
     {
       "name": "Hero – Gebetswerk",
       "blocks": [
+        {
+          "type": "bento_card",
+          "settings": { "card_eyebrow": "Handarbeit", "card_title": "Bestickt mit echtem Goldfaden", "card_style": "dark" }
+        },
+        {
+          "type": "bento_card",
+          "settings": { "card_eyebrow": "Verpackung", "card_title": "Edler Geschenkkarton", "card_style": "light" }
+        },
+        {
+          "type": "bento_card",
+          "settings": { "card_eyebrow": "Detail", "card_title": "Jede Linie individuell gestickt", "card_style": "dark" }
+        },
         {
           "type": "step",
           "settings": { "step_title": "Design wählen", "step_desc": "Farbe, Stoff & Stickschrift bestimmen" }

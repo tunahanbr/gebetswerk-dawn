@@ -12,49 +12,52 @@
     "main": {
       "type": "gebetswerk-main-product",
       "blocks": {
-        "bead-1": {
-          "type": "bead_option",
-          "settings": {
-            "name": "Perlen · Weiß",
-            "variant_id": 0,
-            "fallback_image": "bead-white.jpg",
-            "price_cents": 1490
-          }
-        },
-        "bead-2": {
-          "type": "bead_option",
-          "settings": {
-            "name": "Perlen · Schwarz",
-            "variant_id": 0,
-            "fallback_image": "bead-black.jpg",
-            "price_cents": 1490
-          }
-        },
-        "bead-3": {
-          "type": "bead_option",
-          "settings": {
-            "name": "Perlen · Gold",
-            "variant_id": 0,
-            "fallback_image": "bead-gold.jpg",
-            "price_cents": 1490
-          }
-        }
+        "thread-gold":   { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
+        "thread-silver": { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
+        "thread-white":  { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
+        "thread-black":  { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
+        "badge-lock":    { "type": "trust_badge",  "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
+        "badge-shield":  { "type": "trust_badge",  "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
+        "badge-heart":   { "type": "trust_badge",  "settings": { "icon": "heart",  "label": "Handgefertigt" } },
+        "badge-clock":   { "type": "trust_badge",  "settings": { "icon": "clock",  "label": "3–5 Tage" } },
+        "sym-none":      { "type": "symbol",       "settings": { "symbol_id": "none",     "label": "Keins",        "icon": "—"  } },
+        "sym-moon":      { "type": "symbol",       "settings": { "symbol_id": "moon",     "label": "Halbmond",     "icon": "☾"  } },
+        "sym-heart":     { "type": "symbol",       "settings": { "symbol_id": "heart",    "label": "Herz",         "icon": "♥"  } },
+        "sym-infinity":  { "type": "symbol",       "settings": { "symbol_id": "infinity", "label": "Unendlichkeit","icon": "∞"  } },
+        "addon-giftwrap": { "type": "opt_checkbox", "settings": { "label": "Mit Geschenkschleife verpacken", "icon": "🎁", "field_key": "Geschenkverpackung", "surcharge_cents": 199, "addon_variant_id": 53088151601488, "default_checked": false } },
+        "addon-beads":    { "type": "opt_product",  "settings": { "label": "Gebetskette dazu?", "field_key": "Gebetskette", "display_type": "image_grid", "include_none": true, "none_label": "Keine", "separate_line_item": true } },
+        "acc-shipping":  { "type": "accordion",    "settings": { "title": "Versand & Rückgabe", "content": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.</p>" } },
+        "acc-care":      { "type": "accordion",    "settings": { "title": "Pflege", "content": "<p>Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln.</p>" } }
       },
       "block_order": [
-        "bead-1",
-        "bead-2",
-        "bead-3"
+        "thread-gold", "thread-silver", "thread-white", "thread-black",
+        "badge-lock", "badge-shield", "badge-heart", "badge-clock",
+        "sym-none", "sym-moon", "sym-heart", "sym-infinity",
+        "addon-giftwrap", "addon-beads",
+        "acc-shipping", "acc-care"
       ],
       "settings": {
         "price_name1": 1000,
         "price_name2": 1500,
         "price_giftwrap": 199,
+        "price_symbol": 400,
         "addon_name1_variant_id": 53088151535952,
         "addon_name2_variant_id": 53088151568720,
         "addon_giftwrap_variant_id": 53088151601488,
         "addon_symbol_variant_id": 53088243745104,
-        "shipping_text": "Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.",
-        "care_text": "Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln."
+        "personalize_title": "Gebetsteppich personalisieren?",
+        "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
+        "shipping_row1": "3–5 Werktage Lieferzeit · kostenlos ab 100 €",
+        "shipping_row2": "In edler Geschenkverpackung mit Goldschleife",
+        "countdown_cutoff_hour": 17
+      }
+    },
+    "gebetswerk_reviews": {
+      "type": "gebetswerk-reviews",
+      "settings": {
+        "eyebrow": "Kundenbewertungen",
+        "heading": "Was unsere Kunden sagen",
+        "review_count": "1.240"
       }
     },
     "gebetswerk_testimonials": {
@@ -147,6 +150,7 @@
   },
   "order": [
     "main",
+    "gebetswerk_reviews",
     "gebetswerk_testimonials",
     "gebetswerk_faq"
   ]

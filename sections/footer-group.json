@@ -9,31 +9,32 @@
           "type": "nav_column",
           "settings": {
             "heading": "Shop",
-            "link_1_label": "Gebetsteppiche", "link_1_url": "/collections/all",
-            "link_2_label": "Sets",           "link_2_url": "/collections/all",
-            "link_3_label": "Gebetsketten",   "link_3_url": "/collections/all",
-            "link_4_label": "Geschenkkarten", "link_4_url": "/collections/all"
+            "link_1_label": "Alle Produkte",    "link_1_url": "/collections/all",
+            "link_2_label": "Gebetsteppiche",   "link_2_url": "/collections/all",
+            "link_3_label": "Gebetsketten",     "link_3_url": "/collections/all",
+            "link_4_label": "Personalisierung", "link_4_url": "/products/gebetsteppich"
           }
         },
         "nav-2": {
           "type": "nav_column",
           "settings": {
-            "heading": "Service",
-            "link_1_label": "Versand & Lieferung", "link_1_url": "/pages/versand",
-            "link_2_label": "Rückgabe",            "link_2_url": "/pages/rueckgabe",
-            "link_3_label": "FAQ",                 "link_3_url": "/pages/faq",
-            "link_4_label": "Kontakt",             "link_4_url": "/pages/contact"
+            "heading": "Hilfe",
+            "link_1_label": "Kontakt",              "link_1_url": "/pages/contact",
+            "link_2_label": "FAQ",                  "link_2_url": "/#shopify-section-gebetswerk_faq",
+            "link_3_label": "Versand & Lieferung",  "link_3_url": "/policies/shipping-policy",
+            "link_4_label": "Rückgabe & Widerruf",  "link_4_url": "/policies/refund-policy",
+            "link_5_label": "Über uns",             "link_5_url": "/pages/about"
           }
         },
         "nav-3": {
           "type": "nav_column",
           "settings": {
-            "heading": "Über",
-            "link_1_label": "Unsere Geschichte", "link_1_url": "/pages/about",
-            "link_2_label": "Manufaktur",        "link_2_url": "/pages/about",
-            "link_3_label": "Impressum",         "link_3_url": "/pages/impressum",
-            "link_4_label": "AGB",               "link_4_url": "/pages/agb",
-            "link_5_label": "Datenschutz",       "link_5_url": "/pages/datenschutz"
+            "heading": "Rechtliches",
+            "link_1_label": "Impressum",             "link_1_url": "/policies/legal-notice",
+            "link_2_label": "Datenschutzerklärung",  "link_2_url": "/policies/privacy-policy",
+            "link_3_label": "AGB",                   "link_3_url": "/policies/terms-of-service",
+            "link_4_label": "Widerrufsrecht",        "link_4_url": "/policies/refund-policy",
+            "link_5_label": "Cookie-Einstellungen",  "link_5_url": "#shopifyReshowConsentBanner"
           }
         }
       },
@@ -46,7 +47,9 @@
         "show_newsletter": true,
         "email_placeholder": "Deine E-Mail",
         "email_button": "Abonnieren",
-        "email_note": "10 % Willkommensrabatt für neue Abonnenten."
+        "email_note": "10 % Willkommensrabatt für neue Abonnenten.",
+        "instagram": "https://www.instagram.com/gebetswerk/",
+        "email": "gebetswerk@gmail.com"
       }
     }
   },

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bestellbestätigung {{ order.name }} – Gebetswerk</title>
+</head>
+<body style="margin:0;padding:0;background:#F9F6F0;font-family:'Helvetica Neue',Arial,sans-serif;">
+
+  <!-- Wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F9F6F0;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+        <!-- ── Header ── -->
+        <tr>
+          <td style="background:#1A1613;border-radius:16px 16px 0 0;padding:28px 40px;text-align:center;">
+            <p style="margin:0;font-size:24px;font-weight:700;letter-spacing:0.15em;color:#C89B3C;">GW</p>
+            <p style="margin:4px 0 0;font-size:11px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;color:#F9F6F0;opacity:0.7;">GEBETSWERK</p>
+          </td>
+        </tr>
+
+        <!-- ── Thank you banner ── -->
+        <tr>
+          <td style="background:#C89B3C;padding:20px 40px;text-align:center;">
+            <p style="margin:0;font-size:13px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#fff;">Bestellbestätigung {{ order.name }}</p>
+          </td>
+        </tr>
+
+        <!-- ── Main card ── -->
+        <tr>
+          <td style="background:#ffffff;padding:40px;border-radius:0 0 16px 16px;">
+
+            <!-- Greeting -->
+            <p style="margin:0 0 8px;font-size:26px;font-weight:300;color:#1A1613;line-height:1.2;">
+              Danke für deine Bestellung{% if billing_address.first_name != blank %}, {{ billing_address.first_name }}{% endif %}! ✨
+            </p>
+            <p style="margin:0 0 32px;font-size:15px;color:#6B6560;line-height:1.6;">
+              Wir haben deine Bestellung erhalten und beginnen bald mit der Fertigung. Du erhältst eine weitere E-Mail sobald dein Paket auf dem Weg ist.
+            </p>
+
+            <!-- Status box -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+              <tr>
+                <td style="background:#F9F6F0;border-radius:12px;padding:20px 24px;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="width:50%;padding-right:16px;border-right:1px solid #E5E0D8;">
+                        <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C89B3C;">Bestellnummer</p>
+                        <p style="margin:0;font-size:18px;font-weight:600;color:#1A1613;">{{ order.name }}</p>
+                      </td>
+                      <td style="padding-left:16px;">
+                        <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C89B3C;">Bestelldatum</p>
+                        <p style="margin:0;font-size:15px;color:#1A1613;">{{ order.created_at | date: "%d.%m.%Y" }}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+              <tr><td style="border-top:1px solid #E5E0D8;"></td></tr>
+            </table>
+
+            <!-- Order items heading -->
+            <p style="margin:0 0 16px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6B6560;">Bestellte Artikel</p>
+
+            <!-- Line items -->
+            {% for line_item in line_items %}
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr>
+                <td style="width:72px;vertical-align:top;padding-right:16px;">
+                  {% if line_item.image %}
+                  <img src="{{ line_item.image | img_url: '150x' }}" width="72" style="border-radius:8px;display:block;" alt="{{ line_item.title | escape }}">
+                  {% endif %}
+                </td>
+                <td style="vertical-align:top;">
+                  <p style="margin:0 0 2px;font-size:15px;font-weight:600;color:#1A1613;">{{ line_item.title }}</p>
+                  {% unless line_item.variant_title == 'Default Title' %}
+                  <p style="margin:0 0 4px;font-size:12px;color:#6B6560;">{{ line_item.variant_title }}</p>
+                  {% endunless %}
+                  {% for property in line_item.properties %}
+                    {% unless property.first == blank or property.first contains '_' or property.last == blank %}
+                    <p style="margin:0;font-size:12px;color:#6B6560;">
+                      <span style="color:#1A1613;font-weight:500;">{{ property.first }}:</span> {{ property.last }}
+                    </p>
+                    {% endunless %}
+                  {% endfor %}
+                  <p style="margin:6px 0 0;font-size:12px;color:#6B6560;">Menge: {{ line_item.quantity }}</p>
+                </td>
+                <td style="vertical-align:top;text-align:right;white-space:nowrap;">
+                  <p style="margin:0;font-size:15px;font-weight:600;color:#1A1613;">{{ line_item.final_line_price | money }}</p>
+                </td>
+              </tr>
+            </table>
+            {% endfor %}
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 16px;">
+              <tr><td style="border-top:1px solid #E5E0D8;"></td></tr>
+            </table>
+
+            <!-- Totals -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+              <tr>
+                <td style="font-size:14px;color:#6B6560;padding:4px 0;">Zwischensumme</td>
+                <td style="text-align:right;font-size:14px;color:#1A1613;padding:4px 0;">{{ subtotal_price | money }}</td>
+              </tr>
+              {% if delivery_method == 'shipping' %}
+              <tr>
+                <td style="font-size:14px;color:#6B6560;padding:4px 0;">Versand</td>
+                <td style="text-align:right;font-size:14px;color:#1A1613;padding:4px 0;">
+                  {% if shipping_price == 0 %}Kostenlos 🎉{% else %}{{ shipping_price | money }}{% endif %}
+                </td>
+              </tr>
+              {% endif %}
+              {% for tax_line in tax_lines %}
+              <tr>
+                <td style="font-size:13px;color:#6B6560;padding:4px 0;">MwSt. ({{ tax_line.title }} {{ tax_line.rate | times: 100 }}%)</td>
+                <td style="text-align:right;font-size:13px;color:#6B6560;padding:4px 0;">{{ tax_line.price | money }}</td>
+              </tr>
+              {% endfor %}
+              <tr>
+                <td style="font-size:18px;font-weight:700;color:#1A1613;padding:12px 0 4px;border-top:2px solid #1A1613;">Gesamt</td>
+                <td style="text-align:right;font-size:18px;font-weight:700;color:#1A1613;padding:12px 0 4px;border-top:2px solid #1A1613;">{{ total_price | money }}</td>
+              </tr>
+            </table>
+
+            <!-- Shipping address -->
+            {% if delivery_method == 'shipping' %}
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+              <tr>
+                <td style="width:50%;vertical-align:top;padding-right:16px;">
+                  <p style="margin:0 0 8px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C89B3C;">Lieferadresse</p>
+                  <p style="margin:0;font-size:14px;color:#1A1613;line-height:1.7;">
+                    {{ shipping_address.name }}<br>
+                    {{ shipping_address.street }}<br>
+                    {{ shipping_address.zip }} {{ shipping_address.city }}<br>
+                    {{ shipping_address.country }}
+                  </p>
+                </td>
+                <td style="width:50%;vertical-align:top;padding-left:16px;border-left:1px solid #E5E0D8;">
+                  <p style="margin:0 0 8px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#C89B3C;">Versandmethode</p>
+                  <p style="margin:0;font-size:14px;color:#1A1613;">{{ shipping_method.title }}</p>
+                  <p style="margin:8px 0 0;font-size:13px;color:#6B6560;">Lieferung in 3–5 Werktagen nach Produktion</p>
+                </td>
+              </tr>
+            </table>
+            {% endif %}
+
+            <!-- Promise box -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+              <tr>
+                <td style="background:#F9F6F0;border-radius:12px;padding:20px 24px;border-left:3px solid #C89B3C;">
+                  <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#1A1613;">🕌 Handgefertigt für dich</p>
+                  <p style="margin:0;font-size:13px;color:#6B6560;line-height:1.6;">
+                    Jedes Gebetswerk-Stück wird von Hand gefertigt und individuell bestickt. Wir legen größten Wert auf Qualität und freuen uns, dieses besondere Stück für dich herzustellen.
+                  </p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- CTA -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+              <tr>
+                <td align="center">
+                  <a href="{{ shop.url }}/account/orders/{{ order.id | encode_url_component }}" style="display:inline-block;padding:14px 32px;background:#1A1613;color:#F9F6F0;font-size:14px;font-weight:600;border-radius:40px;text-decoration:none;">
+                    Bestellung ansehen
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Contact -->
+            <p style="margin:0;font-size:13px;color:#6B6560;text-align:center;line-height:1.7;">
+              Fragen? Schreib uns: <a href="mailto:{{ shop.email }}" style="color:#C89B3C;text-decoration:none;">{{ shop.email }}</a>
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- ── Footer ── -->
+        <tr>
+          <td style="padding:28px 40px;text-align:center;">
+            <p style="margin:0 0 8px;font-size:12px;color:#6B6560;">
+              © {{ 'now' | date: "%Y" }} Gebetswerk · Mit Liebe gefertigt.
+            </p>
+            <p style="margin:0;font-size:12px;color:#6B6560;">
+              <a href="{{ shop.url }}/policies/privacy-policy" style="color:#6B6560;text-decoration:underline;">Datenschutz</a>
+              &nbsp;·&nbsp;
+              <a href="{{ shop.url }}/policies/terms-of-service" style="color:#6B6560;text-decoration:underline;">AGB</a>
+              &nbsp;·&nbsp;
+              <a href="{{ shop.url }}/policies/refund-policy" style="color:#6B6560;text-decoration:underline;">Widerruf</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+
+</body>
+</html>

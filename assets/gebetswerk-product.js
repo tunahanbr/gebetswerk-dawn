@@ -7,31 +7,59 @@
 
   /* ── Data from Liquid ─────────────────────────────────────── */
   const VARIANTS       = window.GW_VARIANTS       || [];
-  const BEADS          = window.GW_BEADS          || [];
   const PRICES         = window.GW_PRICES         || { name1: 1000, name2: 1500, giftwrap: 199 };
   const ADDON_VARIANTS = window.GW_ADDON_VARIANTS || { name1: 0, name2: 0, giftwrap: 0 };
+  const SYMBOLS        = window.GW_SYMBOLS        || [
+    { id: 'none', label: 'Keins', icon: '—' },
+    { id: 'moon', label: 'Halbmond', icon: '☾' },
+    { id: 'heart', label: 'Herz', icon: '♥' },
+    { id: 'infinity', label: 'Unendlich', icon: '∞' },
+  ];
+  const SYM_ICONS  = Object.fromEntries(SYMBOLS.map(s => [s.id, s.icon]));
+  const SYM_LABELS = Object.fromEntries(SYMBOLS.map(s => [s.id, s.label]));
 
   /* ── State ────────────────────────────────────────────────── */
   const state = {
-    variantId:   VARIANTS[0]?.id || null,
+    variantId:    VARIANTS[0]?.id || null,
     variantPrice: VARIANTS[0]?.price || 0,
-    qty:         1,
-    personalize: true,
-    twoNames:    false,
-    name1:       '',
-    name2:       '',
-    thread:      'gold',
-    threadHex:   '#c9a24a',
-    threadLabel: 'Gold',
-    symbol:      'none',
-    symbolPos:   'above',
-    beadIndex:   0,      // 0 = none
-    beadVariantId: null,
-    beadPrice:   0,
-    beadLabel:   'Keine',
-    giftWrap:    false,
-    loading:     false,
+    qty:          1,
+    personalize:  true,
+    twoNames:     false,
+    name1:        '',
+    name2:        '',
+    thread:       'gold',
+    threadHex:    '#c9a24a',
+    threadLabel:  'Gold',
+    symbol:       'none',
+    symbolPos:    'above',
+    loading:      false,
   };
+
+  /* ── Dynamic Addon State ──────────────────────────────────── */
+  // Key → { fieldKey, value, surchargeCents, variantId, separateLineItem }
+  const addonMap = new Map();
+
+  function addonTotalCents() {
+    let t = 0;
+    addonMap.forEach(a => { t += a.surchargeCents || 0; });
+    return t;
+  }
+
+  function addonCartProperties() {
+    const props = {};
+    addonMap.forEach(a => { if (a.fieldKey && a.value) props[a.fieldKey] = a.value; });
+    return props;
+  }
+
+  function addonCartItems() {
+    const items = [];
+    addonMap.forEach(a => {
+      if (a.variantId && a.value) {
+        items.push({ id: a.variantId, quantity: state.qty, properties: { '_ref': String(state.variantId) } });
+      }
+    });
+    return items;
+  }
 
   /* ── Helpers ──────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
@@ -44,8 +72,7 @@
       if (state.twoNames) t += PRICES.name2;
       if (state.symbol !== 'none') t += PRICES.symbol || 0;
     }
-    t += state.beadPrice;
-    if (state.giftWrap) t += PRICES.giftwrap;
+    t += addonTotalCents();
     return t * state.qty;
   }
 
@@ -55,51 +82,25 @@
     state.loading = true;
     setButtonLoading(true);
 
+    const props = Object.assign(buildProperties(), addonCartProperties());
+
     /* Build line items array */
-    const items = [{
-      id:         state.variantId,
-      quantity:   state.qty,
-      properties: buildProperties(),
-    }];
+    const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
 
-    /* Add bead as separate line item — real inventory deducted from bead product */
-    if (state.beadIndex > 0 && state.beadVariantId) {
-      items.push({
-        id:       state.beadVariantId,
-        quantity: state.qty,
-        properties: { '_Zugehöriger Teppich': document.title }
-      });
-    }
-
-    /* Add personalization surcharges as separate line items so cart total is correct */
+    /* Personalisierungs-Aufpreise als separate Artikel (korrekter Warenkorb-Preis) */
     if (state.personalize && ADDON_VARIANTS.name1) {
-      items.push({
-        id:       ADDON_VARIANTS.name1,
-        quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1 || '—' }
-      });
-      if (state.twoNames && ADDON_VARIANTS.name2) {
-        items.push({
-          id:       ADDON_VARIANTS.name2,
-          quantity: state.qty,
-          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2 || '—' }
-        });
-      }
+      items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1 || '—' } });
+      if (state.twoNames && ADDON_VARIANTS.name2)
+        items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
+          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2 || '—' } });
     }
-    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol) {
-      items.push({
-        id:       ADDON_VARIANTS.symbol,
-        quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId }
-      });
-    }
-    if (state.giftWrap && ADDON_VARIANTS.giftwrap) {
-      items.push({
-        id:       ADDON_VARIANTS.giftwrap,
-        quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId }
-      });
-    }
+    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
+      items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId } });
+
+    /* Dynamische Addon-Artikel (opt_product, opt_checkbox mit Variant-ID) */
+    addonCartItems().forEach(i => items.push(i));
 
     try {
       const res = await fetch('/cart/add.js', {
@@ -126,17 +127,19 @@
       document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => { b.textContent = realCount; });
       document.querySelectorAll('.cart-count-bubble').forEach(b => { b.hidden = realCount === 0; });
 
-      /* If Dawn's notification didn't fire, show brief success state */
+      /* Show success state and offer to configure another rug */
       const btn = $('gw-atc-btn');
+      const resetBtn = $('gw-reset-btn');
       if (btn) {
         btn.textContent = '✓ Im Warenkorb';
         btn.style.background = '#2d6a4f';
+        if (resetBtn) resetBtn.hidden = false;
         setTimeout(() => {
           btn.textContent = 'In den Warenkorb · ' + fmt(totalCents());
           btn.style.background = '';
           state.loading = false;
           setButtonLoading(false);
-        }, 2000);
+        }, 2500);
         return;
       }
 
@@ -146,6 +149,49 @@
     } finally {
       state.loading = false;
       setButtonLoading(false);
+    }
+  }
+
+  /* ── Jetzt kaufen → Cart API + /checkout ─────────────────────── */
+  async function buyNow() {
+    if (state.loading || !state.variantId) return;
+    state.loading = true;
+    const btn = $('gw-buy-now-btn');
+    if (btn) { btn.disabled = true; btn.querySelector('svg')?.remove(); btn.textContent = 'Wird vorbereitet…'; }
+
+    const props = Object.assign(buildProperties(), addonCartProperties());
+    const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
+
+    if (state.personalize && ADDON_VARIANTS.name1) {
+      items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1 || '—' } });
+      if (state.twoNames && ADDON_VARIANTS.name2)
+        items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
+          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2 || '—' } });
+    }
+    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
+      items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
+        properties: { '_TeppichVariant': '' + state.variantId } });
+    addonCartItems().forEach(i => items.push(i));
+
+    try {
+      const res = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.description || 'Fehler beim Hinzufügen. Bitte erneut versuchen.');
+        return;
+      }
+      window.location.href = '/checkout';
+    } catch (e) {
+      console.error('Buy Now error:', e);
+      alert('Netzwerkfehler. Bitte erneut versuchen.');
+    } finally {
+      state.loading = false;
+      if (btn) { btn.disabled = false; btn.textContent = 'Jetzt kaufen'; }
     }
   }
 
@@ -169,8 +215,7 @@
       if (state.twoNames && state.name2) props['Name 2'] = state.name2;
       props['Schriftfarbe'] = state.threadLabel;
       if (state.symbol !== 'none') {
-        const symLabels = { moon:'Halbmond', heart:'Herz', infinity:'Unendlichkeit' };
-        props['Symbol'] = symLabels[state.symbol] || state.symbol;
+        props['Symbol'] = SYM_LABELS[state.symbol] || state.symbol;
         const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts', between:'Zwischen den Namen' };
         props['Symbolposition'] = posLabels[state.symbolPos];
       }
@@ -228,8 +273,7 @@
       n2.hidden = !show;
     }
 
-    const symChars = { none:'', moon:'☾', heart:'♥', infinity:'∞' };
-    const ch = symChars[state.symbol] || '';
+    const ch = SYM_ICONS[state.symbol] || '';
     ['above','below','left','right'].forEach(pos => {
       const el = $('gw-sym-' + pos);
       if (!el) return;
@@ -312,9 +356,10 @@
   function startCountdown() {
     const el = $('gw-countdown-time');
     if (!el) return;
+    const cutoffHour = window.GW_COUNTDOWN_HOUR || 17;
     function tick() {
       const now = new Date(), cutoff = new Date(now);
-      cutoff.setHours(17, 0, 0, 0);
+      cutoff.setHours(cutoffHour, 0, 0, 0);
       if (now >= cutoff) cutoff.setDate(cutoff.getDate() + 1);
       const d = cutoff - now;
       el.textContent = [Math.floor(d/3600000), Math.floor(d%3600000/60000), Math.floor(d%60000/1000)]
@@ -337,8 +382,7 @@
       if (state.twoNames && state.name2) lines.push('Name 2: ' + state.name2);
       lines.push('Schrift: ' + state.threadLabel);
       if (state.symbol !== 'none') {
-        const symLabels = { moon:'Halbmond ☾', heart:'Herz ♥', infinity:'Unendlichkeit ∞' };
-        lines.push('Symbol: ' + (symLabels[state.symbol] || state.symbol));
+        lines.push('Symbol: ' + (SYM_LABELS[state.symbol] || state.symbol) + ' ' + (SYM_ICONS[state.symbol] || ''));
         const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts', between:'Zwischen den Namen' };
         lines.push('Position: ' + (posLabels[state.symbolPos] || state.symbolPos));
       }
@@ -351,11 +395,169 @@
   }
 
   /* ── Init ─────────────────────────────────────────────────── */
+  /* ── Dynamic Addon Initialization ────────────────────────── */
+  function initAddons() {
+    /* opt_text */
+    document.querySelectorAll('[data-addon="text"]').forEach(input => {
+      const key = 'text-' + input.dataset.block;
+      const base = parseInt(input.dataset.surcharge) || 0;
+      addonMap.set(key, { fieldKey: input.dataset.fkey, value: '', surchargeCents: 0, variantId: 0, separateLineItem: false });
+      input.addEventListener('input', () => {
+        if (input.maxLength > 0) input.value = input.value.slice(0, input.maxLength);
+        const a = addonMap.get(key);
+        a.value = input.value;
+        a.surchargeCents = input.value.length > 0 ? base : 0;
+        const counter = document.querySelector('[data-counter="' + input.dataset.block + '"]');
+        if (counter) counter.textContent = input.value.length + '/' + (input.maxLength > 0 ? input.maxLength : '∞');
+        updatePrice();
+      });
+    });
+
+    /* opt_checkbox */
+    document.querySelectorAll('[data-addon="checkbox"]').forEach(cb => {
+      const key = 'cb-' + cb.dataset.block;
+      const surcharge = parseInt(cb.dataset.surcharge) || 0;
+      const vid = parseInt(cb.dataset.variant) || 0;
+      addonMap.set(key, { fieldKey: cb.dataset.fkey, value: cb.checked ? 'Ja' : '', surchargeCents: cb.checked ? surcharge : 0, variantId: vid, separateLineItem: vid > 0 });
+      cb.addEventListener('change', () => {
+        const a = addonMap.get(key);
+        a.value = cb.checked ? 'Ja' : '';
+        a.surchargeCents = cb.checked ? surcharge : 0;
+        updatePrice();
+      });
+    });
+
+    /* opt_choice → dropdown */
+    document.querySelectorAll('[data-addon="choice-select"]').forEach(sel => {
+      const gid = sel.dataset.gid;
+      const key = 'choice-' + gid;
+      const fkey = sel.closest('[data-addon="choice-group"]')?.dataset.fkey || gid;
+      const update = () => {
+        const opt = sel.options[sel.selectedIndex];
+        addonMap.set(key, { fieldKey: fkey, value: opt?.value || '', surchargeCents: parseInt(opt?.dataset.surcharge) || 0, variantId: parseInt(opt?.dataset.variant) || 0, separateLineItem: false });
+        updatePrice();
+      };
+      update(); sel.addEventListener('change', update);
+    });
+
+    /* opt_choice → buttons / swatches / images */
+    document.querySelectorAll('[data-addon="choice-btn"]').forEach(btn => {
+      const gid = btn.dataset.gid;
+      const key = 'choice-' + gid;
+      const fkey = btn.closest('[data-addon="choice-group"]')?.dataset.fkey || gid;
+      if (btn.classList.contains('is-active')) {
+        addonMap.set(key, { fieldKey: fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.surcharge) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: false });
+      }
+      btn.addEventListener('click', () => {
+        btn.closest('[data-addon="choice-group"]')?.querySelectorAll('[data-addon="choice-btn"]').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        addonMap.set(key, { fieldKey: fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.surcharge) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: false });
+        updatePrice();
+      });
+    });
+
+    /* opt_product → image_grid cards */
+    document.querySelectorAll('[data-addon="product-card"]').forEach(btn => {
+      const blockId = btn.dataset.block;
+      const key = 'prod-' + blockId;
+      const sep = btn.dataset.separate === 'true';
+      if (btn.classList.contains('is-active')) {
+        addonMap.set(key, { fieldKey: btn.dataset.fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.price) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: sep });
+      }
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-addon="product-card"][data-block="' + blockId + '"]').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        addonMap.set(key, { fieldKey: btn.dataset.fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.price) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: sep });
+        updatePrice();
+      });
+    });
+
+    /* opt_product → dropdown */
+    document.querySelectorAll('[data-addon="product-select"]').forEach(sel => {
+      const key = 'prod-' + sel.dataset.block;
+      const sep = sel.dataset.separate === 'true';
+      const update = () => {
+        const opt = sel.options[sel.selectedIndex];
+        addonMap.set(key, { fieldKey: sel.dataset.fkey, value: opt?.value || '', surchargeCents: parseInt(opt?.dataset.price) || 0, variantId: parseInt(opt?.dataset.variant) || 0, separateLineItem: sep });
+        updatePrice();
+      };
+      update(); sel.addEventListener('change', update);
+    });
+
+    /* opt_product → radio list */
+    document.querySelectorAll('[data-addon="product-radio"]').forEach(radio => {
+      const key = 'prod-' + radio.dataset.block;
+      const sep = radio.dataset.separate === 'true';
+      if (radio.checked) addonMap.set(key, { fieldKey: radio.dataset.fkey, value: radio.value || '', surchargeCents: parseInt(radio.dataset.price) || 0, variantId: parseInt(radio.dataset.variant) || 0, separateLineItem: sep });
+      radio.addEventListener('change', () => {
+        addonMap.set(key, { fieldKey: radio.dataset.fkey, value: radio.value || '', surchargeCents: parseInt(radio.dataset.price) || 0, variantId: parseInt(radio.dataset.variant) || 0, separateLineItem: sep });
+        updatePrice();
+      });
+    });
+  }
+
   function init() {
 
     /* ATC button → Cart API */
     const atcBtn = $('gw-atc-btn');
     if (atcBtn) atcBtn.addEventListener('click', addToCart);
+
+    /* Buy Now → Cart API + /checkout */
+    const buyNowBtn = $('gw-buy-now-btn');
+    if (buyNowBtn) buyNowBtn.addEventListener('click', buyNow);
+
+    /* Reset-Button → Formular zurücksetzen für zweiten Teppich */
+    const resetBtn = $('gw-reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        /* Namen leeren */
+        const n1 = $('gw-name1-input'); if (n1) { n1.value = ''; state.name1 = ''; }
+        const n2 = $('gw-name2-input'); if (n2) { n2.value = ''; state.name2 = ''; }
+        const c1 = $('gw-name1-count'); if (c1) c1.textContent = '0/11';
+        const c2 = $('gw-name2-count'); if (c2) c2.textContent = '0/11';
+
+        /* Zweiten Namen ausblenden */
+        state.twoNames = false;
+        const twoTog = $('gw-twonames-toggle'); if (twoTog) twoTog.checked = false;
+        const n2sec  = $('gw-name2-section');  if (n2sec)  n2sec.hidden = true;
+
+        /* Symbol zurücksetzen */
+        state.symbol = 'none';
+        document.querySelectorAll('[data-symbol]').forEach((b, i) => b.classList.toggle('is-active', i === 0));
+        const posSection = $('gw-sympos-section'); if (posSection) posSection.hidden = true;
+        const priceTag   = $('gw-symbol-price-tag'); if (priceTag) priceTag.hidden = true;
+
+        /* Geschenk zurücksetzen */
+        state.giftWrap = false;
+        const gwTog = $('gw-giftwrap-toggle'); if (gwTog) gwTog.checked = false;
+
+        /* Qty auf 1 */
+        state.qty = 1;
+        const qtyVal = $('gw-qty-val'); if (qtyVal) qtyVal.textContent = '1';
+        const qtyInp = $('gw-qty-input'); if (qtyInp) qtyInp.value = '1';
+
+        /* Addon-State zurücksetzen */
+        addonMap.forEach((a, key) => {
+          a.value = ''; a.surchargeCents = 0;
+          if (key.startsWith('text-')) {
+            const input = document.querySelector('[data-addon="text"][data-block="' + key.slice(5) + '"]');
+            if (input) { input.value = ''; const c = document.querySelector('[data-counter="' + key.slice(5) + '"]'); if (c) c.textContent = '0/' + input.maxLength; }
+          } else if (key.startsWith('cb-')) {
+            const cb = document.querySelector('[data-addon="checkbox"][data-block="' + key.slice(3) + '"]');
+            if (cb) cb.checked = false;
+          }
+        });
+
+        /* Reset-Button wieder ausblenden */
+        resetBtn.hidden = true;
+
+        updatePrice();
+        updatePreview();
+
+        /* Zum Formular scrollen */
+        document.querySelector('.gw-personalize-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
 
     /* Quantity */
     $('gw-qty-minus')?.addEventListener('click', () => { state.qty = Math.max(1, state.qty - 1); $('gw-qty-val').textContent = state.qty; $('gw-qty-input').value = state.qty; updatePrice(); });
@@ -388,7 +590,7 @@
       state.twoNames = e.target.checked;
       if (name2Sec) name2Sec.hidden = !state.twoNames;
       const betweenBtn = $('gw-sympos-between');
-      if (betweenBtn) betweenBtn.hidden = true;
+      if (betweenBtn) betweenBtn.hidden = !state.twoNames;
       if (!state.twoNames && state.symbolPos === 'between') {
         state.symbolPos = 'left';
         document.querySelectorAll('[data-sympos]').forEach(b => b.classList.remove('is-active'));
@@ -403,16 +605,6 @@
     $('gw-name2-input')?.addEventListener('input', e => {
       state.name2 = e.target.value = e.target.value.slice(0, 11);
       const c = $('gw-name2-count'); if (c) c.textContent = state.name2.length + '/11';
-      const betweenBtn = $('gw-sympos-between');
-      if (betweenBtn) {
-        betweenBtn.hidden = !state.name2;
-        if (!state.name2 && state.symbolPos === 'between') {
-          state.symbolPos = 'left';
-          document.querySelectorAll('[data-sympos]').forEach(b => b.classList.remove('is-active'));
-          const leftBtn = document.querySelector('[data-sympos="left"]');
-          if (leftBtn) leftBtn.classList.add('is-active');
-        }
-      }
       updatePreview();
     });
 
@@ -455,25 +647,8 @@
       });
     });
 
-    /* Beads — from GW_BEADS array (populated by Liquid blocks) */
-    document.querySelectorAll('[data-bead]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.bead);
-        const beadData = BEADS[idx];
-        state.beadIndex    = idx;
-        state.beadVariantId = parseInt(btn.dataset.beadVariant) || null;
-        state.beadPrice    = parseInt(btn.dataset.beadPrice) || 0;
-        state.beadLabel    = btn.dataset.beadLabel || 'Keine';
-        document.querySelectorAll('[data-bead]').forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-        updatePrice();
-      });
-    });
-
-    /* Gift wrap */
-    $('gw-giftwrap-toggle')?.addEventListener('change', e => {
-      state.giftWrap = e.target.checked; updatePrice();
-    });
+    /* Dynamische Addons (opt_text, opt_checkbox, opt_choice, opt_product) */
+    initAddons();
 
     /* Color variants */
     document.querySelectorAll('[data-variant-id]').forEach(btn => {

@@ -1,0 +1,578 @@
+{%- if cart.item_count == 0 -%}
+
+  {%- comment -%} ── Leerer Warenkorb ── {%- endcomment -%}
+  <div class="gw-cart-empty">
+    <div class="gw-cart-empty__inner">
+      <div class="gw-cart-empty__icon">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="22" cy="54" r="4"/><circle cx="46" cy="54" r="4"/><path d="M2 4h8l8 32h28l6-22H16"/></svg>
+      </div>
+      <h1 class="gw-cart-empty__title">Dein Warenkorb ist leer</h1>
+      <p class="gw-cart-empty__text">Entdecke unsere personalisierten Gebetsteppiche – ein Geschenk, das bleibt.</p>
+      <a href="/collections/all" class="gw-cart-empty__btn">Zur Kollektion</a>
+    </div>
+  </div>
+
+{%- else -%}
+
+<div class="gw-cart-page" id="gw-cart-page">
+  <div class="gw-cart-page__inner">
+
+    {%- comment -%} ── Header ── {%- endcomment -%}
+    <div class="gw-cart-header">
+      <h1 class="gw-cart-header__title">Dein Warenkorb</h1>
+      <p class="gw-cart-header__count">{{ cart.item_count }} {{ cart.item_count | pluralize: 'Artikel', 'Artikel' }}</p>
+    </div>
+
+    <div class="gw-cart-layout">
+
+      {%- comment -%} ══ ITEMS ══ {%- endcomment -%}
+      <div class="gw-cart-items" id="gw-cart-items">
+        <form action="/cart" method="post" id="gw-cart-form">
+
+          {%- for item in cart.items -%}
+            {%- comment -%} Identify add-on items (have _ref or _TeppichVariant property) {%- endcomment -%}
+            {%- assign is_addon = false -%}
+            {%- for p in item.properties -%}
+              {%- if p.first == '_ref' or p.first == '_TeppichVariant' -%}
+                {%- assign is_addon = true -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            <div class="gw-cart-item{% if is_addon %} gw-cart-item--addon{% endif %}" data-key="{{ item.key }}">
+
+              {%- comment -%} Image {%- endcomment -%}
+              <a href="{{ item.url }}" class="gw-cart-item__img-link">
+                {%- if item.image -%}
+                  <img src="{{ item.image | image_url: width: 300 }}" alt="{{ item.title | escape }}" width="150" loading="lazy" class="gw-cart-item__img">
+                {%- else -%}
+                  <div class="gw-cart-item__img-placeholder">{{ 'product-apparel-1' | placeholder_svg_tag }}</div>
+                {%- endif -%}
+              </a>
+
+              {%- comment -%} Info {%- endcomment -%}
+              <div class="gw-cart-item__info">
+                <div class="gw-cart-item__top">
+                  <div>
+                    <p class="gw-cart-item__vendor">{{ item.vendor }}</p>
+                    <a href="{{ item.url }}" class="gw-cart-item__name">{{ item.product.title }}</a>
+                    {%- unless item.variant.title == 'Default Title' -%}
+                      <p class="gw-cart-item__variant">{{ item.variant.title }}</p>
+                    {%- endunless -%}
+                  </div>
+                  <p class="gw-cart-item__price">{{ item.final_line_price | money }}</p>
+                </div>
+
+                {%- comment -%} Personalisierungs-Properties (versteckte rausfiltern) {%- endcomment -%}
+                {%- assign visible_props = false -%}
+                {%- for p in item.properties -%}
+                  {%- unless p.first == blank or p.first == '_ref' or p.first == '_TeppichVariant' or p.first == '_Name' or p.second == blank -%}
+                    {%- assign visible_props = true -%}
+                  {%- endunless -%}
+                {%- endfor -%}
+
+                {%- if visible_props -%}
+                  <ul class="gw-cart-item__props">
+                    {%- for p in item.properties -%}
+                      {%- unless p.first == blank or p.first contains '_' or p.second == blank -%}
+                        <li>
+                          <span class="gw-cart-item__prop-key">{{ p.first }}:</span>
+                          <span class="gw-cart-item__prop-val">{{ p.second }}</span>
+                        </li>
+                      {%- endunless -%}
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+
+                {%- comment -%} Quantity + Remove {%- endcomment -%}
+                <div class="gw-cart-item__actions">
+                  {%- unless is_addon -%}
+                    <div class="gw-cart-qty" data-key="{{ item.key }}">
+                      <button type="button" class="gw-cart-qty__btn" data-action="minus" aria-label="Weniger">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="10" x2="16" y2="10"/></svg>
+                      </button>
+                      <span class="gw-cart-qty__val">{{ item.quantity }}</span>
+                      <button type="button" class="gw-cart-qty__btn" data-action="plus" aria-label="Mehr">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="4" x2="10" y2="16"/><line x1="4" y1="10" x2="16" y2="10"/></svg>
+                      </button>
+                    </div>
+                  {%- else -%}
+                    <span class="gw-cart-item__addon-label">Add-on</span>
+                  {%- endunless -%}
+
+                  <button type="button" class="gw-cart-item__remove" data-key="{{ item.key }}" aria-label="Entfernen">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M8 6V4h4v2M16 6l-1 11H5L4 6"/></svg>
+                    Entfernen
+                  </button>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+
+        </form>
+      </div>
+
+      {%- comment -%} ══ SUMMARY ══ {%- endcomment -%}
+      <aside class="gw-cart-summary">
+        <div class="gw-cart-summary__box">
+
+          <h2 class="gw-cart-summary__title">Bestellübersicht</h2>
+
+          <div class="gw-cart-summary__rows">
+            <div class="gw-cart-summary__row">
+              <span>Zwischensumme</span>
+              <span id="gw-cart-subtotal">{{ cart.total_price | money }}</span>
+            </div>
+            <div class="gw-cart-summary__row gw-cart-summary__row--shipping">
+              <span>Versand</span>
+              <span>
+                {%- if cart.total_price >= 10000 -%}
+                  <span class="gw-cart-summary__free">Kostenlos 🎉</span>
+                {%- else -%}
+                  Wird im Checkout berechnet
+                {%- endif -%}
+              </span>
+            </div>
+          </div>
+
+          {%- if cart.total_price < 10000 -%}
+            {%- assign remaining = 10000 | minus: cart.total_price -%}
+            <div class="gw-cart-summary__freeship">
+              <div class="gw-cart-summary__freeship-bar">
+                <div class="gw-cart-summary__freeship-fill" style="width:{{ cart.total_price | times: 100 | divided_by: 10000 | at_most: 100 }}%"></div>
+              </div>
+              <p>Noch <strong>{{ remaining | money }}</strong> bis zum kostenlosen Versand</p>
+            </div>
+          {%- endif -%}
+
+          <div class="gw-cart-summary__total">
+            <span>Gesamt</span>
+            <span id="gw-cart-total">{{ cart.total_price | money }}</span>
+          </div>
+          <p class="gw-cart-summary__tax">inkl. MwSt.</p>
+
+          <a href="/checkout" class="gw-cart-checkout-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Sicher zur Kasse
+          </a>
+
+          <a href="/collections/all" class="gw-cart-continue">
+            ← Weiter einkaufen
+          </a>
+
+          {%- comment -%} Trust badges {%- endcomment -%}
+          <div class="gw-cart-trust">
+            <div class="gw-cart-trust__item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>SSL-gesichert</span>
+            </div>
+            <div class="gw-cart-trust__item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>14 Tage Rückgabe</span>
+            </div>
+            <div class="gw-cart-trust__item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <span>3–5 Tage Lieferzeit</span>
+            </div>
+          </div>
+
+          {%- comment -%} Payment icons {%- endcomment -%}
+          <p class="gw-cart-payment-label">Wir akzeptieren</p>
+          <div class="gw-cart-payment">
+            {%- for type in shop.enabled_payment_types -%}
+              {{ type | payment_type_svg_tag: class: 'gw-cart-payment__icon' }}
+            {%- endfor -%}
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+{%- endif -%}
+
+<style>
+/* ── Cart Page ───────────────────────────────────────────────────── */
+.gw-cart-empty {
+  background: var(--gw-ivory, #F9F6F0);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+.gw-cart-empty__inner {
+  text-align: center;
+  max-width: 400px;
+}
+.gw-cart-empty__icon svg {
+  width: 64px; height: 64px;
+  color: var(--gw-gold, #C89B3C);
+  margin-bottom: 24px;
+}
+.gw-cart-empty__title {
+  font-family: 'Fraunces', serif;
+  font-size: 32px; font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--gw-ink, #1A1613);
+  margin: 0 0 12px;
+}
+.gw-cart-empty__text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px; color: var(--gw-muted, #6B6560);
+  margin: 0 0 28px; line-height: 1.6;
+}
+.gw-cart-empty__btn {
+  display: inline-flex; align-items: center;
+  padding: 14px 32px;
+  background: var(--gw-ink, #1A1613);
+  color: var(--gw-ivory, #F9F6F0);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px; font-weight: 600;
+  border-radius: 40px; text-decoration: none;
+  transition: opacity 0.15s;
+}
+.gw-cart-empty__btn:hover { opacity: 0.8; }
+
+/* Page */
+.gw-cart-page {
+  background: var(--gw-ivory, #F9F6F0);
+  min-height: 60vh;
+  padding: 40px 0 80px;
+}
+.gw-cart-page__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+@media (min-width: 750px) { .gw-cart-page__inner { padding: 0 40px; } }
+
+/* Header */
+.gw-cart-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gw-border, #E5E0D8);
+}
+.gw-cart-header__title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 400; letter-spacing: -0.02em;
+  color: var(--gw-ink, #1A1613);
+  margin: 0;
+}
+.gw-cart-header__count {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px; color: var(--gw-muted, #6B6560);
+  margin: 0;
+}
+
+/* Layout */
+.gw-cart-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+@media (min-width: 900px) {
+  .gw-cart-layout {
+    grid-template-columns: 1fr 360px;
+    align-items: start;
+    gap: 48px;
+  }
+}
+
+/* Cart Item */
+.gw-cart-item {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--gw-border, #E5E0D8);
+}
+@media (min-width: 600px) { .gw-cart-item { grid-template-columns: 120px 1fr; gap: 20px; } }
+.gw-cart-item--addon {
+  grid-template-columns: 80px 1fr;
+  opacity: 0.85;
+}
+.gw-cart-item__img-link { display: block; }
+.gw-cart-item__img {
+  width: 100%; height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  aspect-ratio: 3/4;
+  display: block;
+  background: var(--gw-sand, #EDE8DF);
+}
+.gw-cart-item__img-placeholder {
+  width: 100%; aspect-ratio: 3/4;
+  border-radius: 12px;
+  background: var(--gw-sand, #EDE8DF);
+  display: flex; align-items: center; justify-content: center;
+}
+.gw-cart-item__info { display: flex; flex-direction: column; gap: 8px; }
+.gw-cart-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.gw-cart-item__vendor {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gw-gold, #C89B3C);
+  margin: 0;
+}
+.gw-cart-item__name {
+  font-family: 'Fraunces', serif;
+  font-size: 16px; font-weight: 400;
+  color: var(--gw-ink, #1A1613);
+  text-decoration: none;
+  line-height: 1.3; display: block; margin-top: 2px;
+}
+.gw-cart-item__name:hover { text-decoration: underline; }
+.gw-cart-item__variant {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px; color: var(--gw-muted, #6B6560);
+  margin: 2px 0 0;
+}
+.gw-cart-item__price {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px; font-weight: 600;
+  color: var(--gw-ink, #1A1613);
+  margin: 0; white-space: nowrap;
+}
+
+/* Personalization properties */
+.gw-cart-item__props {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.gw-cart-item__props li {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px; color: var(--gw-muted, #6B6560);
+}
+.gw-cart-item__prop-key { font-weight: 500; color: var(--gw-ink, #1A1613); }
+.gw-cart-item__prop-val { margin-left: 4px; }
+
+/* Actions */
+.gw-cart-item__actions {
+  display: flex; align-items: center; gap: 16px;
+  margin-top: 4px;
+}
+.gw-cart-item__addon-label {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--gw-sand, #EDE8DF);
+  color: var(--gw-muted, #6B6560);
+  padding: 3px 8px; border-radius: 20px;
+}
+
+/* Qty */
+.gw-cart-qty {
+  display: flex; align-items: center; gap: 0;
+  border: 1px solid var(--gw-border, #E5E0D8);
+  border-radius: 8px; overflow: hidden;
+}
+.gw-cart-qty__btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer;
+  color: var(--gw-ink, #1A1613);
+  transition: background 0.1s;
+}
+.gw-cart-qty__btn:hover { background: var(--gw-sand, #EDE8DF); }
+.gw-cart-qty__btn svg { width: 14px; height: 14px; }
+.gw-cart-qty__val {
+  width: 28px; text-align: center;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--gw-ink, #1A1613);
+}
+
+/* Remove */
+.gw-cart-item__remove {
+  display: flex; align-items: center; gap: 4px;
+  background: none; border: none; cursor: pointer;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px; color: var(--gw-muted, #6B6560);
+  padding: 0; transition: color 0.15s;
+}
+.gw-cart-item__remove:hover { color: #b91c1c; }
+.gw-cart-item__remove svg { width: 14px; height: 14px; }
+
+/* ── Summary Box ── */
+.gw-cart-summary__box {
+  background: var(--gw-sand, #EDE8DF);
+  border-radius: 16px;
+  padding: 28px;
+  position: sticky;
+  top: 100px;
+}
+.gw-cart-summary__title {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--gw-ink, #1A1613);
+  margin: 0 0 20px;
+}
+.gw-cart-summary__rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.gw-cart-summary__row {
+  display: flex; justify-content: space-between;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px; color: var(--gw-ink, #1A1613);
+}
+.gw-cart-summary__free { color: #15803d; font-weight: 600; }
+
+/* Free shipping bar */
+.gw-cart-summary__freeship {
+  background: var(--gw-ivory, #F9F6F0);
+  border-radius: 8px; padding: 12px; margin: 0 0 16px;
+}
+.gw-cart-summary__freeship-bar {
+  height: 4px; background: var(--gw-border, #E5E0D8);
+  border-radius: 2px; margin-bottom: 8px; overflow: hidden;
+}
+.gw-cart-summary__freeship-fill {
+  height: 100%; background: var(--gw-gold, #C89B3C);
+  border-radius: 2px; transition: width 0.3s ease;
+}
+.gw-cart-summary__freeship p {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px; color: var(--gw-muted, #6B6560);
+  margin: 0;
+}
+
+.gw-cart-summary__total {
+  display: flex; justify-content: space-between;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--gw-border, #E5E0D8);
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 400;
+  color: var(--gw-ink, #1A1613);
+}
+.gw-cart-summary__tax {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px; color: var(--gw-muted, #6B6560);
+  margin: 0 0 20px; text-align: right;
+}
+
+/* Checkout button */
+.gw-cart-checkout-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; width: 100%;
+  padding: 16px; margin-bottom: 12px;
+  background: var(--gw-ink, #1A1613);
+  color: var(--gw-ivory, #F9F6F0);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px; font-weight: 600;
+  border-radius: 40px; text-decoration: none;
+  transition: opacity 0.15s;
+}
+.gw-cart-checkout-btn:hover { opacity: 0.85; }
+.gw-cart-checkout-btn svg { width: 16px; height: 16px; }
+
+.gw-cart-continue {
+  display: block; text-align: center;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px; color: var(--gw-muted, #6B6560);
+  text-decoration: none; margin-bottom: 24px;
+}
+.gw-cart-continue:hover { color: var(--gw-ink, #1A1613); }
+
+/* Trust */
+.gw-cart-trust {
+  display: flex; gap: 12px; justify-content: space-between;
+  padding: 16px 0;
+  border-top: 1px solid var(--gw-border, #E5E0D8);
+  margin-bottom: 16px;
+}
+.gw-cart-trust__item {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; text-align: center; flex: 1;
+}
+.gw-cart-trust__item svg { width: 18px; height: 18px; color: var(--gw-gold, #C89B3C); }
+.gw-cart-trust__item span {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 10px; color: var(--gw-muted, #6B6560);
+  line-height: 1.3;
+}
+
+/* Payment icons */
+.gw-cart-payment-label {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--gw-muted, #6B6560);
+  margin: 0 0 8px; text-align: center;
+}
+.gw-cart-payment {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+}
+.gw-cart-payment__icon { height: 24px; width: auto; border-radius: 3px; }
+</style>
+
+<script>
+(function () {
+  const page = document.getElementById('gw-cart-page');
+  if (!page) return;
+
+  async function updateItem(key, qty) {
+    const res = await fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: qty })
+    });
+    const cart = await res.json();
+    if (qty === 0) {
+      location.reload();
+    } else {
+      document.getElementById('gw-cart-subtotal').textContent = formatMoney(cart.total_price);
+      document.getElementById('gw-cart-total').textContent = formatMoney(cart.total_price);
+      const el = page.querySelector(`[data-key="${key}"] .gw-cart-qty__val`);
+      if (el) el.textContent = qty;
+      // Update cart bubble
+      document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => {
+        b.textContent = cart.item_count;
+      });
+    }
+  }
+
+  function formatMoney(cents) {
+    return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+  }
+
+  // Qty buttons
+  page.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const row  = btn.closest('[data-key]');
+    const key  = row.dataset.key;
+    const val  = row.querySelector('.gw-cart-qty__val');
+    let qty    = parseInt(val.textContent);
+    if (btn.dataset.action === 'plus') qty++;
+    else if (btn.dataset.action === 'minus') qty = Math.max(0, qty - 1);
+    val.textContent = qty;
+    updateItem(key, qty);
+  });
+
+  // Remove buttons
+  page.addEventListener('click', e => {
+    const btn = e.target.closest('.gw-cart-item__remove');
+    if (!btn) return;
+    updateItem(btn.dataset.key, 0);
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Warenkorb – Gebetswerk",
+  "tag": "section",
+  "settings": [],
+  "presets": [{ "name": "Warenkorb – Gebetswerk" }]
+}
+{% endschema %}
