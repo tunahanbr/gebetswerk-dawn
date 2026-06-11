@@ -145,6 +145,7 @@
       "settings": {
         "eyebrow": "Gebetsteppich mit Namen & Farbe",
         "heading": "<p>Ein Geschenk, das <em>Bedeutung</em> trägt.</p>",
+        "image": "shopify://shop_images/yahya.png",
         "badge_eyebrow": "Bestseller",
         "badge_name": "Klassik · Creme",
         "badge_price": "ab €49,90",
@@ -154,15 +155,17 @@
     "gebetswerk_reviews": {
       "type": "gebetswerk-reviews",
       "blocks": {
-        "jm_review_widget": {
-          "type": "shopify://apps/judge-me-reviews/blocks/featured_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+        "judge_me_reviews_review_widget_homepage_wAPHVW": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget_homepage/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "maxwidth": 1080
+            "product": "gebetsteppich",
+            "review_data": "real_data",
+            "max_width": 1200
           }
         }
       },
       "block_order": [
-        "jm_review_widget"
+        "judge_me_reviews_review_widget_homepage_wAPHVW"
       ],
       "settings": {
         "eyebrow": "Kundenbewertungen",
