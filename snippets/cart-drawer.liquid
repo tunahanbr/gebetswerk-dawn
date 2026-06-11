@@ -11,71 +11,7 @@
 <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
 
-<script>
-(function () {
-  function isAddon(i) {
-    return i.product_title === 'Aufpreise' ||
-      (i.properties && '_Zugehöriger Teppich' in i.properties);
-  }
-
-  function updateBadge(cart) {
-    const realCount = cart.items
-      .filter(i => !isAddon(i))
-      .reduce((sum, i) => sum + i.quantity, 0);
-    document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => { b.textContent = realCount; });
-    document.querySelectorAll('.cart-count-bubble').forEach(b => { b.hidden = realCount === 0; });
-  }
-
-  async function cleanOrphanedAddons() {
-    try {
-      const cart = await fetch('/cart.js').then(r => r.json());
-
-      updateBadge(cart);
-
-      if (cart.item_count === 0) return;
-
-      const realItems = cart.items.filter(i => !isAddon(i));
-
-      if (realItems.length > 0) {
-        /* Real items exist — only remove orphaned Aufpreise */
-        const realVariantIds = new Set(realItems.map(i => String(i.variant_id)));
-        const orphaned = cart.items.filter(i => {
-          if (i.product_title !== 'Aufpreise') return false;
-          const tv = (i.properties && i.properties['_TeppichVariant']) || '';
-          return !realVariantIds.has(tv);
-        });
-        if (orphaned.length === 0) return;
-        const updates = {};
-        orphaned.forEach(i => { updates[i.key] = 0; });
-        await fetch('/cart/update.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ updates })
-        });
-      } else {
-        /* No real items — clear everything */
-        await fetch('/cart/clear.js', { method: 'POST' });
-      }
-
-      const newCart = await fetch('/cart.js').then(r => r.json());
-      updateBadge(newCart);
-      document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
-
-      if (newCart.item_count === 0) {
-        setTimeout(() => window.location.reload(), 150);
-      } else if (window.location.pathname === '/cart') {
-        window.location.reload();
-      }
-    } catch (e) { /* silent */ }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', cleanOrphanedAddons);
-  } else {
-    cleanOrphanedAddons();
-  }
-})();
-</script>
+{% comment %} Aufpreis-Sync: global via assets/gebetswerk-cart-sync.js (theme.liquid) {% endcomment %}
 
 <style>
   .drawer {
@@ -254,7 +190,7 @@
                             {%- unless addon.product.title == 'Aufpreise' -%}{%- continue -%}{%- endunless -%}
                             {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                             {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
-                              {%- assign gw_addon_total = gw_addon_total | plus: addon.final_price -%}
+                              {%- assign gw_addon_total = gw_addon_total | plus: addon.final_line_price -%}
                             {%- endif -%}
                           {%- endfor -%}
 
@@ -281,7 +217,7 @@
                             {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                             {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                               {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
-                              <div class="gw-cart-addon-inline">1. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                              <div class="gw-cart-addon-inline">1. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
                             {%- endif -%}
                           {%- endfor -%}
 
@@ -290,7 +226,7 @@
                             {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                             {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                               {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
-                              <div class="gw-cart-addon-inline">2. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                              <div class="gw-cart-addon-inline">2. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
                             {%- endif -%}
                           {%- endfor -%}
 
@@ -299,7 +235,7 @@
                             {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                             {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                               {%- assign sym_type = item.properties['Symbol'] | default: '' -%}
-                              <div class="gw-cart-addon-inline">Symbol{%- if sym_type != '' -%} · {{ sym_type }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                              <div class="gw-cart-addon-inline">Symbol{%- if sym_type != '' -%} · {{ sym_type }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
                             {%- endif -%}
                           {%- endfor -%}
 
@@ -311,7 +247,7 @@
                             {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Geschenkverpackung' -%}{%- continue -%}{%- endunless -%}
                             {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                             {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
-                              <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_price | money }}</span></div>
+                              <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_line_price | money }}</span></div>
                             {%- endif -%}
                           {%- endfor -%}
 

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "theme-dev",
+      "runtimeExecutable": "shopify",
+      "runtimeArgs": ["theme", "dev", "--store", "gebetswerk.myshopify.com", "--theme", "183241736528", "--port", "9293"],
+      "port": 9293,
+      "autoPort": false
+    }
+  ]
+}

@@ -89,11 +89,16 @@
     "availability": "{% if current_variant.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
     "seller": { "@type": "Organization", "name": {{ shop.name | json }} }
   },
+  {%- assign ld_count = product.metafields.reviews.rating_count -%}
+  {%- if ld_count and ld_count > 0 -%}
   "aggregateRating": {
     "@type": "AggregateRating",
-    "ratingValue": "4.9",
-    "reviewCount": "{{ section.settings.review_count_number }}"
+    "ratingValue": "{{ product.metafields.reviews.rating.value.rating | round: 2 }}",
+    "reviewCount": "{{ ld_count }}"
   }
+  {%- else -%}
+  "category": "Religious Items"
+  {%- endif -%}
 }
 </script>
 
@@ -151,16 +156,16 @@
 
         <h1 class="gw-product__title">{{ product.title }}</h1>
 
-        <div class="gw-product__rating">
-          {%- comment -%} Judge.me star badge — overrides fallback once app is installed {%- endcomment -%}
-          <div class="jdgm-prev-badge gw-product__jdgm-badge" data-id="{{ product.id }}"></div>
-          <div class="gw-product__rating-fallback">
-            <div class="gw-product__rating-stars">
-              {%- for i in (1..5) -%}<svg class="gw-product__rating-star" viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
+        {%- assign jm_rating = product.metafields.reviews.rating.value -%}
+        {%- assign jm_count = product.metafields.reviews.rating_count -%}
+        {%- if jm_count and jm_count > 0 -%}
+          <div class="gw-product__rating">
+            <div class="gw-product__rating-fallback">
+              {% render 'gw-rating-stars', product: product, show_count: false %}
+              <a href="#gw-reviews" class="gw-product__rating-count">{{ jm_rating.rating | round: 1 | replace: '.', ',' }} · {{ jm_count }} Bewertung{% if jm_count != 1 %}en{% endif %}</a>
             </div>
-            <a href="#gw-reviews" class="gw-product__rating-count">{{ section.settings.review_display }}</a>
           </div>
-        </div>
+        {%- endif -%}
 
         <div class="gw-product__price-row">
           <span id="gw-price" class="gw-product__price">{{ current_variant.price | money }}</span>

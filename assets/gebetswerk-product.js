@@ -55,7 +55,7 @@
     const items = [];
     addonMap.forEach(a => {
       if (a.variantId && a.value) {
-        items.push({ id: a.variantId, quantity: state.qty, properties: { '_ref': String(state.variantId) } });
+        items.push({ id: a.variantId, quantity: state.qty, properties: { '_TeppichVariant': String(state.variantId) } });
       }
     });
     return items;
@@ -76,9 +76,41 @@
     return t * state.qty;
   }
 
+  /* ── Validation ───────────────────────────────────────────── */
+  function showFieldError(inputId, msg) {
+    const input = $(inputId);
+    if (!input) { alert(msg); return; }
+    input.style.borderColor = '#c0392b';
+    let err = input.parentElement.querySelector('.gw-form-error');
+    if (!err) {
+      err = document.createElement('p');
+      err.className = 'gw-form-error';
+      err.style.cssText = 'color:#c0392b;font-size:12px;margin:6px 0 0;font-family:Inter,system-ui,sans-serif;';
+      input.parentElement.appendChild(err);
+    }
+    err.textContent = msg;
+    input.addEventListener('input', () => { input.style.borderColor = ''; err.remove(); }, { once: true });
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.focus({ preventScroll: true });
+  }
+
+  function validatePersonalization() {
+    if (!state.personalize) return true;
+    if (!state.name1.trim()) {
+      showFieldError('gw-name1-input', 'Bitte gib einen Namen ein — oder deaktiviere die Personalisierung.');
+      return false;
+    }
+    if (state.twoNames && !state.name2.trim()) {
+      showFieldError('gw-name2-input', 'Bitte gib den zweiten Namen ein — oder deaktiviere die Option.');
+      return false;
+    }
+    return true;
+  }
+
   /* ── Cart API ─────────────────────────────────────────────── */
   async function addToCart() {
     if (state.loading || !state.variantId) return;
+    if (!validatePersonalization()) return;
     state.loading = true;
     setButtonLoading(true);
 
@@ -90,10 +122,10 @@
     /* Personalisierungs-Aufpreise als separate Artikel (korrekter Warenkorb-Preis) */
     if (state.personalize && ADDON_VARIANTS.name1) {
       items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1 || '—' } });
+        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
       if (state.twoNames && ADDON_VARIANTS.name2)
         items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
-          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2 || '—' } });
+          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
     }
     if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
       items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
@@ -155,6 +187,7 @@
   /* ── Jetzt kaufen → Cart API + /checkout ─────────────────────── */
   async function buyNow() {
     if (state.loading || !state.variantId) return;
+    if (!validatePersonalization()) return;
     state.loading = true;
     const btn = $('gw-buy-now-btn');
     if (btn) { btn.disabled = true; btn.querySelector('svg')?.remove(); btn.textContent = 'Wird vorbereitet…'; }
@@ -164,10 +197,10 @@
 
     if (state.personalize && ADDON_VARIANTS.name1) {
       items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1 || '—' } });
+        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
       if (state.twoNames && ADDON_VARIANTS.name2)
         items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
-          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2 || '—' } });
+          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
     }
     if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
       items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
@@ -210,18 +243,17 @@
   ─────────────────────────────────────────────────────────── */
   function buildProperties() {
     const props = {};
-    if (state.personalize && state.name1) {
-      props['Name 1'] = state.name1;
-      if (state.twoNames && state.name2) props['Name 2'] = state.name2;
+    if (state.personalize && state.name1.trim()) {
+      props['Name 1'] = state.name1.trim();
+      if (state.twoNames && state.name2.trim()) props['Name 2'] = state.name2.trim();
       props['Schriftfarbe'] = state.threadLabel;
       if (state.symbol !== 'none') {
         props['Symbol'] = SYM_LABELS[state.symbol] || state.symbol;
         const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts', between:'Zwischen den Namen' };
-        props['Symbolposition'] = posLabels[state.symbolPos];
+        props['Symbolposition'] = posLabels[state.symbolPos] || state.symbolPos;
       }
     }
-    if (state.beadIndex > 0) props['Gebetskette'] = state.beadLabel;
-    if (state.giftWrap)      props['Geschenkverpackung'] = 'Ja';
+    /* Gebetskette & Geschenkverpackung kommen aus addonCartProperties() */
     return props;
   }
 
@@ -387,8 +419,7 @@
         lines.push('Position: ' + (posLabels[state.symbolPos] || state.symbolPos));
       }
     }
-    if (state.beadIndex > 0) lines.push('Gebetskette: ' + state.beadLabel);
-    if (state.giftWrap) lines.push('Geschenkschleife inklusive');
+    addonMap.forEach(a => { if (a.fieldKey && a.value) lines.push(a.fieldKey + ': ' + a.value); });
 
     summary.hidden = lines.length === 0;
     list.innerHTML = lines.map(l => '<li>' + l + '</li>').join('');

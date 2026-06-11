@@ -1822,3 +1822,31 @@ cart-remove-button button:hover,
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* ── Bewertungssterne (Judge.me Metafields, snippet gw-rating-stars) ── */
+.gw-stars {
+  position: relative;
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 2px;
+  vertical-align: middle;
+}
+.gw-stars__row--bg {
+  color: #D9D3C7;
+}
+.gw-stars__row--fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--gw-gold, #C89B3C);
+}
+.gw-stars__count {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--gw-muted, #6B6560);
+  vertical-align: middle;
+  margin-left: 4px;
+}

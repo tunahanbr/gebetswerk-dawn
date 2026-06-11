@@ -2,28 +2,26 @@
   <div class="gw-reviews-section__inner">
 
     <div class="gw-reviews-section__header">
-      <p class="gw-reviews-section__eyebrow">{{ section.settings.eyebrow | default: 'Kundenbewertungen' }}</p>
-      <h2 class="gw-reviews-section__title">{{ section.settings.heading | default: 'Was unsere Kunden sagen' }}</h2>
+      <p class="gw-reviews-section__eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="gw-reviews-section__title">{{ section.settings.heading }}</h2>
     </div>
 
     {%- comment -%}
-      Judge.me Reviews Widget
-      Wird automatisch befüllt sobald Judge.me installiert ist.
-      Bis dahin zeigt es nichts (display:none via CSS wenn leer).
+      Judge.me rendert die Reviews server-seitig über seinen App Block
+      (Theme App Extension). Im Theme-Editor: Section → "Block hinzufügen"
+      → Judge.me "Review Widget". Legacy-Divs (jdgm-widget + data-id)
+      werden von der neuen App-Embed-Version NICHT mehr befüllt.
     {%- endcomment -%}
-    <div id="judgeme_product_reviews"
-         class="jdgm-widget jdgm-review-widget"
-         data-id="{{ product.id }}"
-         data-product-title="{{ product.title | escape }}"
-         data-product-url="{{ shop.url }}{{ product.url }}">
-    </div>
-
-    {%- comment -%} Fallback — nur sichtbar wenn Judge.me Widget leer bleibt (Fehlerfall) {%- endcomment -%}
-    <div class="gw-reviews-fallback" id="gw-reviews-fallback">
-      <p class="gw-reviews-fallback__text">
-        ⭐⭐⭐⭐⭐ &nbsp; <strong>4,9 / 5</strong> — Basierend auf {{ section.settings.review_count | default: '1.240' }} Bewertungen
-      </p>
-    </div>
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        {% render block %}
+      {%- endfor -%}
+    {%- else -%}
+      <div class="gw-reviews-fallback">
+        <p class="gw-reviews-fallback__text">Füge im Theme-Editor den Judge.me „Review Widget"-Block zu dieser Section hinzu.</p>
+        <p class="gw-reviews-fallback__hint">Section auswählen → Block hinzufügen → Apps → Judge.me Review Widget</p>
+      </div>
+    {%- endif -%}
 
   </div>
 </section>
@@ -80,42 +78,36 @@
 }
 .jdgm-prev-badge__text { color: var(--gw-muted, #6B6560) !important; }
 
-/* ── Reviews-Section Widget ───────────────────────────────────── */
-.gw-reviews-section .jdgm-widget {
+/* ── Judge.me Review Widget (neue jm-* Klassen, App-Block-Version) ── */
+.gw-reviews-section .jdgm-widget,
+.gw-reviews-section .jm-review-widget {
   font-family: 'Inter', system-ui, sans-serif !important;
   color: var(--gw-ink, #1A1613) !important;
   background: transparent !important;
 }
 
-/* Zusammenfassungs-Header ausblenden (eigenes Heading reicht) */
-.gw-reviews-section .jdgm-rev-widg__header { display: none !important; }
+/* Widget-eigenen Titel ausblenden — unser Section-Heading reicht */
+.gw-reviews-section .jm-review-widget-minimal-header__title { display: none !important; }
 
-/* Gesamtübersicht (Sterne-Zusammenfassung) */
-.gw-reviews-section .jdgm-rev-widg__summary {
-  background: var(--gw-sand, #EDE8DF) !important;
-  border: none !important;
-  border-radius: 16px !important;
-  padding: 24px 32px !important;
-  margin-bottom: 32px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 24px !important;
+/* Sterne: Gold */
+.gw-reviews-section .jm-star-rating,
+.gw-reviews-section .jm-star-rating__font-icon {
+  color: var(--gw-gold, #C89B3C) !important;
+  fill: var(--gw-gold, #C89B3C) !important;
 }
-.gw-reviews-section .jdgm-rev-widg__summary-rating {
+.gw-reviews-section .jm-star-rating svg,
+.gw-reviews-section .jm-star-rating svg * {
+  fill: var(--gw-gold, #C89B3C) !important;
+}
+
+/* Durchschnitts-Rating groß in Fraunces */
+.gw-reviews-section .jm-average-rating-display {
   font-family: 'Fraunces', serif !important;
-  font-size: 48px !important;
-  font-weight: 400 !important;
   color: var(--gw-ink, #1A1613) !important;
-  line-height: 1 !important;
-}
-.gw-reviews-section .jdgm-rev-widg__summary-count {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 13px !important;
-  color: var(--gw-muted, #6B6560) !important;
 }
 
 /* Einzelne Review-Karte */
-.gw-reviews-section .jdgm-rev {
+.gw-reviews-section .jm-review-item {
   background: #fff !important;
   border: 1px solid var(--gw-border, #E5E0D8) !important;
   border-radius: 16px !important;
@@ -123,130 +115,114 @@
   margin-bottom: 16px !important;
   box-shadow: none !important;
 }
-.gw-reviews-section .jdgm-rev:last-child { margin-bottom: 0 !important; }
 
-/* Reviewer Name */
-.gw-reviews-section .jdgm-rev__author {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
+/* Texte: Ink statt Schwarz */
+.gw-reviews-section .jm-review-widget .jm-text,
+.gw-reviews-section .jm-review-item {
   color: var(--gw-ink, #1A1613) !important;
 }
 
-/* Verifiziert-Badge */
-.gw-reviews-section .jdgm-rev__author-badge {
-  background: var(--gw-sand, #EDE8DF) !important;
-  color: var(--gw-muted, #6B6560) !important;
-  border: none !important;
-  border-radius: 20px !important;
+/* Buttons (Bewertung schreiben, Mehr laden) */
+.gw-reviews-section .jm-button--primary {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
-}
-
-/* Datum */
-.gw-reviews-section .jdgm-rev__timestamp {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 12px !important;
-  color: var(--gw-muted, #6B6560) !important;
-}
-
-/* Review-Titel */
-.gw-reviews-section .jdgm-rev__title {
-  font-family: 'Fraunces', serif !important;
-  font-size: 16px !important;
-  font-weight: 400 !important;
-  color: var(--gw-ink, #1A1613) !important;
-  margin: 8px 0 4px !important;
-}
-
-/* Review-Text */
-.gw-reviews-section .jdgm-rev__body {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.65 !important;
-  color: var(--gw-ink, #1A1613) !important;
-}
-
-/* "Bewertung schreiben"-Link */
-.gw-reviews-section .jdgm-write-rev-link,
-.gw-reviews-section a.jdgm-write-rev-link {
-  display: inline-block !important;
-  font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: #fff !important;
   background: var(--gw-gold, #C89B3C) !important;
+  color: #fff !important;
   border: none !important;
   border-radius: 100px !important;
-  padding: 10px 22px !important;
-  text-decoration: none !important;
+  font-weight: 600 !important;
   letter-spacing: 0.03em !important;
   transition: background 0.2s !important;
-  margin-top: 24px !important;
 }
-.gw-reviews-section .jdgm-write-rev-link:hover {
+.gw-reviews-section .jm-button--primary:hover {
   background: #b8871f !important;
 }
-
-/* Pagination */
-.gw-reviews-section .jdgm-paginate {
+.gw-reviews-section .jm-button--secondary,
+.gw-reviews-section .jm-button--tertiary {
   font-family: 'Inter', system-ui, sans-serif !important;
-  color: var(--gw-muted, #6B6560) !important;
-  margin-top: 24px !important;
+  color: var(--gw-ink, #1A1613) !important;
+  border-color: var(--gw-border, #E5E0D8) !important;
+  border-radius: 100px !important;
 }
-.gw-reviews-section .jdgm-paginate a {
-  color: var(--gw-gold, #C89B3C) !important;
-  font-weight: 600 !important;
-  text-decoration: none !important;
-}
-.gw-reviews-section .jdgm-paginate a:hover { text-decoration: underline !important; }
 
-/* Formular (Review schreiben) */
-.gw-reviews-section .jdgm-form {
-  background: var(--gw-sand, #EDE8DF) !important;
-  border: none !important;
-  border-radius: 16px !important;
-  padding: 28px !important;
-  margin-top: 24px !important;
+/* Pagination: nur die AKTIVE Seite gold — Judge.me gibt allen
+   Seitenzahlen jm-button--primary, unterscheidbar nur via aria-current */
+.gw-reviews-section .jm-pagination-controls .jm-button--primary {
+  background: transparent !important;
+  color: var(--gw-ink, #1A1613) !important;
+  border: 1px solid var(--gw-border, #E5E0D8) !important;
 }
-.gw-reviews-section .jdgm-form input,
-.gw-reviews-section .jdgm-form textarea {
+.gw-reviews-section .jm-pagination-controls .jm-button[aria-current="page"] {
+  background: var(--gw-gold, #C89B3C) !important;
+  color: #fff !important;
+  border-color: var(--gw-gold, #C89B3C) !important;
+}
+.gw-reviews-section .jm-pagination-controls .jm-button--primary:hover:not([aria-current="page"]) {
+  background: var(--gw-sand, #EDE8DF) !important;
+}
+
+/* Header-Zeile (Bewertung schreiben / Filter / Sortierung) vereinheitlichen */
+.gw-reviews-section .jm-review-widget-minimal-header__button-and-filters .jm-button,
+.gw-reviews-section .jm-sort-filter__select {
+  min-height: 36px !important;
+  border-radius: 100px !important;
+}
+.gw-reviews-section select.jm-sort-filter__select,
+.gw-reviews-section select.jdgm-sort-dropdown.jm-sort-filter__select,
+.gw-reviews-section .jm-sort-filter__select {
+  border-radius: 100px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  border-color: var(--gw-border, #E5E0D8) !important;
+  color: var(--gw-ink, #1A1613) !important;
+  padding-left: 14px !important;
+  padding-right: 28px !important;
+}
+
+/* Formular-Inputs */
+.gw-reviews-section .jm-review-widget input,
+.gw-reviews-section .jm-review-widget textarea,
+.gw-reviews-section .jm-review-widget select {
   font-family: 'Inter', system-ui, sans-serif !important;
   border: 1px solid var(--gw-border, #E5E0D8) !important;
   border-radius: 8px !important;
-  padding: 10px 14px !important;
   background: #fff !important;
   color: var(--gw-ink, #1A1613) !important;
+}
+.gw-reviews-section .jm-review-widget input:focus,
+.gw-reviews-section .jm-review-widget textarea:focus {
+  border-color: var(--gw-gold, #C89B3C) !important;
   outline: none !important;
 }
-.gw-reviews-section .jdgm-form input:focus,
-.gw-reviews-section .jdgm-form textarea:focus {
-  border-color: var(--gw-gold, #C89B3C) !important;
+
+/* ── Judge.me Featured Carousel (Startseite) ──────────────────── */
+/* Carousel-eigener Titel + Rating-Zeile ausblenden — Section-Header reicht */
+.gw-reviews-section .jdgm-carousel-title-and-link { display: none !important; }
+
+/* Riesige Lücke zum Header schließen (Wrapper-Padding + Carousel-Margin) */
+.gw-reviews-section .jdgm-carousel-wrapper { padding-top: 0 !important; }
+.gw-reviews-section .jdgm-carousel.jdgm-widget { margin-top: 0 !important; }
+
+/* Gequetschtes Mini-Produktbild unter den Reviews ausblenden */
+.gw-reviews-section .jdgm-carousel-item__product { display: none !important; }
+
+.gw-reviews-section .jdgm-carousel-item {
+  background: #fff !important;
+  border: 1px solid var(--gw-border, #E5E0D8) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
 }
-.gw-reviews-section .jdgm-form label {
+.gw-reviews-section .jdgm-carousel-item__review-body,
+.gw-reviews-section .jdgm-carousel-item__review-title {
   font-family: 'Inter', system-ui, sans-serif !important;
-  font-size: 13px !important;
+  color: var(--gw-ink, #1A1613) !important;
+}
+.gw-reviews-section .jdgm-carousel-item__reviewer-name {
+  font-family: 'Inter', system-ui, sans-serif !important;
   font-weight: 600 !important;
   color: var(--gw-ink, #1A1613) !important;
 }
-.gw-reviews-section .jdgm-form button[type="submit"],
-.gw-reviews-section .jdgm-submit-btn {
-  font-family: 'Inter', system-ui, sans-serif !important;
-  background: var(--gw-gold, #C89B3C) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 100px !important;
-  padding: 12px 28px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: background 0.2s !important;
-}
-.gw-reviews-section .jdgm-form button[type="submit"]:hover,
-.gw-reviews-section .jdgm-submit-btn:hover {
-  background: #b8871f !important;
+.gw-reviews-section .jdgm-carousel__arrows .jdgm-carousel-arrow,
+.gw-reviews-section [class*="jdgm-carousel"] .jdgm-star {
+  color: var(--gw-gold, #C89B3C) !important;
 }
 
 /* Fallback — shown until Judge.me widget has content */
@@ -277,6 +253,11 @@
 {
   "name": "Reviews (Judge.me)",
   "tag": "section",
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
   "settings": [
     {
       "type": "text",
@@ -289,13 +270,6 @@
       "id": "heading",
       "label": "Überschrift",
       "default": "Was unsere Kunden sagen"
-    },
-    {
-      "type": "text",
-      "id": "review_count",
-      "label": "Bewertungsanzahl (Fallback)",
-      "default": "1.240",
-      "info": "Wird im Fallback-Text angezeigt bis Judge.me aktiv ist"
     }
   ],
   "presets": [

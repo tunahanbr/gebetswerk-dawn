@@ -1,5 +1,9 @@
 {%- liquid
-  assign col    = collection
+  if section.settings.collection != blank
+    assign col = collections[section.settings.collection]
+  else
+    assign col = collection
+  endif
   assign prefix = section.settings.name_prefix | default: 'Personalisierter Gebetsteppich'
   assign suffix = section.settings.name_suffix | default: '· Geschenk'
 -%}
@@ -66,7 +70,6 @@
               {%- else -%}
                 {%- assign card_img   = product.featured_media -%}
               {%- endif -%}
-              {%- assign hover_img    = product.media[1] -%}
               {%- assign card_url     = product.url | append: '?variant=' | append: card_variant.id -%}
               {%- assign card_title   = prefix | append: ' – ' | append: color_val | append: ' ' | append: suffix -%}
               {%- assign card_price   = card_variant.price -%}
@@ -76,9 +79,6 @@
                 <div class="gw-col-card__img-wrap">
                   {%- if card_img -%}
                     <img src="{{ card_img | image_url: width: 700 }}" alt="{{ card_title | escape }}" width="700" loading="lazy">
-                    {%- if hover_img and hover_img != card_img -%}
-                      <img src="{{ hover_img | image_url: width: 700 }}" alt="{{ card_title | escape }}" width="700" loading="lazy" class="gw-col-card__img-hover">
-                    {%- endif -%}
                   {%- else -%}
                     {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-col-card__placeholder' }}
                   {%- endif -%}
@@ -93,7 +93,7 @@
                   <p class="gw-col-card__color">{{ color_val }}</p>
                   <p class="gw-col-card__name">{{ card_title }}</p>
                   <div class="gw-col-card__rating">
-                    <div class="jdgm-prev-badge" data-id="{{ product.id }}"></div>
+                    {% render 'gw-rating-stars', product: product %}
                   </div>
                   <p class="gw-col-card__price">
                     {%- if card_variant.compare_at_price > card_variant.price -%}
@@ -104,33 +104,6 @@
                 </div>
                 </a>
 
-                {%- if color_opt.values.size > 1 -%}
-                  <div class="gw-col-card__swatches">
-                    {%- for sv in color_opt.values -%}
-                      {%- assign sv_variant = nil -%}
-                      {%- for v in product.variants -%}
-                        {%- if v.options contains sv -%}
-                          {%- assign sv_variant = v -%}
-                          {%- break -%}
-                        {%- endif -%}
-                      {%- endfor -%}
-                      {%- if sv_variant != nil -%}
-                        {%- assign sv_img = sv_variant.featured_image | default: product.featured_media -%}
-                        <a href="{{ product.url | append: '?variant=' | append: sv_variant.id }}"
-                           class="gw-col-card__swatch{% if sv == color_val %} is-active{% endif %}"
-                           data-img="{{ sv_img | image_url: width: 700 }}"
-                           title="{{ sv | escape }}"
-                           aria-label="{{ sv | escape }}">
-                          {%- if sv_variant.featured_image -%}
-                            <img src="{{ sv_variant.featured_image | image_url: width: 60 }}" alt="{{ sv | escape }}" loading="lazy">
-                          {%- else -%}
-                            <span class="gw-col-card__swatch-dot"></span>
-                          {%- endif -%}
-                        </a>
-                      {%- endif -%}
-                    {%- endfor -%}
-                  </div>
-                {%- endif -%}
               </article>
 
               {%- assign card_count = card_count | plus: 1 -%}
@@ -141,9 +114,6 @@
               <div class="gw-col-card__img-wrap">
                 {%- if product.featured_media -%}
                   <img src="{{ product.featured_media | image_url: width: 700 }}" alt="{{ product.featured_media.alt | escape }}" width="700" loading="lazy">
-                  {%- if product.media[1] -%}
-                    <img src="{{ product.media[1] | image_url: width: 700 }}" alt="{{ product.title | escape }}" width="700" loading="lazy" class="gw-col-card__img-hover">
-                  {%- endif -%}
                 {%- else -%}
                   {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-col-card__placeholder' }}
                 {%- endif -%}
@@ -151,7 +121,7 @@
               <div class="gw-col-card__info">
                 <p class="gw-col-card__name">{{ product.title }}</p>
                 <div class="gw-col-card__rating">
-                  <div class="jdgm-prev-badge" data-id="{{ product.id }}"></div>
+                  {% render 'gw-rating-stars', product: product %}
                 </div>
                 <p class="gw-col-card__price">
                   {%- if product.price_varies -%}ab {% endif %}{{ product.price | money }}
@@ -295,11 +265,9 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.35s ease, transform 0.55s ease;
+  transition: transform 0.55s ease;
 }
-.gw-col-card__img-hover { opacity: 0; }
-.gw-col-card__link:hover .gw-col-card__img-wrap > img:not(.gw-col-card__img-hover) { opacity: 0; transform: scale(1.04); }
-.gw-col-card__link:hover .gw-col-card__img-hover { opacity: 1; transform: scale(1.04); }
+.gw-col-card__link:hover .gw-col-card__img-wrap img { transform: scale(1.06); }
 
 /* Swatches */
 .gw-col-card__swatches {
@@ -387,7 +355,6 @@
 }
 
 /* Judge.me placeholder — hidden until app fills it */
-.gw-col-card__rating .jdgm-prev-badge:empty { display: none; }
 
 .gw-col-card__price {
   font-family: 'Inter', system-ui, sans-serif;
@@ -408,31 +375,17 @@
 }
 </style>
 
-<script>
-(function () {
-  function initSwatches() {
-    document.querySelectorAll('.gw-col-card__swatch').forEach(function (sw) {
-      var card = sw.closest('.gw-col-card');
-      var link = card && card.querySelector('.gw-col-card__link');
-      var mainImg = link && link.querySelector('.gw-col-card__img-wrap > img:not(.gw-col-card__img-hover)');
-      if (!mainImg || !sw.dataset.img) return;
-      sw.addEventListener('mouseenter', function () { mainImg.src = sw.dataset.img; });
-      sw.addEventListener('mouseleave', function () {
-        var active = card.querySelector('.gw-col-card__swatch.is-active');
-        if (active && active.dataset.img) mainImg.src = active.dataset.img;
-      });
-    });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSwatches);
-  else initSwatches();
-  document.addEventListener('shopify:section:load', initSwatches);
-})();
-</script>
 
 {% schema %}
 {
   "name": "Kollektion – Grid",
   "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Kollektion",
+      "info": "Wähle eine Kollektion aus. Leer lassen = aktuelle Kollektionsseite wird verwendet."
+    },
     {
       "type": "text",
       "id": "eyebrow",

@@ -150,7 +150,7 @@
                         {%- unless addon.product.title == 'Aufpreise' -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
-                          {%- assign gw_addon_total = gw_addon_total | plus: addon.final_price -%}
+                          {%- assign gw_addon_total = gw_addon_total | plus: addon.final_line_price -%}
                         {%- endif -%}
                       {%- endfor -%}
 
@@ -177,7 +177,7 @@
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
-                          <div class="gw-cart-addon-inline">1. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                          <div class="gw-cart-addon-inline">1. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
                         {%- endif -%}
                       {%- endfor -%}
 
@@ -186,7 +186,7 @@
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
-                          <div class="gw-cart-addon-inline">2. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                          <div class="gw-cart-addon-inline">2. Name{%- if addon_name != '' -%} · {{ addon_name }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
                         {%- endif -%}
                       {%- endfor -%}
 
@@ -195,7 +195,7 @@
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign sym_type = item.properties['Symbol'] | default: '' -%}
-                          <div class="gw-cart-addon-inline">Symbol{%- if sym_type != '' -%} · {{ sym_type }}{%- endif -%}<span>+{{ addon.final_price | money }}</span></div>
+                          <div class="gw-cart-addon-inline">Symbol{%- if sym_type != '' -%} · {{ sym_type }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
                         {%- endif -%}
                       {%- endfor -%}
 
@@ -207,7 +207,7 @@
                         {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Geschenkverpackung' -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
-                          <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_price | money }}</span></div>
+                          <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_line_price | money }}</span></div>
                         {%- endif -%}
                       {%- endfor -%}
 

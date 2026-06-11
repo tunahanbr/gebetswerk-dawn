@@ -47,7 +47,13 @@
             <span class="gw-hero__trust-stars">
               {%- for i in (1..5) -%}<svg viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
             </span>
-            <strong>{{ section.settings.rating_score }}</strong>&thinsp;·&thinsp;{{ section.settings.rating_count }}
+            {%- assign jm_rating = shop.metafields.judgeme.all_reviews_rating | round: 1 -%}
+            {%- assign jm_count = shop.metafields.judgeme.all_reviews_count -%}
+            {%- if jm_rating and jm_rating > 0 -%}
+              <strong>{{ jm_rating | replace: '.', ',' }}</strong>&thinsp;·&thinsp;{{ jm_count }} Bewertungen
+            {%- else -%}
+              <strong>{{ section.settings.rating_score }}</strong>&thinsp;·&thinsp;{{ section.settings.rating_count }}
+            {%- endif -%}
           </span>
         </div>
       </div>

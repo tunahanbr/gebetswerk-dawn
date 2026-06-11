@@ -1,40 +1,154 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "gebetswerk-main-product",
       "blocks": {
-        "thread-gold":   { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
-        "thread-silver": { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
-        "thread-white":  { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
-        "thread-black":  { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
-        "badge-lock":    { "type": "trust_badge",  "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
-        "badge-shield":  { "type": "trust_badge",  "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
-        "badge-heart":   { "type": "trust_badge",  "settings": { "icon": "heart",  "label": "Handgefertigt" } },
-        "badge-clock":   { "type": "trust_badge",  "settings": { "icon": "clock",  "label": "3–5 Tage" } },
-        "sym-none":      { "type": "symbol",       "settings": { "symbol_id": "none",     "label": "Keins",        "icon": "—"  } },
-        "sym-moon":      { "type": "symbol",       "settings": { "symbol_id": "moon",     "label": "Halbmond",     "icon": "☾"  } },
-        "sym-heart":     { "type": "symbol",       "settings": { "symbol_id": "heart",    "label": "Herz",         "icon": "♥"  } },
-        "sym-infinity":  { "type": "symbol",       "settings": { "symbol_id": "infinity", "label": "Unendlichkeit","icon": "∞"  } },
-        "addon-giftwrap": { "type": "opt_checkbox", "settings": { "label": "Mit Geschenkschleife verpacken", "icon": "🎁", "field_key": "Geschenkverpackung", "surcharge_cents": 199, "addon_variant_id": 53088151601488, "default_checked": false } },
-        "addon-beads":    { "type": "opt_product",  "settings": { "label": "Gebetskette dazu?", "field_key": "Gebetskette", "display_type": "image_grid", "include_none": true, "none_label": "Keine", "separate_line_item": true } },
-        "acc-shipping":  { "type": "accordion",    "settings": { "title": "Versand & Rückgabe", "content": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.</p>" } },
-        "acc-care":      { "type": "accordion",    "settings": { "title": "Pflege", "content": "<p>Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln.</p>" } }
+        "thread-gold": {
+          "type": "thread_color",
+          "settings": {
+            "id": "gold",
+            "name": "Gold",
+            "hex": "#c9a24a"
+          }
+        },
+        "thread-silver": {
+          "type": "thread_color",
+          "settings": {
+            "id": "silver",
+            "name": "Silber",
+            "hex": "#c8c8cc"
+          }
+        },
+        "thread-white": {
+          "type": "thread_color",
+          "settings": {
+            "id": "white",
+            "name": "Weiß",
+            "hex": "#f5f1e6"
+          }
+        },
+        "thread-black": {
+          "type": "thread_color",
+          "settings": {
+            "id": "black",
+            "name": "Schwarz",
+            "hex": "#1a1a1a"
+          }
+        },
+        "badge-lock": {
+          "type": "trust_badge",
+          "settings": {
+            "icon": "lock",
+            "label": "SSL-gesichert"
+          }
+        },
+        "badge-shield": {
+          "type": "trust_badge",
+          "settings": {
+            "icon": "shield",
+            "label": "14 Tage Rückgabe"
+          }
+        },
+        "badge-heart": {
+          "type": "trust_badge",
+          "settings": {
+            "icon": "heart",
+            "label": "Handgefertigt"
+          }
+        },
+        "badge-clock": {
+          "type": "trust_badge",
+          "settings": {
+            "icon": "clock",
+            "label": "3–5 Tage"
+          }
+        },
+        "sym-none": {
+          "type": "symbol",
+          "settings": {
+            "symbol_id": "none",
+            "label": "Keins",
+            "icon": "—"
+          }
+        },
+        "sym-moon": {
+          "type": "symbol",
+          "settings": {
+            "symbol_id": "moon",
+            "label": "Halbmond",
+            "icon": "☾"
+          }
+        },
+        "sym-heart": {
+          "type": "symbol",
+          "settings": {
+            "symbol_id": "heart",
+            "label": "Herz",
+            "icon": "♥"
+          }
+        },
+        "sym-infinity": {
+          "type": "symbol",
+          "settings": {
+            "symbol_id": "infinity",
+            "label": "Unendlichkeit",
+            "icon": "∞"
+          }
+        },
+        "addon-giftwrap": {
+          "type": "opt_checkbox",
+          "settings": {
+            "label": "Mit Geschenkschleife verpacken",
+            "icon": "🎁",
+            "field_key": "Geschenkverpackung",
+            "surcharge_cents": 199,
+            "addon_variant_id": 53088151601488,
+            "default_checked": false
+          }
+        },
+        "addon-beads": {
+          "type": "opt_product",
+          "settings": {
+            "label": "Gebetskette dazu?",
+            "field_key": "Gebetskette",
+            "display_type": "image_grid",
+            "include_none": true,
+            "none_label": "Keine",
+            "separate_line_item": true
+          }
+        },
+        "acc-shipping": {
+          "type": "accordion",
+          "settings": {
+            "title": "Versand & Rückgabe",
+            "content": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.</p>"
+          }
+        },
+        "acc-care": {
+          "type": "accordion",
+          "settings": {
+            "title": "Pflege",
+            "content": "<p>Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln.</p>"
+          }
+        }
       },
       "block_order": [
-        "thread-gold", "thread-silver", "thread-white", "thread-black",
-        "badge-lock", "badge-shield", "badge-heart", "badge-clock",
-        "sym-none", "sym-moon", "sym-heart", "sym-infinity",
-        "addon-giftwrap", "addon-beads",
-        "acc-shipping", "acc-care"
+        "thread-gold",
+        "thread-silver",
+        "thread-white",
+        "thread-black",
+        "badge-lock",
+        "badge-shield",
+        "badge-heart",
+        "badge-clock",
+        "sym-none",
+        "sym-moon",
+        "sym-heart",
+        "sym-infinity",
+        "addon-giftwrap",
+        "addon-beads",
+        "acc-shipping",
+        "acc-care"
       ],
       "settings": {
         "price_name1": 1000,
@@ -54,53 +168,21 @@
     },
     "gebetswerk_reviews": {
       "type": "gebetswerk-reviews",
-      "settings": {
-        "eyebrow": "Kundenbewertungen",
-        "heading": "Was unsere Kunden sagen",
-        "review_count": "1.240"
-      }
-    },
-    "gebetswerk_testimonials": {
-      "type": "gebetswerk-testimonials",
+      "settings": {},
       "blocks": {
-        "r1": {
-          "type": "review",
+        "jm_review_widget": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "fallback_image": "testimonial-1.jpg",
-            "title": "Geschenk für Mama",
-            "text": "Der Teppich ist atemberaubend schön – die Stickerei mit dem Namen meiner Mutter brachte sie zum Weinen.",
-            "name": "Selma K."
-          }
-        },
-        "r2": {
-          "type": "review",
-          "settings": {
-            "fallback_image": "testimonial-2.jpg",
-            "title": "Sieht so unfassbar schön aus",
-            "text": "Hochwertige Verarbeitung, schneller Versand, edle Verpackung. Genau wie auf den Bildern.",
-            "name": "Yusuf A."
-          }
-        },
-        "r3": {
-          "type": "review",
-          "settings": {
-            "fallback_image": "testimonial-3.jpg",
-            "title": "Großartige Qualität",
-            "text": "Sehr gut, wunderschöne Farbe und der Goldfaden ist wirklich Gold. Werde wieder bestellen!",
-            "name": "Nadina K."
+            "review_data": "real_data",
+            "max_width": 1000,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
           }
         }
       },
       "block_order": [
-        "r1",
-        "r2",
-        "r3"
-      ],
-      "settings": {
-        "eyebrow": "Kundenbewertungen",
-        "heading": "<p>4,9 von 5 — <em>1.240 Bewertungen</em></p>",
-        "link_label": ""
-      }
+        "jm_review_widget"
+      ]
     },
     "gebetswerk_faq": {
       "type": "gebetswerk-faq",
@@ -151,7 +233,6 @@
   "order": [
     "main",
     "gebetswerk_reviews",
-    "gebetswerk_testimonials",
     "gebetswerk_faq"
   ]
 }

@@ -1,0 +1,23 @@
+{% comment %}
+  Bewertungssterne aus Judge.me-Metafields (reviews.rating / reviews.rating_count).
+  Rendert nichts, wenn das Produkt keine Bewertungen hat.
+
+  Usage:
+  {% render 'gw-rating-stars', product: product %}
+  {% render 'gw-rating-stars', product: product, show_count: false %}
+{% endcomment %}
+
+{%- liquid
+  assign gw_rs_rating = product.metafields.reviews.rating.value.rating | times: 1.0
+  assign gw_rs_count = product.metafields.reviews.rating_count | times: 1
+-%}
+{%- if gw_rs_count > 0 -%}
+  {%- assign gw_rs_pct = gw_rs_rating | divided_by: 5.0 | times: 100.0 | round: 1 -%}
+  <span class="gw-stars" role="img" aria-label="{{ gw_rs_rating | round: 1 }} von 5 Sternen, {{ gw_rs_count }} Bewertung{% if gw_rs_count != 1 %}en{% endif %}">
+    <span class="gw-stars__row gw-stars__row--bg" aria-hidden="true">★★★★★</span>
+    <span class="gw-stars__row gw-stars__row--fill" aria-hidden="true" style="width: {{ gw_rs_pct }}%">★★★★★</span>
+  </span>
+  {%- unless show_count == false -%}
+    <span class="gw-stars__count">({{ gw_rs_count }})</span>
+  {%- endunless -%}
+{%- endif -%}
