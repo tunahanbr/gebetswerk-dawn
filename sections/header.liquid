@@ -70,6 +70,43 @@
       padding-top: 0.5rem;
     }
   }
+
+  /* Gebetswerk navbar refinements */
+  .header__menu-item {
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+
+  .header__menu-item:hover,
+  .header__menu-item:focus-visible {
+    color: #C89B3C;
+  }
+
+  .header__active-menu-item {
+    color: #C89B3C;
+  }
+
+  .header-wrapper {
+    border-bottom: 1px solid rgba(200, 155, 60, 0.25);
+  }
+
+  .header__icon svg {
+    transition: color 0.2s ease;
+  }
+
+  .header__icon:hover svg,
+  .header__icon:focus-visible svg {
+    color: #C89B3C;
+  }
+
+  @media screen and (min-width: 990px) {
+    .header__inline-menu .header__menu-item {
+      padding: 0.6rem 1rem;
+    }
+  }
 </style>
 
 {%- style -%}
