@@ -121,11 +121,11 @@
                   <tbody role="rowgroup">
                     {%- assign last_rug_index = 0 -%}
                     {%- for item in cart.items -%}
-                      {%- unless item.product.title == 'Aufpreise' -%}{%- assign last_rug_index = item.index -%}{%- endunless -%}
+                      {%- if item.properties['_TeppichVariant'] == blank -%}{%- assign last_rug_index = item.index -%}{%- endif -%}
                     {%- endfor -%}
 
                     {%- for item in cart.items -%}
-                      {%- if item.product.title == 'Aufpreise' -%}{%- continue -%}{%- endif -%}
+                      {%- if item.properties['_TeppichVariant'] != blank -%}{%- continue -%}{%- endif -%}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
