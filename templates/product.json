@@ -109,10 +109,11 @@
           "settings": {
             "label": "Mit Geschenkschleife verpacken",
             "icon": "🎁",
+            "description": "",
             "field_key": "Geschenkverpackung",
+            "default_checked": false,
             "surcharge_cents": 199,
-            "addon_variant_id": 53088151601488,
-            "default_checked": false
+            "addon_variant_id": 53088151601488
           }
         },
         "addon-beads": {
@@ -120,6 +121,7 @@
           "settings": {
             "label": "Gebetskette dazu?",
             "field_key": "Gebetskette",
+            "product": "gebetskette",
             "display_type": "image_grid",
             "include_none": true,
             "none_label": "Keine",
@@ -160,6 +162,15 @@
         "acc-care"
       ],
       "settings": {
+        "personalize_title": "Gebetsteppich personalisieren?",
+        "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
+        "badge_text": "Personalisiertes Set",
+        "review_display": "2.627 Bewertungen",
+        "review_count_number": 2627,
+        "shipping_row1": "3–5 Werktage Lieferzeit · kostenlos ab 100 €",
+        "shipping_row2": "In edler Geschenkverpackung mit Goldschleife",
+        "countdown_cutoff_hour": 17,
+        "inventory_threshold": 10,
         "price_name1": 1000,
         "price_name2": 1500,
         "price_giftwrap": 199,
@@ -168,30 +179,15 @@
         "addon_name2_variant_id": 53088151568720,
         "addon_giftwrap_variant_id": 53088151601488,
         "addon_symbol_variant_id": 53088243745104,
-        "personalize_title": "Gebetsteppich personalisieren?",
-        "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
-        "shipping_row1": "3–5 Werktage Lieferzeit · kostenlos ab 100 €",
-        "shipping_row2": "In edler Geschenkverpackung mit Goldschleife",
-        "countdown_cutoff_hour": 17
+        "beads_product": ""
       }
     },
     "gebetswerk_reviews": {
       "type": "gebetswerk-reviews",
-      "settings": {},
-      "blocks": {
-        "jm_review_widget": {
-          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-          "settings": {
-            "review_data": "real_data",
-            "max_width": 1000,
-            "show_shop_reviews": false,
-            "empty_state": "empty_widget"
-          }
-        }
-      },
-      "block_order": [
-        "jm_review_widget"
-      ]
+      "settings": {
+        "eyebrow": "Kundenbewertungen",
+        "heading": "Was unsere Kunden sagen"
+      }
     },
     "gebetswerk_faq": {
       "type": "gebetswerk-faq",
@@ -235,7 +231,8 @@
         "eyebrow": "Häufige Fragen",
         "heading": "<p>Alles, was du <em>wissen musst</em>.</p>",
         "subtext": "Du hast eine andere Frage? Schreib uns – wir antworten innerhalb von 24 Stunden.",
-        "cta_label": "Kontakt aufnehmen"
+        "cta_label": "Kontakt aufnehmen",
+        "cta_url": ""
       }
     }
   },
