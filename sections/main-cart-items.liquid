@@ -27,7 +27,7 @@
 
 {%- assign gw_real_count = 0 -%}
 {%- for item in cart.items -%}
-  {%- unless item.product.title == 'Aufpreise' -%}{%- assign gw_real_count = gw_real_count | plus: 1 -%}{%- endunless -%}
+  {%- unless item.properties['_TeppichVariant'] != blank -%}{%- assign gw_real_count = gw_real_count | plus: 1 -%}{%- endunless -%}
 {%- endfor -%}
 
 <cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty or gw_real_count == 0 %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
@@ -147,7 +147,7 @@
                       {%- assign item_vid = item.variant_id | append: '' -%}
                       {%- assign gw_addon_total = 0 -%}
                       {%- for addon in cart.items -%}
-                        {%- unless addon.product.title == 'Aufpreise' -%}{%- continue -%}{%- endunless -%}
+                        {%- unless addon.properties['_TeppichVariant'] != blank -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign gw_addon_total = gw_addon_total | plus: addon.final_line_price -%}
@@ -173,7 +173,7 @@
                       {%- endif -%}
 
                       {%- for addon in cart.items -%}
-                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Name 1' -%}{%- continue -%}{%- endunless -%}
+                        {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == 'Name 1' -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
@@ -182,7 +182,7 @@
                       {%- endfor -%}
 
                       {%- for addon in cart.items -%}
-                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == '2. Name' -%}{%- continue -%}{%- endunless -%}
+                        {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == '2. Name' -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
@@ -191,7 +191,7 @@
                       {%- endfor -%}
 
                       {%- for addon in cart.items -%}
-                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Symbol' -%}{%- continue -%}{%- endunless -%}
+                        {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == 'Symbol' -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           {%- assign sym_type = item.properties['Symbol'] | default: '' -%}
@@ -204,7 +204,7 @@
                       {%- endif -%}
 
                       {%- for addon in cart.items -%}
-                        {%- unless addon.product.title == 'Aufpreise' and addon.variant.title == 'Geschenkverpackung' -%}{%- continue -%}{%- endunless -%}
+                        {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == 'Geschenkverpackung' -%}{%- continue -%}{%- endunless -%}
                         {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
                         {%- if tv == item_vid or tv == '' and item.index == last_rug_index -%}
                           <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_line_price | money }}</span></div>
