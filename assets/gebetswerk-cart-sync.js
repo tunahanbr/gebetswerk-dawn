@@ -15,8 +15,20 @@
     const realCount = cart.items
       .filter(i => !isAddon(i))
       .reduce((sum, i) => sum + i.quantity, 0);
-    document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => { b.textContent = realCount; });
-    document.querySelectorAll('.cart-count-bubble').forEach(b => { b.hidden = realCount === 0; });
+    const link = document.getElementById('cart-icon-bubble');
+    if (!link) return;
+    let bubble = link.querySelector('.cart-count-bubble');
+    if (realCount <= 0) {
+      if (bubble) bubble.remove();
+      return;
+    }
+    if (!bubble) {
+      bubble = document.createElement('div');
+      bubble.className = 'cart-count-bubble';
+      link.appendChild(bubble);
+    }
+    const n = realCount < 100 ? realCount : '';
+    bubble.innerHTML = `<span aria-hidden="true">${n}</span><span class="visually-hidden">${realCount} im Warenkorb</span>`;
   }
 
   /* Welche Teppich-Property muss vorhanden sein, damit die Aufpreis-Variante zählt? */

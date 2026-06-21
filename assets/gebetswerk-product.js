@@ -107,6 +107,24 @@
     return true;
   }
 
+  /* ── Cart Bubble ──────────────────────────────────────────── */
+  function updateCartBubble(count) {
+    const link = document.getElementById('cart-icon-bubble');
+    if (!link) return;
+    let bubble = link.querySelector('.cart-count-bubble');
+    if (count <= 0) {
+      if (bubble) bubble.remove();
+      return;
+    }
+    if (!bubble) {
+      bubble = document.createElement('div');
+      bubble.className = 'cart-count-bubble';
+      link.appendChild(bubble);
+    }
+    const n = count < 100 ? count : '';
+    bubble.innerHTML = `<span aria-hidden="true">${n}</span><span class="visually-hidden">${count} im Warenkorb</span>`;
+  }
+
   /* ── Cart API ─────────────────────────────────────────────── */
   async function addToCart() {
     if (state.loading || !state.variantId) return;
@@ -114,7 +132,10 @@
     state.loading = true;
     setButtonLoading(true);
 
-    const props = Object.assign(buildProperties(), addonCartProperties());
+    /* Unique ref per cart-add so same-variant rugs are grouped independently */
+    const ref = 'gw-' + Date.now().toString(36);
+
+    const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
 
     /* Build line items array */
     const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
@@ -122,17 +143,17 @@
     /* Personalisierungs-Aufpreise als separate Artikel (korrekter Warenkorb-Preis) */
     if (state.personalize && ADDON_VARIANTS.name1) {
       items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
+        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
       if (state.twoNames && ADDON_VARIANTS.name2)
         items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
-          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
+          properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
     }
     if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
       items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId } });
+        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId } });
 
     /* Dynamische Addon-Artikel (opt_product, opt_checkbox mit Variant-ID) */
-    addonCartItems().forEach(i => items.push(i));
+    addonCartItems().forEach(i => { i.properties = Object.assign({}, i.properties, { '_ref': ref }); items.push(i); });
 
     try {
       const res = await fetch('/cart/add.js', {
@@ -152,12 +173,11 @@
       document.dispatchEvent(new CustomEvent('cart:open',   { bubbles: true }));
       document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
 
-      /* Fallback: update cart bubble count — only real rug items, no add-ons */
+      /* Update cart bubble — inject element if cart was empty before */
       const realCount = cartRes.items
-        .filter(i => i.product_title !== 'Aufpreise' && !(i.properties && '_Zugehöriger Teppich' in i.properties))
+        .filter(i => !(i.properties && i.properties['_TeppichVariant']))
         .reduce((sum, i) => sum + i.quantity, 0);
-      document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => { b.textContent = realCount; });
-      document.querySelectorAll('.cart-count-bubble').forEach(b => { b.hidden = realCount === 0; });
+      updateCartBubble(realCount);
 
       /* Show success state and offer to configure another rug */
       const btn = $('gw-atc-btn');
@@ -192,20 +212,21 @@
     const btn = $('gw-buy-now-btn');
     if (btn) { btn.disabled = true; btn.querySelector('svg')?.remove(); btn.textContent = 'Wird vorbereitet…'; }
 
-    const props = Object.assign(buildProperties(), addonCartProperties());
+    const ref = 'gw-' + Date.now().toString(36);
+    const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
     const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
 
     if (state.personalize && ADDON_VARIANTS.name1) {
       items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
+        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
       if (state.twoNames && ADDON_VARIANTS.name2)
         items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
-          properties: { '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
+          properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
     }
     if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
       items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
-        properties: { '_TeppichVariant': '' + state.variantId } });
-    addonCartItems().forEach(i => items.push(i));
+        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId } });
+    addonCartItems().forEach(i => { i.properties = Object.assign({}, i.properties, { '_ref': ref }); items.push(i); });
 
     try {
       const res = await fetch('/cart/add.js', {
@@ -612,6 +633,7 @@
       state.name1 = e.target.value = e.target.value.slice(0, 11);
       const c = $('gw-name1-count'); if (c) c.textContent = state.name1.length + '/11';
       updatePreview();
+      updateOrderSummary();
     });
 
     /* Two names toggle */
@@ -637,6 +659,7 @@
       state.name2 = e.target.value = e.target.value.slice(0, 11);
       const c = $('gw-name2-count'); if (c) c.textContent = state.name2.length + '/11';
       updatePreview();
+      updateOrderSummary();
     });
 
     /* Thread colors */
