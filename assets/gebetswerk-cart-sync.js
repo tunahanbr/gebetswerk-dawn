@@ -7,8 +7,12 @@
 (function () {
   'use strict';
 
+  /* Ein "Kind" (Aufpreis, Gebetskette, Addon) ist jede Zeile, die per
+     _TeppichVariant an einen Teppich gekoppelt ist — egal welches Produkt.
+     So wird auch eine verwaiste Gebetskette als Kind erkannt und nicht
+     fälschlich als echtes Produkt (Phantom-Zwischensumme) behandelt. */
   function isAddon(i) {
-    return i.product_title === 'Aufpreise';
+    return !!(i.properties && i.properties['_TeppichVariant'] !== undefined && i.properties['_TeppichVariant'] !== null);
   }
 
   function updateBadge(cart) {
