@@ -135,6 +135,12 @@
     /* Unique ref per cart-add so same-variant rugs are grouped independently */
     const ref = 'gw-' + Date.now().toString(36);
 
+    /* Sichtbares Set-Label (Name/n) → auf jede Aufpreis-/Addon-Zeile, damit bei
+       mehreren Sets in einer Bestellung sofort klar ist, was zusammengehört */
+    const setLabel = state.personalize && state.name1.trim()
+      ? (state.twoNames && state.name2.trim() ? state.name1.trim() + ' & ' + state.name2.trim() : state.name1.trim())
+      : '';
+
     const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
 
     /* Build line items array */
@@ -154,6 +160,9 @@
 
     /* Dynamische Addon-Artikel (opt_product, opt_checkbox mit Variant-ID) */
     addonCartItems().forEach(i => { i.properties = Object.assign({}, i.properties, { '_ref': ref }); items.push(i); });
+
+    /* Set-Label auf alle Addon-Zeilen (nicht auf den Teppich selbst, der zeigt die Namen schon) */
+    if (setLabel) items.forEach((it, idx) => { if (idx > 0) it.properties = Object.assign({}, it.properties, { 'Für': setLabel }); });
 
     try {
       const res = await fetch('/cart/add.js', {
@@ -213,6 +222,9 @@
     if (btn) { btn.disabled = true; btn.querySelector('svg')?.remove(); btn.textContent = 'Wird vorbereitet…'; }
 
     const ref = 'gw-' + Date.now().toString(36);
+    const setLabel = state.personalize && state.name1.trim()
+      ? (state.twoNames && state.name2.trim() ? state.name1.trim() + ' & ' + state.name2.trim() : state.name1.trim())
+      : '';
     const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
     const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
 
@@ -227,6 +239,8 @@
       items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
         properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId } });
     addonCartItems().forEach(i => { i.properties = Object.assign({}, i.properties, { '_ref': ref }); items.push(i); });
+
+    if (setLabel) items.forEach((it, idx) => { if (idx > 0) it.properties = Object.assign({}, it.properties, { 'Für': setLabel }); });
 
     try {
       const res = await fetch('/cart/add.js', {
