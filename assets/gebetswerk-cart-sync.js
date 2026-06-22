@@ -63,12 +63,22 @@
         const updates = {};
         cart.items.forEach(a => {
           if (!isAddon(a)) return;
-          const tv = (a.properties && a.properties['_TeppichVariant']) || '';
-          const propKey = ADDON_PROP[a.variant_title] || null;
-          const want = rugs
-            .filter(r => String(r.variant_id) === tv)
-            .filter(r => !propKey || (r.properties && r.properties[propKey]))
-            .reduce((s, r) => s + r.quantity, 0);
+          const ref = (a.properties && a.properties['_ref']) || '';
+          let matchRugs;
+          if (ref) {
+            /* Präzise Kopplung: jede Aufpreis-Zeile gehört genau zu dem Teppich
+               mit demselben _ref → keine Doppelzählung bei mehreren gleichfarbigen
+               Teppichen, und beim Entfernen des Teppichs fällt der Aufpreis auf 0 */
+            matchRugs = rugs.filter(r => r.properties && r.properties['_ref'] === ref);
+          } else {
+            /* Fallback für ältere Warenkorb-Zeilen ohne _ref */
+            const tv = (a.properties && a.properties['_TeppichVariant']) || '';
+            const propKey = ADDON_PROP[a.variant_title] || null;
+            matchRugs = rugs
+              .filter(r => String(r.variant_id) === tv)
+              .filter(r => !propKey || (r.properties && r.properties[propKey]));
+          }
+          const want = matchRugs.reduce((s, r) => s + r.quantity, 0);
           if (want !== a.quantity) updates[a.key] = want;
         });
         if (Object.keys(updates).length > 0) {

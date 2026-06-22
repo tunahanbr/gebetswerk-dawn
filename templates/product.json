@@ -44,6 +44,14 @@
             "hex": "#1a1a1a"
           }
         },
+        "thread-brown": {
+          "type": "thread_color",
+          "settings": {
+            "id": "brown",
+            "name": "Braun",
+            "hex": "#7a5230"
+          }
+        },
         "badge-lock": {
           "type": "trust_badge",
           "settings": {
@@ -148,6 +156,7 @@
         "thread-silver",
         "thread-white",
         "thread-black",
+        "thread-brown",
         "badge-lock",
         "badge-shield",
         "badge-heart",

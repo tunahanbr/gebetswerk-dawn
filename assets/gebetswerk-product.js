@@ -126,9 +126,9 @@
   }
 
   /* ── Cart API ─────────────────────────────────────────────── */
-  async function addToCart() {
-    if (state.loading || !state.variantId) return;
-    if (!validatePersonalization()) return;
+  async function addToCart(openDrawer) {
+    if (state.loading || !state.variantId) return false;
+    if (!validatePersonalization()) return false;
     state.loading = true;
     setButtonLoading(true);
 
@@ -179,7 +179,7 @@
 
       /* Trigger Dawn's cart drawer / notification */
       const cartRes = await fetch('/cart.js').then(r => r.json());
-      document.dispatchEvent(new CustomEvent('cart:open',   { bubbles: true }));
+      if (openDrawer !== false) document.dispatchEvent(new CustomEvent('cart:open', { bubbles: true }));
       document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
 
       /* Update cart bubble — inject element if cart was empty before */
@@ -190,23 +190,23 @@
 
       /* Show success state and offer to configure another rug */
       const btn = $('gw-atc-btn');
-      const resetBtn = $('gw-reset-btn');
       if (btn) {
         btn.textContent = '✓ Im Warenkorb';
         btn.style.background = '#2d6a4f';
-        if (resetBtn) resetBtn.hidden = false;
         setTimeout(() => {
           btn.textContent = 'In den Warenkorb · ' + fmt(totalCents());
           btn.style.background = '';
           state.loading = false;
           setButtonLoading(false);
         }, 2500);
-        return;
+        return true;
       }
+      return true;
 
     } catch (e) {
       console.error('Cart error:', e);
       alert('Netzwerkfehler. Bitte erneut versuchen.');
+      return false;
     } finally {
       state.loading = false;
       setButtonLoading(false);
@@ -572,56 +572,64 @@
     const buyNowBtn = $('gw-buy-now-btn');
     if (buyNowBtn) buyNowBtn.addEventListener('click', buyNow);
 
-    /* Reset-Button → Formular zurücksetzen für zweiten Teppich */
+    /* Formular für den nächsten Teppich leeren (ohne den Warenkorb anzufassen) */
+    function resetForm() {
+      /* Namen leeren */
+      const n1 = $('gw-name1-input'); if (n1) { n1.value = ''; state.name1 = ''; }
+      const n2 = $('gw-name2-input'); if (n2) { n2.value = ''; state.name2 = ''; }
+      const c1 = $('gw-name1-count'); if (c1) c1.textContent = '0/11';
+      const c2 = $('gw-name2-count'); if (c2) c2.textContent = '0/11';
+
+      /* Zweiten Namen ausblenden */
+      state.twoNames = false;
+      const twoTog = $('gw-twonames-toggle'); if (twoTog) twoTog.checked = false;
+      const n2sec  = $('gw-name2-section');  if (n2sec)  n2sec.hidden = true;
+
+      /* Symbol zurücksetzen */
+      state.symbol = 'none';
+      document.querySelectorAll('[data-symbol]').forEach((b, i) => b.classList.toggle('is-active', i === 0));
+      const posSection = $('gw-sympos-section'); if (posSection) posSection.hidden = true;
+      const priceTag   = $('gw-symbol-price-tag'); if (priceTag) priceTag.hidden = true;
+
+      /* Geschenk zurücksetzen */
+      state.giftWrap = false;
+      const gwTog = $('gw-giftwrap-toggle'); if (gwTog) gwTog.checked = false;
+
+      /* Qty auf 1 */
+      state.qty = 1;
+      const qtyVal = $('gw-qty-val'); if (qtyVal) qtyVal.textContent = '1';
+      const qtyInp = $('gw-qty-input'); if (qtyInp) qtyInp.value = '1';
+
+      /* Addon-State zurücksetzen */
+      addonMap.forEach((a, key) => {
+        a.value = ''; a.surchargeCents = 0;
+        if (key.startsWith('text-')) {
+          const input = document.querySelector('[data-addon="text"][data-block="' + key.slice(5) + '"]');
+          if (input) { input.value = ''; const c = document.querySelector('[data-counter="' + key.slice(5) + '"]'); if (c) c.textContent = '0/' + input.maxLength; }
+        } else if (key.startsWith('cb-')) {
+          const cb = document.querySelector('[data-addon="checkbox"][data-block="' + key.slice(3) + '"]');
+          if (cb) cb.checked = false;
+        }
+      });
+
+      updatePrice();
+      updatePreview();
+      updateOrderSummary();
+    }
+
+    /* „Weiteren Teppich personalisieren" → aktuellen Teppich in den Warenkorb,
+       dann Formular leeren und hoch zum Namensfeld scrollen (Drawer bleibt zu) */
     const resetBtn = $('gw-reset-btn');
     if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
-        /* Namen leeren */
-        const n1 = $('gw-name1-input'); if (n1) { n1.value = ''; state.name1 = ''; }
-        const n2 = $('gw-name2-input'); if (n2) { n2.value = ''; state.name2 = ''; }
-        const c1 = $('gw-name1-count'); if (c1) c1.textContent = '0/11';
-        const c2 = $('gw-name2-count'); if (c2) c2.textContent = '0/11';
-
-        /* Zweiten Namen ausblenden */
-        state.twoNames = false;
-        const twoTog = $('gw-twonames-toggle'); if (twoTog) twoTog.checked = false;
-        const n2sec  = $('gw-name2-section');  if (n2sec)  n2sec.hidden = true;
-
-        /* Symbol zurücksetzen */
-        state.symbol = 'none';
-        document.querySelectorAll('[data-symbol]').forEach((b, i) => b.classList.toggle('is-active', i === 0));
-        const posSection = $('gw-sympos-section'); if (posSection) posSection.hidden = true;
-        const priceTag   = $('gw-symbol-price-tag'); if (priceTag) priceTag.hidden = true;
-
-        /* Geschenk zurücksetzen */
-        state.giftWrap = false;
-        const gwTog = $('gw-giftwrap-toggle'); if (gwTog) gwTog.checked = false;
-
-        /* Qty auf 1 */
-        state.qty = 1;
-        const qtyVal = $('gw-qty-val'); if (qtyVal) qtyVal.textContent = '1';
-        const qtyInp = $('gw-qty-input'); if (qtyInp) qtyInp.value = '1';
-
-        /* Addon-State zurücksetzen */
-        addonMap.forEach((a, key) => {
-          a.value = ''; a.surchargeCents = 0;
-          if (key.startsWith('text-')) {
-            const input = document.querySelector('[data-addon="text"][data-block="' + key.slice(5) + '"]');
-            if (input) { input.value = ''; const c = document.querySelector('[data-counter="' + key.slice(5) + '"]'); if (c) c.textContent = '0/' + input.maxLength; }
-          } else if (key.startsWith('cb-')) {
-            const cb = document.querySelector('[data-addon="checkbox"][data-block="' + key.slice(3) + '"]');
-            if (cb) cb.checked = false;
-          }
-        });
-
-        /* Reset-Button wieder ausblenden */
-        resetBtn.hidden = true;
-
-        updatePrice();
-        updatePreview();
-
-        /* Zum Formular scrollen */
-        document.querySelector('.gw-personalize-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      resetBtn.addEventListener('click', async () => {
+        const ok = await addToCart(false);
+        if (!ok) return;
+        resetForm();
+        const n1 = $('gw-name1-input');
+        if (n1) {
+          n1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          n1.focus({ preventScroll: true });
+        }
       });
     }
 
@@ -684,7 +692,7 @@
         state.threadLabel = btn.dataset.label || btn.dataset.thread;
         document.querySelectorAll('[data-thread]').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-        updateSymbols(); updatePreview();
+        updateSymbols(); updatePreview(); updateOrderSummary();
       });
     });
 
@@ -711,7 +719,7 @@
         state.symbolPos = btn.dataset.sympos;
         document.querySelectorAll('[data-sympos]').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-        updatePreview();
+        updatePreview(); updateOrderSummary();
       });
     });
 

@@ -297,7 +297,7 @@
                 <div class="gw-form-field">
                   <p class="gw-form-label">Schriftfarbe</p>
                   <div class="gw-thread-grid">
-                    {%- assign default_threads = 'gold|Gold|#c9a24a,silver|Silber|#c8c8cc,white|Weiß|#f5f1e6,black|Schwarz|#1a1a1a' | split: ',' -%}
+                    {%- assign default_threads = 'gold|Gold|#c9a24a,silver|Silber|#c8c8cc,white|Weiß|#f5f1e6,black|Schwarz|#1a1a1a,brown|Braun|#7a5230' | split: ',' -%}
                     {%- for tc in default_threads -%}
                       {%- assign p = tc | split: '|' -%}
                       <button type="button" class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}" data-thread="{{ p[0] }}" data-hex="{{ p[2] }}" data-label="{{ p[1] }}" title="{{ p[1] }}" aria-label="{{ p[1] }}">
@@ -613,8 +613,9 @@
             </button>
           </div>
 
-          {%- comment -%} ─ Zweiten Teppich hinzufügen ─ {%- endcomment -%}
-          <button type="button" id="gw-reset-btn" class="gw-reset-btn" hidden>
+          {%- comment -%} ─ Zweiten Teppich hinzufügen: legt den aktuellen in den Warenkorb,
+              leert das Formular und scrollt hoch zum Namensfeld ─ {%- endcomment -%}
+          <button type="button" id="gw-reset-btn" class="gw-reset-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Weiteren Teppich personalisieren
           </button>
@@ -678,7 +679,7 @@
         {%- if product.description != blank or accordion_blocks.size > 0 -%}
           <div class="gw-product-accordion">
             {%- if product.description != blank -%}
-              <details open>
+              <details>
                 <summary>Beschreibung & Material</summary>
                 <div class="gw-product-accordion__body">{{ product.description }}</div>
               </details>
@@ -1065,6 +1066,7 @@
       { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
       { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
       { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
+      { "type": "thread_color", "settings": { "id": "brown",  "name": "Braun",   "hex": "#7a5230" } },
       { "type": "trust_badge", "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
       { "type": "trust_badge", "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
       { "type": "trust_badge", "settings": { "icon": "heart",  "label": "Handgefertigt" } },
