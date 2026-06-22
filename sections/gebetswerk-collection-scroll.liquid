@@ -63,12 +63,28 @@
 
               {%- if card_variant == nil -%}{%- continue -%}{%- endif -%}
 
-              {%- comment -%} Image: prefer variant image, fall back to product media {%- endcomment -%}
+              {%- comment -%}
+                Bild passend zur Farbe wählen:
+                1. Varianten-Bild (in Shopify der Variante zugewiesen)
+                2. sonst Produktbild, dessen Alt-Text die Farbe enthält (z. B. Alt "Weiß")
+                3. sonst das Produkt-Hauptbild als Fallback
+              {%- endcomment -%}
+              {%- assign card_img = nil -%}
               {%- if card_variant.featured_image -%}
                 {%- assign card_img = card_variant.featured_image -%}
               {%- else -%}
-                {%- assign card_img = product.featured_media -%}
+                {%- assign color_down = color_val | downcase -%}
+                {%- for media in product.media -%}
+                  {%- assign alt_down = media.alt | downcase -%}
+                  {%- if alt_down contains color_down -%}
+                    {%- assign card_img = media -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
               {%- endif -%}
+              {%- unless card_img -%}
+                {%- assign card_img = product.featured_media -%}
+              {%- endunless -%}
 
               {%- comment -%} Hover image: next product media {%- endcomment -%}
               {%- assign hover_img = product.media[1] -%}
