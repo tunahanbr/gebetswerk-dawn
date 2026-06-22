@@ -71,11 +71,15 @@
                 4. sonst das Produkt-Hauptbild als Fallback
               {%- endcomment -%}
               {%- assign card_img = nil -%}
+              {%- comment -%} Liquid: `contains` ist bei Integer-Arrays unzuverlässig → IDs einzeln vergleichen {%- endcomment -%}
               {%- for img in product.images -%}
-                {%- if img.variant_ids contains card_variant.id -%}
-                  {%- assign card_img = img -%}
-                  {%- break -%}
-                {%- endif -%}
+                {%- for vid in img.variant_ids -%}
+                  {%- if vid == card_variant.id -%}
+                    {%- assign card_img = img -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if card_img -%}{%- break -%}{%- endif -%}
               {%- endfor -%}
               {%- unless card_img -%}
                 {%- if card_variant.featured_image -%}
