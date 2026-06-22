@@ -101,15 +101,6 @@
                 {%- endif -%}
 
                 <div class="gw-cart-item__actions">
-                  <div class="gw-cart-qty" data-key="{{ item.key }}">
-                    <button type="button" class="gw-cart-qty__btn" data-action="minus" aria-label="Weniger">
-                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="10" x2="16" y2="10"/></svg>
-                    </button>
-                    <span class="gw-cart-qty__val">{{ item.quantity }}</span>
-                    <button type="button" class="gw-cart-qty__btn" data-action="plus" aria-label="Mehr">
-                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="4" x2="10" y2="16"/><line x1="4" y1="10" x2="16" y2="10"/></svg>
-                    </button>
-                  </div>
                   <button type="button" class="gw-cart-item__remove" data-key="{{ item.key }}" aria-label="Entfernen">
                     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M8 6V4h4v2M16 6l-1 11H5L4 6"/></svg>
                     Entfernen
@@ -577,20 +568,6 @@
   function formatMoney(cents) {
     return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
   }
-
-  // Qty buttons
-  page.addEventListener('click', e => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const row  = btn.closest('[data-key]');
-    const key  = row.dataset.key;
-    const val  = row.querySelector('.gw-cart-qty__val');
-    let qty    = parseInt(val.textContent);
-    if (btn.dataset.action === 'plus') qty++;
-    else if (btn.dataset.action === 'minus') qty = Math.max(0, qty - 1);
-    val.textContent = qty;
-    updateItem(key, qty);
-  });
 
   // Remove buttons (Haupt-Produkt)
   page.addEventListener('click', e => {
