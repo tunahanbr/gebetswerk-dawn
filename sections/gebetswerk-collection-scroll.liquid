@@ -63,42 +63,12 @@
 
               {%- if card_variant == nil -%}{%- continue -%}{%- endif -%}
 
-              {%- comment -%}
-                Bild passend zur Farbe wählen:
-                1. Produktbild, das per variant_ids der Farb-Variante zugewiesen ist (zuverlässig)
-                2. sonst das von Shopify ermittelte Varianten-Bild
-                3. sonst Produktbild, dessen Alt-Text die Farbe enthält
-                4. sonst das Produkt-Hauptbild als Fallback
-              {%- endcomment -%}
-              {%- assign card_img = nil -%}
-              {%- comment -%} Liquid: `contains` ist bei Integer-Arrays unzuverlässig → IDs einzeln vergleichen {%- endcomment -%}
-              {%- for img in product.images -%}
-                {%- for vid in img.variant_ids -%}
-                  {%- if vid == card_variant.id -%}
-                    {%- assign card_img = img -%}
-                    {%- break -%}
-                  {%- endif -%}
-                {%- endfor -%}
-                {%- if card_img -%}{%- break -%}{%- endif -%}
-              {%- endfor -%}
-              {%- unless card_img -%}
-                {%- if card_variant.featured_image -%}
-                  {%- assign card_img = card_variant.featured_image -%}
-                {%- endif -%}
-              {%- endunless -%}
-              {%- unless card_img -%}
-                {%- assign color_down = color_val | downcase -%}
-                {%- for media in product.media -%}
-                  {%- assign alt_down = media.alt | downcase -%}
-                  {%- if alt_down contains color_down -%}
-                    {%- assign card_img = media -%}
-                    {%- break -%}
-                  {%- endif -%}
-                {%- endfor -%}
-              {%- endunless -%}
-              {%- unless card_img -%}
+              {%- comment -%} Image: prefer variant image, fall back to product media {%- endcomment -%}
+              {%- if card_variant.featured_image -%}
+                {%- assign card_img = card_variant.featured_image -%}
+              {%- else -%}
                 {%- assign card_img = product.featured_media -%}
-              {%- endunless -%}
+              {%- endif -%}
 
               {%- comment -%} Hover image: next product media {%- endcomment -%}
               {%- assign hover_img = product.media[1] -%}
