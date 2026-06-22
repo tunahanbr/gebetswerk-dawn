@@ -63,15 +63,38 @@
 
               {%- if card_variant == nil -%}{%- continue -%}{%- endif -%}
 
-              {%- comment -%} Image: prefer variant image, fall back to product media {%- endcomment -%}
-              {%- if card_variant.featured_image -%}
-                {%- assign card_img = card_variant.featured_image -%}
-              {%- else -%}
-                {%- assign card_img = product.featured_media -%}
-              {%- endif -%}
+              {%- comment -%}
+                Image: match the colour to the product image by filename, e.g.
+                "…-gruen-verpackt.jpg" for "Grün". The variants have no images
+                assigned in admin, so variant.featured_image is unreliable and
+                can collapse to the single product image (black) for every
+                colour — which is exactly the bug this avoids.
+              {%- endcomment -%}
+              {%- assign cslug = color_val | downcase | replace: 'ä', 'ae' | replace: 'ö', 'oe' | replace: 'ü', 'ue' | replace: 'ß', 'ss' | strip -%}
+              {%- assign card_img  = nil -%}
+              {%- assign hover_img = nil -%}
+              {%- for img in product.images -%}
+                {%- assign fname = img.src | split: '?' | first | downcase -%}
+                {%- if fname contains cslug -%}
+                  {%- if card_img == nil -%}
+                    {%- assign card_img = img -%}
+                  {%- elsif hover_img == nil -%}
+                    {%- assign hover_img = img -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
 
-              {%- comment -%} Hover image: next product media {%- endcomment -%}
-              {%- assign hover_img = product.media[1] -%}
+              {%- comment -%} Fallbacks for products without colour-named images {%- endcomment -%}
+              {%- if card_img == nil -%}
+                {%- if card_variant.featured_image -%}
+                  {%- assign card_img = card_variant.featured_image -%}
+                {%- else -%}
+                  {%- assign card_img = product.featured_media -%}
+                {%- endif -%}
+              {%- endif -%}
+              {%- if hover_img == nil -%}
+                {%- assign hover_img = product.media[1] -%}
+              {%- endif -%}
 
               {%- assign card_url   = product.url | append: '?variant=' | append: card_variant.id -%}
               {%- assign card_title = prefix | append: ' – ' | append: color_val | append: ' ' | append: suffix -%}
