@@ -304,7 +304,8 @@
   transition: opacity 0.35s ease, transform 0.55s ease;
 }
 /* Zweitbild wird nicht mehr eingeblendet — beim Hover nur kurz ins Hauptbild zoomen */
-.gw-cscroll__img-hover {
+/* Selector must out-specify ".gw-cscroll__img-wrap img" (class+type) which also sets display */
+.gw-cscroll__img-wrap img.gw-cscroll__img-hover {
   display: none;
 }
 .gw-cscroll__card:hover .gw-cscroll__img-wrap > img { transform: scale(1.06); }
