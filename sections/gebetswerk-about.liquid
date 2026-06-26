@@ -9,7 +9,7 @@
     </div>
     {%- if section.settings.hero_image != blank -%}
       <div class="gw-about__hero-img">
-        <img src="{{ section.settings.hero_image | image_url: width: 1600 }}" alt="{{ section.settings.heading | escape }}" loading="eager">
+        <img src="{{ section.settings.hero_image | image_url: width: 1600 }}" alt="{{ section.settings.heading | escape }}" width="1600" height="{{ 1600 | divided_by: section.settings.hero_image.aspect_ratio | round }}" loading="eager">
       </div>
     {%- endif -%}
   </div>
@@ -50,7 +50,7 @@
       </div>
       {%- if section.settings.story_image != blank -%}
         <div class="gw-about__story-img">
-          <img src="{{ section.settings.story_image | image_url: width: 900 }}" alt="Gebetswerk Manufaktur" loading="lazy">
+          <img src="{{ section.settings.story_image | image_url: width: 900 }}" alt="Gebetswerk Manufaktur" width="900" height="{{ 900 | divided_by: section.settings.story_image.aspect_ratio | round }}" loading="lazy">
         </div>
       {%- endif -%}
     </div>

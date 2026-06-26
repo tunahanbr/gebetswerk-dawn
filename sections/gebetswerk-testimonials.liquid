@@ -22,12 +22,14 @@
                 <img
                   src="{{ block.settings.image | image_url: width: 600 }}"
                   alt="{{ block.settings.title | escape }}"
+                  width="600"
+                  height="{{ 600 | divided_by: block.settings.image.aspect_ratio | round }}"
                   loading="lazy"
                 >
               </div>
             {%- elsif block.settings.fallback_image != blank -%}
               <div class="gw-review__img">
-                <img src="{{ block.settings.fallback_image | asset_url }}" alt="{{ block.settings.title | escape }}" loading="lazy">
+                <img src="{{ block.settings.fallback_image | asset_url }}" alt="{{ block.settings.title | escape }}" width="600" height="600" loading="lazy">
               </div>
             {%- endif -%}
             <div class="gw-review__body">

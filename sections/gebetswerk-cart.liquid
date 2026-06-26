@@ -8,7 +8,7 @@
       </div>
       <h1 class="gw-cart-empty__title">Dein Warenkorb ist leer</h1>
       <p class="gw-cart-empty__text">Entdecke unsere personalisierten Gebetsteppiche – ein Geschenk, das bleibt.</p>
-      <a href="/collections/all" class="gw-cart-empty__btn">Zur Kollektion</a>
+      <a href="{{ routes.all_products_collection_url }}" class="gw-cart-empty__btn">Zur Kollektion</a>
     </div>
   </div>
 
@@ -26,7 +26,7 @@
 
       {%- comment -%} ══ ITEMS ══ {%- endcomment -%}
       <div class="gw-cart-items" id="gw-cart-items">
-        <form action="/cart" method="post" id="gw-cart-form">
+        <form action="{{ routes.cart_url }}" method="post" id="gw-cart-form">
 
           {%- for item in cart.items -%}
 
@@ -44,7 +44,7 @@
 
               <a href="{{ item.url }}" class="gw-cart-item__img-link">
                 {%- if item.image -%}
-                  <img src="{{ item.image | image_url: width: 300 }}" alt="{{ item.title | escape }}" width="150" loading="lazy" class="gw-cart-item__img">
+                  <img src="{{ item.image | image_url: width: 300 }}" alt="{{ item.title | escape }}" width="150" height="{{ 150 | divided_by: item.image.aspect_ratio | round }}" loading="lazy" class="gw-cart-item__img">
                 {%- else -%}
                   <div class="gw-cart-item__img-placeholder">{{ 'product-apparel-1' | placeholder_svg_tag }}</div>
                 {%- endif -%}
@@ -53,10 +53,10 @@
               <div class="gw-cart-item__info">
                 <div class="gw-cart-item__top">
                   <div>
-                    <p class="gw-cart-item__vendor">{{ item.vendor }}</p>
-                    <a href="{{ item.url }}" class="gw-cart-item__name">{{ item.product.title }}</a>
+                    <p class="gw-cart-item__vendor">{{ item.vendor | escape }}</p>
+                    <a href="{{ item.url }}" class="gw-cart-item__name">{{ item.product.title | escape }}</a>
                     {%- unless item.variant.title == 'Default Title' -%}
-                      <p class="gw-cart-item__variant">{{ item.variant.title }}</p>
+                      <p class="gw-cart-item__variant">{{ item.variant.title | escape }}</p>
                     {%- endunless -%}
                   </div>
                   {%- assign group_price = item.final_line_price -%}
@@ -93,7 +93,7 @@
                       {%- unless p.first == blank or p.first contains '_' or p.last == blank -%}
                         <li>
                           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="2 8 6 12 14 4"/></svg>
-                          <span>{{ p.first }}: <strong>{{ p.last }}</strong></span>
+                          <span>{{ p.first | escape }}: <strong>{{ p.last | escape }}</strong></span>
                         </li>
                       {%- endunless -%}
                     {%- endfor -%}
@@ -159,7 +159,7 @@
             Sicher zur Kasse
           </a>
 
-          <a href="/collections/all" class="gw-cart-continue">
+          <a href="{{ routes.all_products_collection_url }}" class="gw-cart-continue">
             ← Weiter einkaufen
           </a>
 

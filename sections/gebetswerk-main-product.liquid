@@ -2,21 +2,17 @@
   assign current_variant = product.selected_or_first_available_variant
   assign inv = current_variant.inventory_quantity | default: 0
   assign inv_threshold = section.settings.inventory_threshold | default: 10
-  assign beads_product = all_products[section.settings.beads_product]
 -%}
 
 {%- assign raw_p1 = section.settings.price_name1 | plus: 0 -%}
 {%- assign raw_p2 = section.settings.price_name2 | plus: 0 -%}
-{%- assign raw_pg = section.settings.price_giftwrap | plus: 0 -%}
 
 {%- if raw_p1 < 100 -%}{%- assign price_name1 = raw_p1 | times: 100 -%}{%- else -%}{%- assign price_name1 = raw_p1 -%}{%- endif -%}
 {%- if raw_p2 < 100 -%}{%- assign price_name2 = raw_p2 | times: 100 -%}{%- else -%}{%- assign price_name2 = raw_p2 -%}{%- endif -%}
-{%- if raw_pg < 100 -%}{%- assign price_giftwrap = raw_pg | times: 100 -%}{%- else -%}{%- assign price_giftwrap = raw_pg -%}{%- endif -%}
 
 {%- comment -%} Pass all data to JS {%- endcomment -%}
 <script>
   window.GW_VARIANTS            = {{ product.variants | json }};
-  window.GW_BASE_PRICE          = {{ current_variant.price }};
   window.GW_COUNTDOWN_HOUR      = {{ section.settings.countdown_cutoff_hour | default: 17 }};
 
   {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
@@ -33,21 +29,10 @@
     {%- endif -%}
   ];
 
-  {%- comment -%} Bead options from selected product variants {%- endcomment -%}
-  window.GW_BEADS = [
-    { id: 'none', label: 'Keine', variantId: null, price: 0 }
-    {%- if beads_product != blank -%}
-      {%- for variant in beads_product.variants -%}
-        ,{ id: {{ forloop.index | json }}, label: {{ variant.title | json }}, variantId: {{ variant.id }}, price: {{ variant.price }} }
-      {%- endfor -%}
-    {%- endif -%}
-  ];
-
   {%- comment -%} Personalization pricing — hardcoded in cents {%- endcomment -%}
   window.GW_PRICES = {
-    name1:    {{ section.settings.price_name1    | default: 1000 }},
-    name2:    {{ section.settings.price_name2    | default: 1500 }},
-    giftwrap: {{ section.settings.price_giftwrap | default: 199 }},
+    name1:    {{ price_name1 | default: 1000 }},
+    name2:    {{ price_name2 | default: 1500 }},
     symbol:   {{ section.settings.price_symbol   | default: 400 }}
   };
 
@@ -55,7 +40,6 @@
   window.GW_ADDON_VARIANTS = {
     name1:    {{ section.settings.addon_name1_variant_id    | default: 0 }},
     name2:    {{ section.settings.addon_name2_variant_id    | default: 0 }},
-    giftwrap: {{ section.settings.addon_giftwrap_variant_id | default: 0 }},
     symbol:   {{ section.settings.addon_symbol_variant_id   | default: 0 }}
   };
 </script>
@@ -107,9 +91,9 @@
 
     {%- comment -%} Breadcrumb {%- endcomment -%}
     <nav class="gw-breadcrumb" aria-label="Breadcrumb">
-      <a href="/"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7"/><path d="M5 8v9h4v-5h2v5h4V8"/></svg> Home</a>
+      <a href="{{ routes.root_url }}"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7"/><path d="M5 8v9h4v-5h2v5h4V8"/></svg> Home</a>
       <span class="gw-breadcrumb__sep">/</span>
-      <a href="/collections/all">Gebetsteppiche</a>
+      <a href="{{ routes.all_products_collection_url }}">Gebetsteppiche</a>
       <span class="gw-breadcrumb__sep">/</span>
       <span>{{ product.title }}</span>
     </nav>
@@ -123,7 +107,7 @@
           <img id="gw-gallery-main-img"
             src="{{ main_img | image_url: width: 1200 }}"
             alt="{{ main_img.alt | default: product.title | escape }}"
-            width="1200" loading="eager" fetchpriority="high"
+            width="1200" height="{{ 1200 | divided_by: main_img.aspect_ratio | round }}" loading="eager" fetchpriority="high"
           >
 
         </div>
@@ -132,14 +116,14 @@
           {%- if product.media.size > 0 -%}
             {%- for media in product.media limit: 4 -%}
               <button class="gw-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ media.preview_image | image_url: width: 800 }}" aria-label="Bild {{ forloop.index }}">
-                <img src="{{ media.preview_image | image_url: width: 200 }}" alt="{{ media.alt | default: product.title | escape }}" loading="lazy" width="200">
+                <img src="{{ media.preview_image | image_url: width: 200 }}" alt="{{ media.alt | default: product.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: media.preview_image.aspect_ratio | round }}">
               </button>
             {%- endfor -%}
           {%- else -%}
             {%- assign fallback_thumbs = 'product-main.jpg,product-thumb1.jpg,product-thumb2.jpg,product-thumb3.jpg' | split: ',' -%}
             {%- for img in fallback_thumbs -%}
               <button class="gw-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ img | asset_url }}" aria-label="Bild {{ forloop.index }}">
-                <img src="{{ img | asset_url }}" alt="Produktbild" loading="lazy">
+                <img src="{{ img | asset_url }}" alt="Produktbild" loading="lazy" width="200" height="200">
               </button>
             {%- endfor -%}
           {%- endif -%}
@@ -208,8 +192,6 @@
           <input type="hidden" name="properties[Symbol]"           id="prop-symbol"     value="">
           <input type="hidden" name="properties[Symbolposition]"   id="prop-symbol-pos" value="">
           <input type="hidden" name="properties[Gebetskette]"      id="prop-bead"       value="">
-          <input type="hidden" name="properties[Geschenkverpackung]" id="prop-giftwrap" value="">
-
           {%- comment -%} ─ Color variant picker ─ {%- endcomment -%}
           {%- if product.variants.size > 1 -%}
             <div style="margin-bottom:24px;">
@@ -223,14 +205,15 @@
                     data-color-name="{{ variant.title | escape }}"
                     data-variant-img="{{ variant.featured_image | image_url: width: 800 }}"
                     data-variant-inventory="{{ variant.inventory_quantity }}"
+                    data-variant-available="{{ variant.available }}"
                     aria-label="{{ variant.title }}"
                     title="{{ variant.title }}"
                     {% unless variant.available %}style="opacity:0.4;" title="{{ variant.title }} – ausverkauft"{% endunless %}
                   >
                     {%- if variant.featured_image -%}
-                      <img src="{{ variant.featured_image | image_url: width: 120 }}" alt="{{ variant.title | escape }}" loading="lazy">
+                      <img src="{{ variant.featured_image | image_url: width: 120 }}" alt="{{ variant.title | escape }}" loading="lazy" width="120" height="{{ 120 | divided_by: variant.featured_image.aspect_ratio | round }}">
                     {%- else -%}
-                      <img src="{{ 'mat-white.jpg' | asset_url }}" alt="{{ variant.title | escape }}" loading="lazy">
+                      <img src="{{ 'mat-white.jpg' | asset_url }}" alt="{{ variant.title | escape }}" loading="lazy" width="120" height="120">
                     {%- endif -%}
                   </button>
                 {%- endfor -%}
@@ -389,6 +372,7 @@
                     data-fkey="{{ block.settings.field_key | escape }}"
                     data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
                     data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
+                    data-required="{{ block.settings.required }}"
                     autocomplete="off">
                   {%- if block.settings.show_char_counter and block.settings.max_chars > 0 -%}
                     <span class="gw-char-count" data-counter="{{ block.id }}">0/{{ block.settings.max_chars }}</span>
@@ -472,7 +456,7 @@
                             {{ inner.shopify_attributes }}>
                             <div class="gw-bead-btn__img">
                               {%- if inner.settings.choice_image != blank -%}
-                                <img src="{{ inner.settings.choice_image | image_url: width: 200 }}" alt="{{ inner.settings.choice_label | escape }}" loading="lazy">
+                                <img src="{{ inner.settings.choice_image | image_url: width: 200 }}" alt="{{ inner.settings.choice_label | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: inner.settings.choice_image.aspect_ratio | round }}">
                               {%- elsif inner.settings.hex_color != blank -%}
                                 <div style="width:100%;height:100%;background:{{ inner.settings.hex_color }};border-radius:4px;"></div>
                               {%- else -%}
@@ -574,9 +558,9 @@
                           data-val="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
                           <div class="gw-bead-btn__img">
                             {%- if v.featured_image -%}
-                              <img src="{{ v.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy">
+                              <img src="{{ v.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: v.featured_image.aspect_ratio | round }}">
                             {%- elsif linked_product.featured_image -%}
-                              <img src="{{ linked_product.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy">
+                              <img src="{{ linked_product.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: linked_product.featured_image.aspect_ratio | round }}">
                             {%- else -%}
                               <div class="gw-bead-btn__none">?</div>
                             {%- endif -%}
@@ -823,12 +807,6 @@
     },
     {
       "type": "number",
-      "id": "price_giftwrap",
-      "label": "Aufpreis: Geschenkverpackung",
-      "default": 199
-    },
-    {
-      "type": "number",
       "id": "price_symbol",
       "label": "Aufpreis: Symbol",
       "default": 400
@@ -854,23 +832,8 @@
     },
     {
       "type": "number",
-      "id": "addon_giftwrap_variant_id",
-      "label": "Variant ID → Geschenkverpackung (€1,99)"
-    },
-    {
-      "type": "number",
       "id": "addon_symbol_variant_id",
       "label": "Variant ID → Symbol (€4,00)"
-    },
-    {
-      "type": "header",
-      "content": "📿 Gebetsketten"
-    },
-    {
-      "type": "product",
-      "id": "beads_product",
-      "label": "Gebetsketten-Produkt auswählen",
-      "info": "Jede Variante dieses Produkts wird als wählbare Option angezeigt. Preis & Lagerbestand kommen automatisch aus Shopify."
     }
   ],
   "blocks": [

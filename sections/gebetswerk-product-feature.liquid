@@ -29,10 +29,12 @@
           <img
             src="{{ section.settings.image | image_url: width: 900 }}"
             alt="{{ section.settings.image.alt | escape }}"
+            width="900"
+            height="{{ 900 | divided_by: section.settings.image.aspect_ratio | round }}"
             loading="lazy"
           >
         {%- else -%}
-          <img src="{{ 'product-main.jpg' | asset_url }}" alt="Gebetsteppich" loading="lazy">
+          <img src="{{ 'product-main.jpg' | asset_url }}" alt="Gebetsteppich" width="900" height="900" loading="lazy">
         {%- endif -%}
         <div class="gw-feature__image-badge">
           <div class="gw-feature__badge-label">

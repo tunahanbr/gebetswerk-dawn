@@ -78,7 +78,7 @@
                 <a href="{{ card_url }}" class="gw-col-card__link" aria-label="{{ card_title | escape }}" title="{{ card_title | escape }}">
                 <div class="gw-col-card__img-wrap">
                   {%- if card_img -%}
-                    <img src="{{ card_img | image_url: width: 700 }}" alt="{{ card_title | escape }}" width="700" loading="lazy">
+                    <img src="{{ card_img | image_url: width: 700 }}" alt="{{ card_title | escape }}" width="700" height="{{ 700 | divided_by: card_img.aspect_ratio | round }}" loading="lazy">
                   {%- else -%}
                     {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-col-card__placeholder' }}
                   {%- endif -%}
@@ -113,7 +113,7 @@
             <a href="{{ product.url }}" class="gw-col-card" aria-label="{{ product.title | escape }}">
               <div class="gw-col-card__img-wrap">
                 {%- if product.featured_media -%}
-                  <img src="{{ product.featured_media | image_url: width: 700 }}" alt="{{ product.featured_media.alt | escape }}" width="700" loading="lazy">
+                  <img src="{{ product.featured_media | image_url: width: 700 }}" alt="{{ product.featured_media.alt | escape }}" width="700" height="{{ 700 | divided_by: product.featured_media.aspect_ratio | round }}" loading="lazy">
                 {%- else -%}
                   {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-col-card__placeholder' }}
                 {%- endif -%}

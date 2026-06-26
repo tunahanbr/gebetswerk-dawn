@@ -7,8 +7,8 @@
 
   /* ── Data from Liquid ─────────────────────────────────────── */
   const VARIANTS       = window.GW_VARIANTS       || [];
-  const PRICES         = window.GW_PRICES         || { name1: 1000, name2: 1500, giftwrap: 199 };
-  const ADDON_VARIANTS = window.GW_ADDON_VARIANTS || { name1: 0, name2: 0, giftwrap: 0 };
+  const PRICES         = window.GW_PRICES         || { name1: 1000, name2: 1500, symbol: 400 };
+  const ADDON_VARIANTS = window.GW_ADDON_VARIANTS || { name1: 0, name2: 0, symbol: 0 };
   const SYMBOLS        = window.GW_SYMBOLS        || [
     { id: 'none', label: 'Keins', icon: '—' },
     { id: 'moon', label: 'Halbmond', icon: '☾' },
@@ -54,7 +54,7 @@
   function addonCartItems() {
     const items = [];
     addonMap.forEach(a => {
-      if (a.variantId && a.value) {
+      if (a.separateLineItem && a.variantId && a.value) {
         items.push({ id: a.variantId, quantity: state.qty, properties: { '_TeppichVariant': String(state.variantId) } });
       }
     });
@@ -104,6 +104,13 @@
       showFieldError('gw-name2-input', 'Bitte gib den zweiten Namen ein — oder deaktiviere die Option.');
       return false;
     }
+    for (const input of document.querySelectorAll('[data-addon="text"][data-required="true"]')) {
+      if (!input.value.trim()) {
+        const label = document.querySelector(`label[for="${input.id}"]`)?.textContent?.replace('*', '').trim() || 'Dieses Feld';
+        showFieldError(input.id, label + ' ist ein Pflichtfeld.');
+        return false;
+      }
+    }
     return true;
   }
 
@@ -125,6 +132,42 @@
     bubble.innerHTML = `<span aria-hidden="true">${n}</span><span class="visually-hidden">${count} im Warenkorb</span>`;
   }
 
+  function buildCartItems() {
+    const ref = 'gw-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    const setLabel = state.personalize && state.name1.trim()
+      ? (state.twoNames && state.name2.trim() ? state.name1.trim() + ' & ' + state.name2.trim() : state.name1.trim())
+      : '';
+    const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
+    const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
+
+    if (state.personalize && ADDON_VARIANTS.name1) {
+      items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
+        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
+      if (state.twoNames && ADDON_VARIANTS.name2) {
+        items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
+          properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
+      }
+    }
+
+    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol) {
+      items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
+        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId } });
+    }
+
+    addonCartItems().forEach(item => {
+      item.properties = Object.assign({}, item.properties, { '_ref': ref });
+      items.push(item);
+    });
+
+    if (setLabel) {
+      items.forEach((item, idx) => {
+        if (idx > 0) item.properties = Object.assign({}, item.properties, { 'Für': setLabel });
+      });
+    }
+
+    return items;
+  }
+
   /* ── Cart API ─────────────────────────────────────────────── */
   async function addToCart(openDrawer) {
     if (state.loading || !state.variantId) return false;
@@ -132,55 +175,37 @@
     state.loading = true;
     setButtonLoading(true);
 
-    /* Unique ref per cart-add so same-variant rugs are grouped independently */
-    const ref = 'gw-' + Date.now().toString(36);
-
-    /* Sichtbares Set-Label (Name/n) → auf jede Aufpreis-/Addon-Zeile, damit bei
-       mehreren Sets in einer Bestellung sofort klar ist, was zusammengehört */
-    const setLabel = state.personalize && state.name1.trim()
-      ? (state.twoNames && state.name2.trim() ? state.name1.trim() + ' & ' + state.name2.trim() : state.name1.trim())
-      : '';
-
-    const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
-
-    /* Build line items array */
-    const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
-
-    /* Personalisierungs-Aufpreise als separate Artikel (korrekter Warenkorb-Preis) */
-    if (state.personalize && ADDON_VARIANTS.name1) {
-      items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
-        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
-      if (state.twoNames && ADDON_VARIANTS.name2)
-        items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
-          properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
+    const items = buildCartItems();
+    const cartDrawer = document.querySelector('cart-drawer');
+    const addPayload = { items };
+    if (openDrawer !== false && cartDrawer?.getSectionsToRender) {
+      addPayload.sections = cartDrawer.getSectionsToRender().map(section => section.id);
+      addPayload.sections_url = window.location.pathname;
     }
-    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
-      items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
-        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId } });
-
-    /* Dynamische Addon-Artikel (opt_product, opt_checkbox mit Variant-ID) */
-    addonCartItems().forEach(i => { i.properties = Object.assign({}, i.properties, { '_ref': ref }); items.push(i); });
-
-    /* Set-Label auf alle Addon-Zeilen (nicht auf den Teppich selbst, der zeigt die Namen schon) */
-    if (setLabel) items.forEach((it, idx) => { if (idx > 0) it.properties = Object.assign({}, it.properties, { 'Für': setLabel }); });
 
     try {
       const res = await fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify(addPayload),
       });
 
       if (!res.ok) {
         const err = await res.json();
         alert(err.description || 'Fehler beim Hinzufügen. Bitte erneut versuchen.');
-        return;
+        return false;
       }
 
-      /* Trigger Dawn's cart drawer / notification */
+      const parsedState = await res.json();
+      if (openDrawer !== false && cartDrawer?.renderContents && parsedState.sections) {
+        cartDrawer.renderContents(parsedState);
+      }
+
+      /* Trigger Dawn's pubsub listeners where present */
       const cartRes = await fetch('/cart.js').then(r => r.json());
-      if (openDrawer !== false) document.dispatchEvent(new CustomEvent('cart:open', { bubbles: true }));
-      document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+      if (typeof publish === 'function' && typeof PUB_SUB_EVENTS !== 'undefined' && PUB_SUB_EVENTS.cartUpdate) {
+        publish(PUB_SUB_EVENTS.cartUpdate, { source: 'gebetswerk-product', cartData: cartRes, variantId: state.variantId });
+      }
 
       /* Update cart bubble — inject element if cart was empty before */
       const realCount = cartRes.items
@@ -221,32 +246,11 @@
     const btn = $('gw-buy-now-btn');
     if (btn) { btn.disabled = true; btn.querySelector('svg')?.remove(); btn.textContent = 'Wird vorbereitet…'; }
 
-    const ref = 'gw-' + Date.now().toString(36);
-    const setLabel = state.personalize && state.name1.trim()
-      ? (state.twoNames && state.name2.trim() ? state.name1.trim() + ' & ' + state.name2.trim() : state.name1.trim())
-      : '';
-    const props = Object.assign(buildProperties(), addonCartProperties(), { '_ref': ref });
-    const items = [{ id: state.variantId, quantity: state.qty, properties: props }];
-
-    if (state.personalize && ADDON_VARIANTS.name1) {
-      items.push({ id: ADDON_VARIANTS.name1, quantity: state.qty,
-        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name1.trim() } });
-      if (state.twoNames && ADDON_VARIANTS.name2)
-        items.push({ id: ADDON_VARIANTS.name2, quantity: state.qty,
-          properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId, '_Name': state.name2.trim() } });
-    }
-    if (state.personalize && state.symbol !== 'none' && ADDON_VARIANTS.symbol)
-      items.push({ id: ADDON_VARIANTS.symbol, quantity: state.qty,
-        properties: { '_ref': ref, '_TeppichVariant': '' + state.variantId } });
-    addonCartItems().forEach(i => { i.properties = Object.assign({}, i.properties, { '_ref': ref }); items.push(i); });
-
-    if (setLabel) items.forEach((it, idx) => { if (idx > 0) it.properties = Object.assign({}, it.properties, { 'Für': setLabel }); });
-
     try {
       const res = await fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items: buildCartItems() }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -302,52 +306,18 @@
     if (stickyPrice) stickyPrice.textContent = fmt(total);
 
     const atcBtn = $('gw-atc-btn');
-    if (atcBtn && !state.loading) atcBtn.textContent = 'In den Warenkorb · ' + fmt(total);
+    if (atcBtn && !state.loading) {
+      atcBtn.disabled = false;
+      atcBtn.textContent = 'In den Warenkorb · ' + fmt(total);
+    }
 
-    /* Price breakdown */
-    const breakdown = $('gw-price-breakdown');
-    if (breakdown) {
-      const parts = [fmt(state.variantPrice)];
-      if (state.personalize) {
-        parts.push('Personalisierung +' + fmt(PRICES.name1));
-        if (state.twoNames) parts.push('2. Name +' + fmt(PRICES.name2));
-      }
-      if (state.beadPrice) parts.push(state.beadLabel + ' +' + fmt(state.beadPrice));
-      if (state.giftWrap)  parts.push('Schleife +' + fmt(PRICES.giftwrap));
-      if (state.qty > 1)   parts.push('× ' + state.qty);
-      breakdown.textContent = parts.join(' · ');
+    const stickyBtn = $('gw-sticky-atc-btn');
+    if (stickyBtn && !state.loading) {
+      stickyBtn.disabled = false;
+      stickyBtn.textContent = 'In den Warenkorb';
     }
 
     updateOrderSummary();
-  }
-
-  /* ── Live preview overlay ─────────────────────────────────── */
-  function updatePreview() {
-    const overlay = $('gw-preview-overlay');
-    if (!overlay) return;
-    const hasName = state.personalize && state.name1.trim().length > 0;
-    overlay.hidden = !hasName;
-    if (!hasName) return;
-
-    const c = state.threadHex;
-    const n1 = $('gw-preview-name1');
-    const n2 = $('gw-preview-name2');
-    if (n1) { n1.textContent = state.name1; n1.style.color = c; }
-    if (n2) {
-      const show = state.twoNames && state.name2;
-      n2.textContent = show ? '& ' + state.name2 : '';
-      n2.style.color = c;
-      n2.hidden = !show;
-    }
-
-    const ch = SYM_ICONS[state.symbol] || '';
-    ['above','below','left','right'].forEach(pos => {
-      const el = $('gw-sym-' + pos);
-      if (!el) return;
-      el.hidden = !(ch && state.symbolPos === pos);
-      el.textContent = ch;
-      el.style.color = c;
-    });
   }
 
   /* ── Gallery ──────────────────────────────────────────────── */
@@ -366,7 +336,6 @@
     const price = parseInt(btn.dataset.variantPrice);
     const name  = btn.dataset.colorName;
     const img   = btn.dataset.variantImg;
-    const inv   = parseInt(btn.dataset.variantInventory) || 0;
 
     state.variantId    = id;
     state.variantPrice = price;
@@ -383,7 +352,7 @@
     if (img) { setMainImage(img); setActiveThumb(0); }
 
     /* Update active swatch */
-    document.querySelectorAll('[data-variant-id]').forEach(b => b.classList.toggle('is-active', parseInt(b.dataset.variantId) === id));
+    document.querySelectorAll('.gw-color-swatch[data-variant-id]').forEach(b => b.classList.toggle('is-active', parseInt(b.dataset.variantId) === id));
 
     /* Update urgency indicator */
     updateUrgencyFromVariant(btn);
@@ -442,7 +411,7 @@
     if (!summary || !list) return;
 
     const lines = [];
-    const colorLabel = document.querySelector('[data-variant-id].is-active')?.dataset.colorName || '';
+    const colorLabel = document.querySelector('.gw-color-swatch[data-variant-id].is-active')?.dataset.colorName || '';
     if (colorLabel) lines.push('Farbe: ' + colorLabel);
     if (state.personalize && state.name1) {
       lines.push('Name 1: ' + state.name1);
@@ -457,7 +426,12 @@
     addonMap.forEach(a => { if (a.fieldKey && a.value) lines.push(a.fieldKey + ': ' + a.value); });
 
     summary.hidden = lines.length === 0;
-    list.innerHTML = lines.map(l => '<li>' + l + '</li>').join('');
+    list.replaceChildren();
+    lines.forEach(line => {
+      const li = document.createElement('li');
+      li.textContent = line;
+      list.appendChild(li);
+    });
   }
 
   /* ── Init ─────────────────────────────────────────────────── */
@@ -467,7 +441,8 @@
     document.querySelectorAll('[data-addon="text"]').forEach(input => {
       const key = 'text-' + input.dataset.block;
       const base = parseInt(input.dataset.surcharge) || 0;
-      addonMap.set(key, { fieldKey: input.dataset.fkey, value: '', surchargeCents: 0, variantId: 0, separateLineItem: false });
+      const vid = parseInt(input.dataset.variant) || 0;
+      addonMap.set(key, { fieldKey: input.dataset.fkey, value: '', surchargeCents: 0, variantId: vid, separateLineItem: vid > 0 });
       input.addEventListener('input', () => {
         if (input.maxLength > 0) input.value = input.value.slice(0, input.maxLength);
         const a = addonMap.get(key);
@@ -500,7 +475,7 @@
       const fkey = sel.closest('[data-addon="choice-group"]')?.dataset.fkey || gid;
       const update = () => {
         const opt = sel.options[sel.selectedIndex];
-        addonMap.set(key, { fieldKey: fkey, value: opt?.value || '', surchargeCents: parseInt(opt?.dataset.surcharge) || 0, variantId: parseInt(opt?.dataset.variant) || 0, separateLineItem: false });
+        addonMap.set(key, { fieldKey: fkey, value: opt?.value || '', surchargeCents: parseInt(opt?.dataset.surcharge) || 0, variantId: parseInt(opt?.dataset.variant) || 0, separateLineItem: parseInt(opt?.dataset.variant) > 0 });
         updatePrice();
       };
       update(); sel.addEventListener('change', update);
@@ -512,12 +487,12 @@
       const key = 'choice-' + gid;
       const fkey = btn.closest('[data-addon="choice-group"]')?.dataset.fkey || gid;
       if (btn.classList.contains('is-active')) {
-        addonMap.set(key, { fieldKey: fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.surcharge) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: false });
+        addonMap.set(key, { fieldKey: fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.surcharge) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: parseInt(btn.dataset.variant) > 0 });
       }
       btn.addEventListener('click', () => {
         btn.closest('[data-addon="choice-group"]')?.querySelectorAll('[data-addon="choice-btn"]').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-        addonMap.set(key, { fieldKey: fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.surcharge) || 0, variantId: parseInt(btn.dataset.variant) || 0, separateLineItem: false });
+        addonMap.set(key, { fieldKey: fkey, value: btn.dataset.val || '', surchargeCents: parseInt(btn.dataset.surcharge) || 0, variantId: parseInt(btn.dataset.variant) > 0 ? parseInt(btn.dataset.variant) : 0, separateLineItem: parseInt(btn.dataset.variant) > 0 });
         updatePrice();
       });
     });
@@ -591,10 +566,6 @@
       const posSection = $('gw-sympos-section'); if (posSection) posSection.hidden = true;
       const priceTag   = $('gw-symbol-price-tag'); if (priceTag) priceTag.hidden = true;
 
-      /* Geschenk zurücksetzen */
-      state.giftWrap = false;
-      const gwTog = $('gw-giftwrap-toggle'); if (gwTog) gwTog.checked = false;
-
       /* Qty auf 1 */
       state.qty = 1;
       const qtyVal = $('gw-qty-val'); if (qtyVal) qtyVal.textContent = '1';
@@ -613,7 +584,6 @@
       });
 
       updatePrice();
-      updatePreview();
       updateOrderSummary();
     }
 
@@ -645,7 +615,7 @@
       persTog.addEventListener('change', e => {
         state.personalize = e.target.checked;
         if (persFields) persFields.hidden = !state.personalize;
-        updatePrice(); updatePreview();
+        updatePrice();
       });
     }
     if (persFields) persFields.hidden = !state.personalize;
@@ -654,7 +624,6 @@
     $('gw-name1-input')?.addEventListener('input', e => {
       state.name1 = e.target.value = e.target.value.slice(0, 11);
       const c = $('gw-name1-count'); if (c) c.textContent = state.name1.length + '/11';
-      updatePreview();
       updateOrderSummary();
     });
 
@@ -672,7 +641,7 @@
         const leftBtn = document.querySelector('[data-sympos="left"]');
         if (leftBtn) leftBtn.classList.add('is-active');
       }
-      updatePrice(); updatePreview();
+      updatePrice();
     });
     if (name2Sec) name2Sec.hidden = true;
 
@@ -680,7 +649,6 @@
     $('gw-name2-input')?.addEventListener('input', e => {
       state.name2 = e.target.value = e.target.value.slice(0, 11);
       const c = $('gw-name2-count'); if (c) c.textContent = state.name2.length + '/11';
-      updatePreview();
       updateOrderSummary();
     });
 
@@ -692,7 +660,7 @@
         state.threadLabel = btn.dataset.label || btn.dataset.thread;
         document.querySelectorAll('[data-thread]').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-        updateSymbols(); updatePreview(); updateOrderSummary();
+        updateSymbols(); updateOrderSummary();
       });
     });
 
@@ -709,7 +677,7 @@
         if (state.symbol === 'none' && state.symbolPos === 'between') {
           state.symbolPos = 'left';
         }
-        updatePrice(); updatePreview();
+        updatePrice();
       });
     });
 
@@ -719,7 +687,7 @@
         state.symbolPos = btn.dataset.sympos;
         document.querySelectorAll('[data-sympos]').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-        updatePreview(); updateOrderSummary();
+        updateOrderSummary();
       });
     });
 
@@ -727,7 +695,7 @@
     initAddons();
 
     /* Color variants */
-    document.querySelectorAll('[data-variant-id]').forEach(btn => {
+    document.querySelectorAll('.gw-color-swatch[data-variant-id]').forEach(btn => {
       btn.addEventListener('click', () => selectVariant(btn));
       btn.addEventListener('mouseenter', () => {
         const label = $('gw-color-label');
@@ -735,7 +703,7 @@
       });
       btn.addEventListener('mouseleave', () => {
         const label = $('gw-color-label');
-        const active = document.querySelector('[data-variant-id].is-active');
+        const active = document.querySelector('.gw-color-swatch[data-variant-id].is-active');
         if (label && active) label.textContent = active.dataset.colorName;
       });
     });
@@ -745,43 +713,18 @@
       thumb.addEventListener('click', () => { setMainImage(thumb.dataset.src); setActiveThumb(i); });
     });
 
-      /* Gift message toggle */
-    const giftMsgToggle  = $('gw-giftmsg-toggle');
-    const giftMsgSection = $('gw-giftmsg-section');
-    const giftMsgInput   = $('gw-giftmsg-input');
-    giftMsgToggle?.addEventListener('change', e => {
-      if (giftMsgSection) giftMsgSection.hidden = !e.target.checked;
-    });
-    giftMsgInput?.addEventListener('input', () => {
-      const c = $('gw-giftmsg-count');
-      if (c) c.textContent = giftMsgInput.value.length + '/200';
-    });
-
-    /* Social proof live counter (subtle fluctuation) */
-    const viewersEl = $('gw-viewers');
-    if (viewersEl) {
-      const base = parseInt(viewersEl.textContent) || 12;
-      setInterval(() => {
-        const delta = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
-        const current = parseInt(viewersEl.textContent) || base;
-        const next = Math.max(base - 3, Math.min(base + 6, current + delta));
-        if (next !== current) viewersEl.textContent = next;
-      }, 8000);
-    }
-
     /* Init */
     if (VARIANTS[0]) {
       const urlVariantId = new URLSearchParams(window.location.search).get('variant');
       let initBtn = urlVariantId
-        ? document.querySelector('[data-variant-id="' + urlVariantId + '"]')
+        ? document.querySelector('.gw-color-swatch[data-variant-id="' + urlVariantId + '"]')
         : null;
-      if (!initBtn) initBtn = document.querySelector('[data-variant-id]');
+      if (!initBtn) initBtn = document.querySelector('.gw-color-swatch[data-variant-id]');
       if (initBtn) selectVariant(initBtn);
       else { state.variantPrice = VARIANTS[0].price; }
     }
     updatePrice();
     updateSymbols();
-    updatePreview();
     initStickyAtc();
     startCountdown();
   }

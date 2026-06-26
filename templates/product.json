@@ -182,13 +182,10 @@
         "inventory_threshold": 10,
         "price_name1": 1000,
         "price_name2": 1500,
-        "price_giftwrap": 199,
         "price_symbol": 400,
         "addon_name1_variant_id": 53088151535952,
         "addon_name2_variant_id": 53088151568720,
-        "addon_giftwrap_variant_id": 53088151601488,
-        "addon_symbol_variant_id": 53088243745104,
-        "beads_product": ""
+        "addon_symbol_variant_id": 53088243745104
       }
     },
     "gebetswerk_reviews": {

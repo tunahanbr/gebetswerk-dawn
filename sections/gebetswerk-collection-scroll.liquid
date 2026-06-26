@@ -112,6 +112,7 @@
                       src="{{ card_img | image_url: width: 600 }}"
                       alt="{{ card_title | escape }}"
                       width="600"
+                      height="{{ 600 | divided_by: card_img.aspect_ratio | round }}"
                       loading="lazy"
                     >
                     {%- if hover_img and hover_img != card_img -%}
@@ -119,6 +120,7 @@
                         src="{{ hover_img | image_url: width: 600 }}"
                         alt="{{ card_title | escape }}"
                         width="600"
+                        height="{{ 600 | divided_by: hover_img.aspect_ratio | round }}"
                         loading="lazy"
                         class="gw-cscroll__img-hover"
                       >
@@ -148,14 +150,16 @@
                     src="{{ product.featured_media | image_url: width: 600 }}"
                     alt="{{ product.featured_media.alt | escape }}"
                     width="600"
+                    height="{{ 600 | divided_by: product.featured_media.aspect_ratio | round }}"
                     loading="lazy"
                   >
                   {%- if product.media[1] -%}
                     <img
                       src="{{ product.media[1] | image_url: width: 600 }}"
-                      alt="{{ product.title | escape }}"
-                      width="600"
-                      loading="lazy"
+                        alt="{{ product.title | escape }}"
+                        width="600"
+                        height="{{ 600 | divided_by: product.media[1].aspect_ratio | round }}"
+                        loading="lazy"
                       class="gw-cscroll__img-hover"
                     >
                   {%- endif -%}
