@@ -42,8 +42,8 @@
         {%- assign card_count = 0 -%}
         {%- assign limit = section.settings.products_per_page | default: 24 -%}
 
+        {%- paginate col.products by limit -%}
         {%- for product in col.products -%}
-          {%- if card_count >= limit -%}{%- break -%}{%- endif -%}
 
           {%- assign color_opt = nil -%}
           {%- for opt in product.options_with_values -%}
@@ -133,6 +133,28 @@
           {%- endif -%}
 
         {%- endfor -%}
+        {%- if paginate.pages > 1 -%}
+          <nav class="gw-col-pagination" role="navigation" aria-label="Seitennavigation">
+            {%- if paginate.previous -%}
+              <a class="gw-col-pagination__link" href="{{ paginate.previous.url }}" aria-label="Vorherige Seite">Zurück</a>
+            {%- endif -%}
+
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a class="gw-col-pagination__link" href="{{ part.url }}" aria-label="Seite {{ part.title }}">{{ part.title }}</a>
+              {%- elsif part.title == paginate.current_page -%}
+                <span class="gw-col-pagination__link is-active" aria-current="page">{{ part.title }}</span>
+              {%- else -%}
+                <span class="gw-col-pagination__ellipsis">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- if paginate.next -%}
+              <a class="gw-col-pagination__link" href="{{ paginate.next.url }}" aria-label="Nächste Seite">Weiter</a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+        {%- endpaginate -%}
 
       {%- else -%}
         {%- assign placeholder_colors = 'Weiß,Creme,Sand,Dunkelblau,Bordeaux,Schwarz' | split: ',' -%}

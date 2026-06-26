@@ -1435,6 +1435,13 @@
         "default": false
       },
       {
+        "type": "number",
+        "id": "free_shipping_de_threshold_cents",
+        "label": "Kostenloser Versand nach Deutschland ab",
+        "default": 10000,
+        "info": "Betrag in Cent. Österreich bleibt immer kostenlos. Beispiel: 10000 = 100,00 €."
+      },
+      {
         "type": "header",
         "content": "t:settings_schema.cart.settings.cart_drawer.header"
       },

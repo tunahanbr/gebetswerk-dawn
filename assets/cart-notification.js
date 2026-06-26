@@ -37,10 +37,10 @@ class CartNotification extends HTMLElement {
   renderContents(parsedState) {
     this.cartItemKey = parsedState.key;
     this.getSectionsToRender().forEach((section) => {
-      document.getElementById(section.id).innerHTML = this.getSectionInnerHTML(
-        parsedState.sections[section.id],
-        section.selector
-      );
+      const target = document.getElementById(section.id);
+      const html = parsedState.sections[section.id];
+      const sectionHTML = html ? this.getSectionInnerHTML(html, section.selector) : '';
+      if (target && sectionHTML) target.innerHTML = sectionHTML;
     });
 
     if (this.header) this.header.reveal();
@@ -63,7 +63,7 @@ class CartNotification extends HTMLElement {
   }
 
   getSectionInnerHTML(html, selector = '.shopify-section') {
-    return new DOMParser().parseFromString(html, 'text/html').querySelector(selector).innerHTML;
+    return new DOMParser().parseFromString(html, 'text/html').querySelector(selector)?.innerHTML || '';
   }
 
   handleBodyClick(evt) {

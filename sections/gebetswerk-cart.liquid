@@ -1,4 +1,5 @@
 {{ 'gebetswerk-cart-page.css' | asset_url | stylesheet_tag }}
+{%- assign free_shipping_de_threshold = settings.free_shipping_de_threshold_cents | default: 10000 | plus: 0 -%}
 {%- if cart.item_count == 0 -%}
 
   {%- comment -%} ── Leerer Warenkorb ── {%- endcomment -%}
@@ -39,9 +40,13 @@
               {%- endif -%}
             {%- endfor -%}
             {%- if is_addon -%}{%- continue -%}{%- endif -%}
+            {%- assign item_ref = '' -%}
+            {%- for p in item.properties -%}
+              {%- if p.first == '_ref' -%}{%- assign item_ref = p.last -%}{%- endif -%}
+            {%- endfor -%}
 
             {%- comment -%} ── Haupt-Produkt ── {%- endcomment -%}
-            <div class="gw-cart-item" data-key="{{ item.key }}">
+            <div class="gw-cart-item" data-key="{{ item.key | escape }}" data-ref="{{ item_ref | escape }}">
 
               <a href="{{ item.url }}" class="gw-cart-item__img-link">
                 {%- if item.image -%}
@@ -61,10 +66,6 @@
                     {%- endunless -%}
                   </div>
                   {%- assign group_price = item.final_line_price -%}
-                  {%- assign item_ref = '' -%}
-                  {%- for p in item.properties -%}
-                    {%- if p.first == '_ref' -%}{%- assign item_ref = p.last -%}{%- endif -%}
-                  {%- endfor -%}
                   {%- if item_ref != '' -%}
                     {%- for addon in cart.items -%}
                       {%- assign addon_ref = '' -%}
@@ -130,22 +131,26 @@
             <div class="gw-cart-summary__row gw-cart-summary__row--shipping">
               <span>Versand</span>
               <span>
-                {%- if cart.total_price >= 10000 -%}
-                  <span class="gw-cart-summary__free">Kostenlos 🎉</span>
+                {%- if cart.total_price >= free_shipping_de_threshold -%}
+                  <span class="gw-cart-summary__free">AT kostenlos · DE kostenlos 🎉</span>
                 {%- else -%}
-                  Wird im Checkout berechnet
+                  AT kostenlos · DE im Checkout
                 {%- endif -%}
               </span>
             </div>
           </div>
 
-          {%- if cart.total_price < 10000 -%}
-            {%- assign remaining = 10000 | minus: cart.total_price -%}
+          {%- if cart.total_price < free_shipping_de_threshold -%}
+            {%- assign remaining = free_shipping_de_threshold | minus: cart.total_price -%}
             <div class="gw-cart-summary__freeship">
               <div class="gw-cart-summary__freeship-bar">
-                <div class="gw-cart-summary__freeship-fill" style="width:{{ cart.total_price | times: 100 | divided_by: 10000 | at_most: 100 }}%"></div>
+                <div class="gw-cart-summary__freeship-fill" style="width:{{ cart.total_price | times: 100 | divided_by: free_shipping_de_threshold | at_most: 100 }}%"></div>
               </div>
-              <p>Noch <strong>{{ remaining | money }}</strong> bis zum kostenlosen Versand</p>
+              <p>Österreich ist kostenlos. Noch <strong>{{ remaining | money }}</strong> bis kostenloser Versand nach Deutschland.</p>
+            </div>
+          {%- else -%}
+            <div class="gw-cart-summary__freeship">
+              <p>Österreich kostenlos. Deutschland ab diesem Warenwert kostenlos.</p>
             </div>
           {%- endif -%}
 
@@ -203,25 +208,59 @@
   const page = document.getElementById('gw-cart-page');
   if (!page) return;
 
+  function isAddon(item) {
+    return item.properties && item.properties._TeppichVariant !== undefined && item.properties._TeppichVariant !== null;
+  }
+
+  function findCartItem(key) {
+    return Array.from(page.querySelectorAll('.gw-cart-item')).find(item => item.dataset.key === key);
+  }
+
+  async function removeItemGroup(key, ref) {
+    if (!ref) {
+      await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: key, quantity: 0 })
+      });
+      location.reload();
+      return;
+    }
+
+    const cart = await fetch('/cart.js').then(response => response.json());
+    const updates = { [key]: 0 };
+    cart.items.forEach(item => {
+      if (isAddon(item) && item.properties._ref === ref) updates[item.key] = 0;
+    });
+    await fetch('/cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ updates })
+    });
+    location.reload();
+  }
+
   async function updateItem(key, qty) {
+    if (qty === 0) {
+      const itemEl = findCartItem(key);
+      await removeItemGroup(key, itemEl?.dataset.ref || '');
+      return;
+    }
+
     const res = await fetch('/cart/change.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: key, quantity: qty })
     });
     const cart = await res.json();
-    if (qty === 0) {
-      location.reload();
-    } else {
-      document.getElementById('gw-cart-subtotal').textContent = formatMoney(cart.total_price);
-      document.getElementById('gw-cart-total').textContent = formatMoney(cart.total_price);
-      const el = page.querySelector(`[data-key="${key}"] .gw-cart-qty__val`);
-      if (el) el.textContent = qty;
-      // Update cart bubble
-      document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => {
-        b.textContent = cart.item_count;
-      });
-    }
+    document.getElementById('gw-cart-subtotal').textContent = formatMoney(cart.total_price);
+    document.getElementById('gw-cart-total').textContent = formatMoney(cart.total_price);
+    const el = findCartItem(key)?.querySelector('.gw-cart-qty__val');
+    if (el) el.textContent = qty;
+    const realCount = cart.items.filter(item => !isAddon(item)).reduce((sum, item) => sum + item.quantity, 0);
+    document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => {
+      b.textContent = realCount;
+    });
   }
 
   function formatMoney(cents) {

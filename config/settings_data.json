@@ -176,21 +176,8 @@
     "cart_type": "notification",
     "show_vendor": false,
     "show_cart_note": false,
+    "free_shipping_de_threshold_cents": 10000,
     "cart_drawer_collection": "",
-    "sections": {
-      "main-password-header": {
-        "type": "main-password-header",
-        "settings": {
-          "color_scheme": "scheme-1"
-        }
-      },
-      "main-password-footer": {
-        "type": "main-password-footer",
-        "settings": {
-          "color_scheme": "scheme-1"
-        }
-      }
-    },
     "blocks": {
       "judgeme_core_embed": {
         "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
@@ -368,21 +355,8 @@
       "cart_type": "notification",
       "show_vendor": false,
       "show_cart_note": false,
-      "cart_drawer_collection": "",
-      "sections": {
-        "main-password-header": {
-          "type": "main-password-header",
-          "settings": {
-            "color_scheme": "scheme-1"
-          }
-        },
-        "main-password-footer": {
-          "type": "main-password-footer",
-          "settings": {
-            "color_scheme": "scheme-1"
-          }
-        }
-      }
+      "free_shipping_de_threshold_cents": 10000,
+      "cart_drawer_collection": ""
     }
   }
 }

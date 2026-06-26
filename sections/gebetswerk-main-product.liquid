@@ -208,7 +208,7 @@
                     data-variant-img="{{ variant.featured_image | image_url: width: 800 }}"
                     data-variant-inventory="{{ variant.inventory_quantity }}"
                     data-variant-available="{{ variant.available }}"
-                    aria-label="{{ variant.title }}"
+                    aria-label="{{ variant.title | escape }}"
                     title="{% if variant.available %}{{ variant.title }}{% else %}{{ variant.title }} – ausverkauft{% endif %}"
                   >
                     {%- if variant.featured_image -%}
@@ -264,14 +264,14 @@
                     {%- for block in thread_blocks -%}
                       <button type="button"
                         class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}"
-                        data-thread="{{ block.settings.id }}"
-                        data-hex="{{ block.settings.hex }}"
+                        data-thread="{{ block.settings.id | escape }}"
+                        data-hex="{{ block.settings.hex | escape }}"
                         data-label="{{ block.settings.name | escape }}"
-                        title="{{ block.settings.name }}"
-                        aria-label="{{ block.settings.name }}"
+                        title="{{ block.settings.name | escape }}"
+                        aria-label="{{ block.settings.name | escape }}"
                         {{ block.shopify_attributes }}
                       >
-                        <span class="gw-thread-swatch__dot" style="background:{{ block.settings.hex }};"></span>
+                        <span class="gw-thread-swatch__dot" style="background:{{ block.settings.hex | escape }};"></span>
                       </button>
                     {%- endfor -%}
                   </div>
@@ -353,232 +353,7 @@
             </div>
           </div>
 
-          {%- comment -%} ══ DYNAMISCHE ADD-ONS ══ {%- endcomment -%}
-          {%- assign rendered_choice_groups = '' -%}
-          {%- for block in section.blocks -%}
-
-            {%- comment -%} ── Textfeld ── {%- endcomment -%}
-            {%- if block.type == 'opt_text' -%}
-              <div class="gw-form-field" {{ block.shopify_attributes }}>
-                <label class="gw-form-label" for="addon-{{ block.id }}">
-                  {{ block.settings.label }}
-                  {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-option-price gw-option-price--inline">(+{{ block.settings.surcharge_cents | money_without_currency }}€)</span>{%- endif -%}
-                  {%- if block.settings.required -%}<span class="gw-required-mark"> *</span>{%- endif -%}
-                </label>
-                <div class="gw-form-input-wrap">
-                  <input type="text" id="addon-{{ block.id }}" class="gw-form-input"
-                    placeholder="{{ block.settings.placeholder | escape }}"
-                    {%- if block.settings.max_chars > 0 %}maxlength="{{ block.settings.max_chars }}"{%- endif %}
-                    data-addon="text" data-block="{{ block.id }}"
-                    data-fkey="{{ block.settings.field_key | escape }}"
-                    data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
-                    data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
-                    data-required="{{ block.settings.required }}"
-                    autocomplete="off">
-                  {%- if block.settings.show_char_counter and block.settings.max_chars > 0 -%}
-                    <span class="gw-char-count" data-counter="{{ block.id }}">0/{{ block.settings.max_chars }}</span>
-                  {%- endif -%}
-                </div>
-              </div>
-
-            {%- comment -%} ── Checkbox ── {%- endcomment -%}
-            {%- elsif block.type == 'opt_checkbox' -%}
-              <label class="gw-giftwrap-row" {{ block.shopify_attributes }}>
-                <span>
-                  {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
-                  {{ block.settings.label }}
-                  {%- if block.settings.description != blank -%}
-                    <span class="gw-addon-description">{{ block.settings.description }}</span>
-                  {%- endif -%}
-                </span>
-                <span class="gw-giftwrap-right">
-                  {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-giftwrap-price">+{{ block.settings.surcharge_cents | money }}</span>{%- endif -%}
-                  <input type="checkbox" id="addon-{{ block.id }}"
-                    data-addon="checkbox" data-block="{{ block.id }}"
-                    data-fkey="{{ block.settings.field_key | escape }}"
-                    data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
-                    data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
-                    {% if block.settings.default_checked %}checked{% endif %}>
-                </span>
-              </label>
-
-            {%- comment -%} ── Auswahl-Gruppe ── {%- endcomment -%}
-            {%- elsif block.type == 'opt_choice' -%}
-              {%- assign gid = block.settings.group_id -%}
-              {%- unless rendered_choice_groups contains gid -%}
-                {%- assign rendered_choice_groups = rendered_choice_groups | append: gid | append: '§' -%}
-                {%- assign dt = block.settings.display_type | default: 'buttons' -%}
-                {%- assign glabel = block.settings.group_label | default: gid -%}
-                {%- assign fkey = block.settings.field_key | default: glabel -%}
-                <div class="gw-form-field" data-addon="choice-group" data-gid="{{ gid }}" data-fkey="{{ fkey | escape }}" {{ block.shopify_attributes }}>
-                  <p class="gw-form-label">{{ glabel }}</p>
-                  {%- if dt == 'dropdown' -%}
-                    <select class="gw-form-input" data-addon="choice-select" data-gid="{{ gid }}">
-                      {%- for inner in section.blocks -%}
-                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
-                          <option value="{{ inner.settings.choice_value | escape }}"
-                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
-                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
-                            {% if inner.settings.is_default %}selected{% endif %}>
-                            {{ inner.settings.choice_label }}{% if inner.settings.surcharge_cents > 0 %} (+{{ inner.settings.surcharge_cents | money_without_currency }}€){% endif %}
-                          </option>
-                        {%- endif -%}
-                      {%- endfor -%}
-                    </select>
-                  {%- elsif dt == 'swatches' -%}
-                    <div class="gw-thread-grid">
-                      {%- for inner in section.blocks -%}
-                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
-                          <button type="button"
-                            class="gw-thread-swatch{% if inner.settings.is_default %} is-active{% endif %}"
-                            data-addon="choice-btn" data-gid="{{ gid }}"
-                            data-val="{{ inner.settings.choice_value | escape }}"
-                            data-lbl="{{ inner.settings.choice_label | escape }}"
-                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
-                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
-                            title="{{ inner.settings.choice_label }}" aria-label="{{ inner.settings.choice_label }}"
-                            {{ inner.shopify_attributes }}>
-                            <span class="gw-thread-swatch__dot" style="background:{{ inner.settings.hex_color | default: '#ccc' }};"></span>
-                          </button>
-                        {%- endif -%}
-                      {%- endfor -%}
-                    </div>
-                  {%- elsif dt == 'images' -%}
-                    <div class="gw-beads-grid">
-                      {%- for inner in section.blocks -%}
-                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
-                          <button type="button"
-                            class="gw-bead-btn{% if inner.settings.is_default %} is-active{% endif %}"
-                            data-addon="choice-btn" data-gid="{{ gid }}"
-                            data-val="{{ inner.settings.choice_value | escape }}"
-                            data-lbl="{{ inner.settings.choice_label | escape }}"
-                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
-                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
-                            {{ inner.shopify_attributes }}>
-                            <div class="gw-bead-btn__img">
-                              {%- if inner.settings.choice_image != blank -%}
-                                <img src="{{ inner.settings.choice_image | image_url: width: 200 }}" alt="{{ inner.settings.choice_label | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: inner.settings.choice_image.aspect_ratio | round }}">
-                              {%- elsif inner.settings.hex_color != blank -%}
-                                <div class="gw-bead-btn__color" style="background:{{ inner.settings.hex_color }};"></div>
-                              {%- else -%}
-                                <div class="gw-bead-btn__none">{{ inner.settings.choice_label | slice: 0 }}</div>
-                              {%- endif -%}
-                            </div>
-                            <div class="gw-bead-btn__info">
-                              <span class="gw-bead-btn__name">{{ inner.settings.choice_label }}</span>
-                              <span class="gw-bead-btn__price">{% if inner.settings.surcharge_cents > 0 %}+{{ inner.settings.surcharge_cents | money_without_currency }}€{% else %}—{% endif %}</span>
-                            </div>
-                          </button>
-                        {%- endif -%}
-                      {%- endfor -%}
-                    </div>
-                  {%- else -%}
-                    <div class="gw-sympos-grid gw-sympos-grid--wrap">
-                      {%- for inner in section.blocks -%}
-                        {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
-                          <button type="button"
-                            class="gw-sympos-btn{% if inner.settings.is_default %} is-active{% endif %}"
-                            data-addon="choice-btn" data-gid="{{ gid }}"
-                            data-val="{{ inner.settings.choice_value | escape }}"
-                            data-lbl="{{ inner.settings.choice_label | escape }}"
-                            data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
-                            data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
-                            {{ inner.shopify_attributes }}>
-                            {{ inner.settings.choice_label }}
-                            {%- if inner.settings.surcharge_cents > 0 -%}<span class="gw-choice-price"> +{{ inner.settings.surcharge_cents | money_without_currency }}€</span>{%- endif -%}
-                          </button>
-                        {%- endif -%}
-                      {%- endfor -%}
-                    </div>
-                  {%- endif -%}
-                </div>
-              {%- endunless -%}
-
-            {%- comment -%} ── Produkt-Auswahl ── {%- endcomment -%}
-            {%- elsif block.type == 'opt_product' -%}
-              {%- assign linked_product = all_products[block.settings.product] -%}
-              {%- if linked_product != blank -%}
-                {%- assign opt_dt = block.settings.display_type | default: 'image_grid' -%}
-                <div class="gw-form-field" {{ block.shopify_attributes }}>
-                  <p class="gw-product__section-label">{{ block.settings.label }} <span>Optional</span></p>
-                  {%- if opt_dt == 'dropdown' -%}
-                    <select class="gw-form-input"
-                      data-addon="product-select" data-block="{{ block.id }}"
-                      data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
-                      data-separate="{{ block.settings.separate_line_item }}">
-                      {%- if block.settings.include_none -%}
-                        <option value="" data-price="0" data-variant="0">{{ block.settings.none_label | default: 'Keine' }}</option>
-                      {%- endif -%}
-                      {%- for v in linked_product.variants -%}
-                        <option value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
-                          {{ v.title }} (+{{ v.price | money_without_currency }}€)
-                        </option>
-                      {%- endfor -%}
-                    </select>
-                  {%- elsif opt_dt == 'list' -%}
-                    <div class="gw-product-radio-list">
-                      {%- if block.settings.include_none -%}
-                        <label class="gw-product-radio">
-                          <input type="radio" name="opt-p-{{ block.id }}" value="" data-price="0" data-variant="0"
-                            data-addon="product-radio" data-block="{{ block.id }}"
-                            data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
-                            data-separate="{{ block.settings.separate_line_item }}" checked>
-                          {{ block.settings.none_label | default: 'Keine' }}
-                        </label>
-                      {%- endif -%}
-                      {%- for v in linked_product.variants -%}
-                        <label class="gw-product-radio">
-                          <input type="radio" name="opt-p-{{ block.id }}" value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}"
-                            data-addon="product-radio" data-block="{{ block.id }}"
-                            data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
-                            data-separate="{{ block.settings.separate_line_item }}">
-                          {{ v.title }} (+{{ v.price | money_without_currency }}€)
-                        </label>
-                      {%- endfor -%}
-                    </div>
-                  {%- else -%}
-                    <div class="gw-beads-grid">
-                      {%- if block.settings.include_none -%}
-                        <button type="button" class="gw-bead-btn is-active"
-                          data-addon="product-card" data-block="{{ block.id }}"
-                          data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
-                          data-separate="{{ block.settings.separate_line_item }}"
-                          data-val="" data-price="0" data-variant="0">
-                          <div class="gw-bead-btn__img"><div class="gw-bead-btn__none">{{ block.settings.none_label | default: 'Keine' | slice: 0 }}</div></div>
-                          <div class="gw-bead-btn__info">
-                            <span class="gw-bead-btn__name">{{ block.settings.none_label | default: 'Keine' }}</span>
-                            <span class="gw-bead-btn__price">—</span>
-                          </div>
-                        </button>
-                      {%- endif -%}
-                      {%- for v in linked_product.variants -%}
-                        <button type="button" class="gw-bead-btn"
-                          data-addon="product-card" data-block="{{ block.id }}"
-                          data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
-                          data-separate="{{ block.settings.separate_line_item }}"
-                          data-val="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
-                          <div class="gw-bead-btn__img">
-                            {%- if v.featured_image -%}
-                              <img src="{{ v.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: v.featured_image.aspect_ratio | round }}">
-                            {%- elsif linked_product.featured_image -%}
-                              <img src="{{ linked_product.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: linked_product.featured_image.aspect_ratio | round }}">
-                            {%- else -%}
-                              <div class="gw-bead-btn__none">?</div>
-                            {%- endif -%}
-                          </div>
-                          <div class="gw-bead-btn__info">
-                            <span class="gw-bead-btn__name">{{ v.title }}</span>
-                            <span class="gw-bead-btn__price">+{{ v.price | money_without_currency }}€</span>
-                          </div>
-                        </button>
-                      {%- endfor -%}
-                    </div>
-                  {%- endif -%}
-                </div>
-              {%- endif -%}
-
-            {%- endif -%}
-          {%- endfor -%}
+          {% render 'gw-product-addons', section: section %}
 
           {%- comment -%} ─ Order confirmation summary ─ {%- endcomment -%}
           <div id="gw-order-summary" class="gw-order-summary" hidden>
@@ -754,14 +529,14 @@
       "type": "text",
       "id": "shipping_row1",
       "label": "Versandzeile 1",
-      "default": "3–5 Werktage Lieferzeit · kostenlos ab 100 €",
+      "default": "Österreich kostenlos · Deutschland kostenlos ab 100 €",
       "info": "Erscheint mit LKW-Icon. Leer lassen → wird ausgeblendet"
     },
     {
       "type": "text",
       "id": "shipping_row2",
       "label": "Versandzeile 2",
-      "default": "In edler Geschenkverpackung mit Goldschleife",
+      "default": "3–5 Werktage Lieferzeit · Geschenkverpackung optional",
       "info": "Erscheint mit Paket-Icon. Leer lassen → wird ausgeblendet"
     },
     {
@@ -857,11 +632,10 @@
           "default": "Gold"
         },
         {
-          "type": "text",
+          "type": "color",
           "id": "hex",
           "label": "Farbe als Hex-Code",
-          "default": "#c9a24a",
-          "info": "z. B. #c9a24a für Gold. Hex-Codes findest du auf htmlcolorcodes.com"
+          "default": "#c9a24a"
         }
       ]
     },
@@ -940,7 +714,7 @@
         { "type": "text",       "id": "choice_label", "label": "Bezeichnung",                   "default": "Option 1" },
         { "type": "text",       "id": "choice_value", "label": "Wert (in Bestellung gespeichert)","default": "option1" },
         { "type": "image_picker","id": "choice_image","label": "Bild (für Bildkarten-Darstellung)" },
-        { "type": "text",       "id": "hex_color",    "label": "Farbe #Hex (für Farbfelder)",   "info": "z.B. #c9a24a für Gold" },
+        { "type": "color",      "id": "hex_color",    "label": "Farbe (für Farbfelder)",        "default": "#cccccc" },
         { "type": "checkbox",   "id": "is_default",   "label": "Standard-Auswahl",              "default": false },
         { "type": "number",     "id": "surcharge_cents","label": "Aufpreis in Cent",             "default": 0 },
         { "type": "number",     "id": "addon_variant_id","label": "Aufpreis-Variant ID",         "default": 0 }
@@ -1035,7 +809,7 @@
       { "type": "trust_badge", "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
       { "type": "trust_badge", "settings": { "icon": "heart",  "label": "Handgefertigt" } },
       { "type": "trust_badge", "settings": { "icon": "clock",  "label": "3–5 Tage" } },
-      { "type": "accordion", "settings": { "title": "Versand & Rückgabe", "content": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.</p>" } },
+      { "type": "accordion", "settings": { "title": "Versand & Rückgabe", "content": "<p>Versand in 3–5 Werktagen. Österreich ist kostenlos, Deutschland ab 100 € Bestellwert kostenlos. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen).</p>" } },
       { "type": "accordion", "settings": { "title": "Pflege", "content": "<p>Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln.</p>" } }
     ]
   }]

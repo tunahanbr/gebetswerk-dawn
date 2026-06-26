@@ -140,7 +140,7 @@
           "type": "accordion",
           "settings": {
             "title": "Versand & Rückgabe",
-            "content": "<p>Versand in 3–5 Werktagen. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen). Versand kostenlos ab 100 € innerhalb Deutschlands.</p>"
+            "content": "<p>Versand in 3–5 Werktagen. Österreich ist kostenlos, Deutschland ab 100 € Bestellwert kostenlos. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen).</p>"
           }
         },
         "acc-care": {
@@ -176,8 +176,8 @@
         "badge_text": "Personalisiertes Set",
         "review_display": "2.627 Bewertungen",
         "review_count_number": 2627,
-        "shipping_row1": "3–5 Werktage Lieferzeit · kostenlos ab 100 €",
-        "shipping_row2": "In edler Geschenkverpackung mit Goldschleife",
+        "shipping_row1": "Österreich kostenlos · Deutschland kostenlos ab 100 €",
+        "shipping_row2": "3–5 Werktage Lieferzeit · Geschenkverpackung optional",
         "countdown_cutoff_hour": 17,
         "inventory_threshold": 10,
         "price_name1": 1000,
