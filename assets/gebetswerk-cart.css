@@ -15,7 +15,7 @@
 }
 
 .drawer__heading {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400 !important;
   font-size: 20px !important;
   letter-spacing: -0.01em !important;
@@ -43,7 +43,7 @@ cart-drawer-items::-webkit-scrollbar-thumb { background: var(--gw-border); borde
 
 /* ── Cart items — shared (drawer + page) ───────────────────── */
 .cart-items th {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 11px !important;
   font-weight: 500 !important;
   letter-spacing: 0.12em !important;
@@ -55,7 +55,7 @@ cart-drawer-items::-webkit-scrollbar-thumb { background: var(--gw-border); borde
 .cart-item__name,
 .cart-item__name a,
 a.cart-item__name {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400 !important;
   font-size: 15px !important;
   letter-spacing: -0.01em !important;
@@ -66,7 +66,7 @@ a.cart-item__name {
 .cart-item__details .product-option,
 .cart-item__details .cart-item__selling-plan-allocation,
 .product-option {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 12px !important;
   color: var(--gw-muted) !important;
 }
@@ -81,7 +81,7 @@ a.cart-item__name {
 .cart-item .price__regular,
 .price-item,
 .cart-item__price-wrapper .price {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 14px !important;
   font-weight: 500 !important;
   color: var(--gw-ink) !important;
@@ -97,7 +97,7 @@ a.cart-item__name {
 }
 .quantity__button,
 .quantity__input {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   color: var(--gw-ink) !important;
   background: transparent !important;
   border-color: transparent !important;
@@ -119,13 +119,13 @@ cart-remove-button button:hover,
 
 /* ── Totals ─────────────────────────────────────────────────── */
 .totals__total {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 13px !important;
   font-weight: 400 !important;
   color: var(--gw-muted) !important;
 }
 .totals__total-value {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-size: 22px !important;
   font-weight: 400 !important;
   letter-spacing: -0.02em !important;
@@ -133,7 +133,7 @@ cart-remove-button button:hover,
 }
 
 .tax-note {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 11px !important;
   color: var(--gw-muted) !important;
 }
@@ -141,7 +141,7 @@ cart-remove-button button:hover,
 /* ── Checkout button ────────────────────────────────────────── */
 .cart__checkout-button,
 .cart__checkout-button.button {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 14px !important;
   font-weight: 500 !important;
   letter-spacing: 0.01em !important;
@@ -161,7 +161,7 @@ cart-remove-button button:hover,
 
 /* ── Discounts ──────────────────────────────────────────────── */
 .discounts__discount {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 12px !important;
   color: var(--gw-gold) !important;
 }
@@ -175,14 +175,14 @@ cart-remove-button button:hover,
   padding: 20px 24px !important;
 }
 .cart-notification__heading {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400 !important;
   font-size: 16px !important;
   letter-spacing: -0.01em !important;
   color: var(--gw-ink) !important;
 }
 .cart-notification-product__name {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-size: 14px !important;
   font-weight: 400 !important;
   color: var(--gw-ink) !important;
@@ -192,13 +192,13 @@ cart-remove-button button:hover,
   overflow: hidden !important;
 }
 .cart-notification .price {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 13px !important;
   color: var(--gw-muted) !important;
 }
 .cart-notification__links a,
 .cart-notification__links .button {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   background: var(--gw-ink) !important;
@@ -211,14 +211,14 @@ cart-remove-button button:hover,
 
 /* ── Main cart page (/cart) ─────────────────────────────────── */
 .cart__empty-text {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400 !important;
   letter-spacing: -0.02em !important;
   color: var(--gw-ink) !important;
 }
 .cart__warnings .button,
 .cart__warnings a.button {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 14px !important;
   font-weight: 500 !important;
   background: var(--gw-ink) !important;
@@ -232,13 +232,13 @@ cart-remove-button button:hover,
   border-bottom-color: var(--gw-border) !important;
 }
 .cart__note label {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 12px !important;
   color: var(--gw-muted) !important;
 }
 .cart__note .text-area,
 .cart__note .field__input {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 13px !important;
   border-color: var(--gw-border) !important;
   border-radius: 12px !important;
@@ -248,36 +248,17 @@ cart-remove-button button:hover,
 
 /* ── Login hint in empty cart ───────────────────────────────── */
 .cart__login-title {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400 !important;
   color: var(--gw-ink) !important;
 }
 .cart__login-paragraph,
 .cart__login-paragraph a {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 13px !important;
   color: var(--gw-muted) !important;
 }
 .cart__login-paragraph a { color: var(--gw-ink) !important; text-decoration: underline; }
-
-/* ══════════════════════════════════════════════════════════════
-   MOBILE OPTIMIERUNGEN
-   ══════════════════════════════════════════════════════════════ */
-@media (max-width: 749px) {
-  /* Hero: Bento cards untereinander stacked */
-  .gw-hero__cards { gap: 10px; margin-top: 10px; }
-
-  /* Steps: kein Extra-Padding */
-  .gw-step { padding: 20px 0; }
-
-  /* FAQ Padding */
-  .gw-faq { padding: 64px 16px 0; }
-  .gw-feature { padding: 64px 16px 64px; }
-  .gw-testimonials { padding: 64px 16px; }
-
-  /* Footer kompakter */
-  .gw-footer__nav-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-}
 
 /* ── Cart Addon Inline Display ─────────────────────────────── */
 .gw-cart-addon-inline {
@@ -309,7 +290,7 @@ cart-remove-button button:hover,
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--gw-font-body);
   font-size: 12px;
   color: var(--gw-ink, #1A1613);
 }

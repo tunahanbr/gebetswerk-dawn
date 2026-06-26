@@ -80,16 +80,15 @@
   function showFieldError(inputId, msg) {
     const input = $(inputId);
     if (!input) { alert(msg); return; }
-    input.style.borderColor = '#c0392b';
+    input.classList.add('is-error');
     let err = input.parentElement.querySelector('.gw-form-error');
     if (!err) {
       err = document.createElement('p');
       err.className = 'gw-form-error';
-      err.style.cssText = 'color:#c0392b;font-size:12px;margin:6px 0 0;font-family:Inter,system-ui,sans-serif;';
       input.parentElement.appendChild(err);
     }
     err.textContent = msg;
-    input.addEventListener('input', () => { input.style.borderColor = ''; err.remove(); }, { once: true });
+    input.addEventListener('input', () => { input.classList.remove('is-error'); err.remove(); }, { once: true });
     input.scrollIntoView({ behavior: 'smooth', block: 'center' });
     input.focus({ preventScroll: true });
   }

@@ -169,7 +169,7 @@
             </div>
           {%- endif -%}
         {%- else -%}
-          <div class="gw-product__urgency" id="gw-urgency" style="background:#fff1f1;color:#b91c1c;">
+          <div class="gw-product__urgency" id="gw-urgency">
             <span class="gw-product__urgency-dot"></span>
             <span id="gw-urgency-text">Ausverkauft</span>
           </div>
@@ -196,12 +196,12 @@
           <input type="hidden" name="properties[Gebetskette]"      id="prop-bead"       value="">
           {%- comment -%} ─ Color variant picker ─ {%- endcomment -%}
           {%- if product.variants.size > 1 -%}
-            <div style="margin-bottom:24px;">
+            <div class="gw-form-field">
               <p class="gw-product__section-label">Farbe <span id="gw-color-label">{{ current_variant.title }}</span></p>
               <div class="gw-product__colors">
                 {%- for variant in product.variants -%}
                   <button type="button"
-                    class="gw-color-swatch{% if variant.id == current_variant.id %} is-active{% endif %}"
+                    class="gw-color-swatch{% if variant.id == current_variant.id %} is-active{% endif %}{% unless variant.available %} is-unavailable{% endunless %}"
                     data-variant-id="{{ variant.id }}"
                     data-variant-price="{{ variant.price }}"
                     data-color-name="{{ variant.title | escape }}"
@@ -209,8 +209,7 @@
                     data-variant-inventory="{{ variant.inventory_quantity }}"
                     data-variant-available="{{ variant.available }}"
                     aria-label="{{ variant.title }}"
-                    title="{{ variant.title }}"
-                    {% unless variant.available %}style="opacity:0.4;" title="{{ variant.title }} – ausverkauft"{% endunless %}
+                    title="{% if variant.available %}{{ variant.title }}{% else %}{{ variant.title }} – ausverkauft{% endif %}"
                   >
                     {%- if variant.featured_image -%}
                       <img src="{{ variant.featured_image | image_url: width: 120 }}" alt="{{ variant.title | escape }}" loading="lazy" width="120" height="{{ 120 | divided_by: variant.featured_image.aspect_ratio | round }}">
@@ -236,7 +235,7 @@
             <div id="gw-personalize-fields" class="gw-personalize-fields">
 
               <div class="gw-form-field">
-                <label class="gw-form-label" for="gw-name1-input">Name 1 * <span style="font-weight:400;color:var(--gw-muted)">(max. 11 Zeichen)</span></label>
+                <label class="gw-form-label" for="gw-name1-input">Name 1 * <span class="gw-form-label__hint">(max. 11 Zeichen)</span></label>
                 <div class="gw-form-input-wrap">
                   <input type="text" id="gw-name1-input" class="gw-form-input" placeholder="z. B. Amina" maxlength="11" autocomplete="off">
                   <span id="gw-name1-count" class="gw-char-count">0/11</span>
@@ -296,8 +295,8 @@
               {%- comment -%} Symbols — from blocks or fallback {%- endcomment -%}
               {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
               <div class="gw-form-field">
-                <div class="gw-option-toggle" style="margin-bottom:8px;">
-                  <p class="gw-form-label" style="margin-bottom:0;">Symbol</p>
+                <div class="gw-option-toggle gw-option-toggle--compact">
+                  <p class="gw-form-label gw-form-label--flush">Symbol</p>
                   <span class="gw-option-price" id="gw-symbol-price-tag" hidden>+{{ section.settings.price_symbol | default: 400 | money_without_currency }}€</span>
                 </div>
                 <div class="gw-symbol-grid">
@@ -306,7 +305,7 @@
                       <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}"
                         data-symbol="{{ block.settings.symbol_id }}"
                         {{ block.shopify_attributes }}>
-                        <span class="gw-symbol-btn__icon" style="color:var(--gw-gold)">{{ block.settings.icon }}</span>
+                        <span class="gw-symbol-btn__icon">{{ block.settings.icon }}</span>
                         <span class="gw-symbol-btn__label">{{ block.settings.label }}</span>
                       </button>
                     {%- endfor -%}
@@ -315,7 +314,7 @@
                     {%- for sym in fallback_symbols -%}
                       {%- assign sp = sym | split: '|' -%}
                       <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}">
-                        <span class="gw-symbol-btn__icon" style="color:var(--gw-gold)">{{ sp[2] }}</span>
+                        <span class="gw-symbol-btn__icon">{{ sp[2] }}</span>
                         <span class="gw-symbol-btn__label">{{ sp[1] }}</span>
                       </button>
                     {%- endfor -%}
@@ -329,23 +328,23 @@
                   <button type="button" class="gw-sympos-btn is-active" data-sympos="left">
                     <span>Links</span>
                     <span class="gw-sympos-preview" data-dir="row">
-                      <span style="color:var(--gw-gold);font-size:13px;">☾</span>
-                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--gw-gold);">Aa</span>
+                      <span class="gw-sympos-preview__symbol">☾</span>
+                      <span class="gw-sympos-preview__name">Aa</span>
                     </span>
                   </button>
                   <button type="button" class="gw-sympos-btn" data-sympos="right">
                     <span>Rechts</span>
                     <span class="gw-sympos-preview" data-dir="row-rev">
-                      <span style="color:var(--gw-gold);font-size:13px;">☾</span>
-                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:11px;color:var(--gw-gold);">Aa</span>
+                      <span class="gw-sympos-preview__symbol">☾</span>
+                      <span class="gw-sympos-preview__name">Aa</span>
                     </span>
                   </button>
                   <button type="button" class="gw-sympos-btn" id="gw-sympos-between" data-sympos="between" hidden>
                     <span>Zwischen den Namen</span>
                     <span class="gw-sympos-preview" data-dir="row">
-                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:9px;color:var(--gw-gold);">Aa</span>
-                      <span style="color:var(--gw-gold);font-size:11px;">☾</span>
-                      <span style="font-family:'Fraunces',serif;font-style:italic;font-size:9px;color:var(--gw-gold);">Bb</span>
+                      <span class="gw-sympos-preview__name gw-sympos-preview__name--small">Aa</span>
+                      <span class="gw-sympos-preview__symbol gw-sympos-preview__symbol--small">☾</span>
+                      <span class="gw-sympos-preview__name gw-sympos-preview__name--small">Bb</span>
                     </span>
                   </button>
                 </div>
@@ -363,8 +362,8 @@
               <div class="gw-form-field" {{ block.shopify_attributes }}>
                 <label class="gw-form-label" for="addon-{{ block.id }}">
                   {{ block.settings.label }}
-                  {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-option-price" style="margin-left:4px;font-size:12px;">(+{{ block.settings.surcharge_cents | money_without_currency }}€)</span>{%- endif -%}
-                  {%- if block.settings.required -%}<span style="color:var(--gw-gold)"> *</span>{%- endif -%}
+                  {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-option-price gw-option-price--inline">(+{{ block.settings.surcharge_cents | money_without_currency }}€)</span>{%- endif -%}
+                  {%- if block.settings.required -%}<span class="gw-required-mark"> *</span>{%- endif -%}
                 </label>
                 <div class="gw-form-input-wrap">
                   <input type="text" id="addon-{{ block.id }}" class="gw-form-input"
@@ -389,7 +388,7 @@
                   {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
                   {{ block.settings.label }}
                   {%- if block.settings.description != blank -%}
-                    <span style="display:block;font-size:12px;color:var(--gw-muted);margin-top:2px;">{{ block.settings.description }}</span>
+                    <span class="gw-addon-description">{{ block.settings.description }}</span>
                   {%- endif -%}
                 </span>
                 <span class="gw-giftwrap-right">
@@ -460,7 +459,7 @@
                               {%- if inner.settings.choice_image != blank -%}
                                 <img src="{{ inner.settings.choice_image | image_url: width: 200 }}" alt="{{ inner.settings.choice_label | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: inner.settings.choice_image.aspect_ratio | round }}">
                               {%- elsif inner.settings.hex_color != blank -%}
-                                <div style="width:100%;height:100%;background:{{ inner.settings.hex_color }};border-radius:4px;"></div>
+                                <div class="gw-bead-btn__color" style="background:{{ inner.settings.hex_color }};"></div>
                               {%- else -%}
                                 <div class="gw-bead-btn__none">{{ inner.settings.choice_label | slice: 0 }}</div>
                               {%- endif -%}
@@ -474,7 +473,7 @@
                       {%- endfor -%}
                     </div>
                   {%- else -%}
-                    <div class="gw-sympos-grid" style="flex-wrap:wrap;gap:8px;">
+                    <div class="gw-sympos-grid gw-sympos-grid--wrap">
                       {%- for inner in section.blocks -%}
                         {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
                           <button type="button"
@@ -486,7 +485,7 @@
                             data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
                             {{ inner.shopify_attributes }}>
                             {{ inner.settings.choice_label }}
-                            {%- if inner.settings.surcharge_cents > 0 -%}<span style="font-size:11px;opacity:0.7;"> +{{ inner.settings.surcharge_cents | money_without_currency }}€</span>{%- endif -%}
+                            {%- if inner.settings.surcharge_cents > 0 -%}<span class="gw-choice-price"> +{{ inner.settings.surcharge_cents | money_without_currency }}€</span>{%- endif -%}
                           </button>
                         {%- endif -%}
                       {%- endfor -%}
@@ -517,9 +516,9 @@
                       {%- endfor -%}
                     </select>
                   {%- elsif opt_dt == 'list' -%}
-                    <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="gw-product-radio-list">
                       {%- if block.settings.include_none -%}
-                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                        <label class="gw-product-radio">
                           <input type="radio" name="opt-p-{{ block.id }}" value="" data-price="0" data-variant="0"
                             data-addon="product-radio" data-block="{{ block.id }}"
                             data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
@@ -528,7 +527,7 @@
                         </label>
                       {%- endif -%}
                       {%- for v in linked_product.variants -%}
-                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                        <label class="gw-product-radio">
                           <input type="radio" name="opt-p-{{ block.id }}" value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}"
                             data-addon="product-radio" data-block="{{ block.id }}"
                             data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
@@ -691,7 +690,7 @@
       <p class="gw-sticky-atc__title">{{ product.title | truncate: 30 }}</p>
       <p id="gw-sticky-price" class="gw-sticky-atc__price">{{ current_variant.price | money }}</p>
     </div>
-    <button type="button" id="gw-sticky-atc-btn" class="gw-add-to-cart" style="flex-shrink:0;height:44px;padding:0 20px;font-size:13px;">
+    <button type="button" id="gw-sticky-atc-btn" class="gw-add-to-cart gw-sticky-atc__button">
       In den Warenkorb
     </button>
   </div>

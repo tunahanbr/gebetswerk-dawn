@@ -15,17 +15,19 @@
   --gw-border:      #DDD8D0;
   --gw-radius-card: 20px;
   --gw-max-width:   1320px;
+  --gw-font-body:    var(--font-body-family);
+  --gw-font-heading: var(--font-heading-family);
 }
 
 /* ── Base overrides ───────────────────────────────────────── */
 body {
   background-color: var(--gw-ivory) !important;
   color: var(--gw-ink) !important;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--gw-font-body);
   -webkit-font-smoothing: antialiased;
 }
 
-.shopify-section { font-family: 'Inter', system-ui, sans-serif; }
+.shopify-section { font-family: var(--gw-font-body); }
 
 /* ── Hero section ─────────────────────────────────────────── */
 /* Hero — Mobile 100%, Desktop 80% */
@@ -155,7 +157,7 @@ body {
   margin-bottom: 12px;
 }
 .gw-hero__heading {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: clamp(30px, 6vw, 76px);
   font-weight: 400;
   line-height: 0.97;
@@ -282,7 +284,7 @@ body {
   margin-bottom: 4px;
 }
 .gw-card__title {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 19px;
   font-weight: 400;
   line-height: 1.15;
@@ -333,7 +335,7 @@ body {
   margin-bottom: 24px;
 }
 .gw-step__num {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 30px;
   font-weight: 400;
   color: rgba(26,22,19,0.12);
@@ -342,7 +344,7 @@ body {
 .gw-step__arrow { width: 16px; height: 16px; color: var(--gw-muted); transition: color 0.2s; }
 .gw-step:hover .gw-step__arrow { color: var(--gw-gold); }
 .gw-step__title {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 22px;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -402,7 +404,7 @@ body {
 /* Logo text */
 .header__heading-link,
 .header__heading {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400;
   letter-spacing: -0.02em;
 }
@@ -410,7 +412,7 @@ body {
 .header__menu-item,
 .header__menu-item .link,
 .list-menu__item {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 14px !important;
   font-weight: 400;
   color: rgba(26,22,19,0.75) !important;
@@ -430,7 +432,7 @@ body {
 .card__heading,
 .card__heading a,
 .card__heading.h5 {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400 !important;
   letter-spacing: -0.01em !important;
   font-size: 17px !important;
@@ -438,7 +440,7 @@ body {
 .card__information .price,
 .card__information .price__regular,
 .price-item {
-  font-family: 'Inter', system-ui, sans-serif !important;
+  font-family: var(--gw-font-body) !important;
   font-size: 13px !important;
 }
 /* Rounded card images */
@@ -449,7 +451,7 @@ body {
 
 /* ── Featured-collection section heading override ─────────── */
 .collection__title .title {
-  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-family: var(--gw-font-heading) !important;
   font-weight: 400;
   letter-spacing: -0.02em;
 }
@@ -472,7 +474,7 @@ body {
   color: var(--gw-gold) !important;
 }
 .gw-feature__heading {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: clamp(32px, 5vw, 64px);
   font-weight: 400;
   line-height: 1.04;
@@ -509,7 +511,7 @@ body {
 }
 .gw-feature__icon svg { width: 20px; height: 20px; }
 .gw-feature__item-title {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 22px;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -546,7 +548,7 @@ body {
 }
 .gw-feature__badge-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gw-muted); margin: 0 0 2px; }
 .gw-feature__badge-name {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 17px;
   font-weight: 400;
   margin: 0;
@@ -585,7 +587,7 @@ body {
   margin-bottom: 40px;
 }
 .gw-testimonials__title {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -616,7 +618,7 @@ body {
 .gw-review__stars { display: flex; gap: 2px; margin-bottom: 12px; }
 .gw-review__star { width: 15px; height: 15px; fill: var(--gw-gold); color: var(--gw-gold); }
 .gw-review__title {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 20px;
   font-weight: 400;
   margin: 0 0 8px;
@@ -653,7 +655,7 @@ body {
 }
 
 .gw-faq__heading {
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: clamp(30px, 4vw, 48px);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -686,7 +688,7 @@ body {
   padding: 20px 0;
   cursor: pointer;
   list-style: none;
-  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-family: var(--gw-font-heading);
   font-size: 19px;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -732,13 +734,13 @@ body {
   border-radius: 50%;
   background: var(--gw-ivory);
   color: var(--gw-ink);
-  font-family: 'Fraunces', serif;
+  font-family: var(--gw-font-heading);
   font-size: 15px;
   font-weight: 500;
   flex-shrink: 0;
 }
 .gw-footer__logo-name {
-  font-family: 'Fraunces', serif;
+  font-family: var(--gw-font-heading);
   font-size: 22px;
   font-weight: 400;
   color: var(--gw-ivory);
@@ -815,6 +817,18 @@ body {
 ::-webkit-scrollbar-track { background: var(--gw-sand-light); }
 ::-webkit-scrollbar-thumb { background: var(--gw-border); border-radius: 3px; }
 
+/* ══════════════════════════════════════════════════════════════
+   MOBILE OPTIMIERUNGEN
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 749px) {
+  .gw-hero__cards { gap: 10px; margin-top: 10px; }
+  .gw-step { padding: 20px 0; }
+  .gw-faq { padding: 64px 16px 0; }
+  .gw-feature { padding: 64px 16px 64px; }
+  .gw-testimonials { padding: 64px 16px; }
+  .gw-footer__nav-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+}
+
 /* ── Bewertungssterne (Judge.me Metafields, snippet gw-rating-stars) ── */
 .gw-stars {
   position: relative;
@@ -836,7 +850,7 @@ body {
   color: var(--gw-gold, #C89B3C);
 }
 .gw-stars__count {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--gw-font-body);
   font-size: 12px;
   color: var(--gw-muted, #6B6560);
   vertical-align: middle;
