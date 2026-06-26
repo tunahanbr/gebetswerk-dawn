@@ -1,0 +1,325 @@
+/* Cart styles: drawer, cart page, notification, quantity, checkout */
+/* ══════════════════════════════════════════════════════════════
+   CART — BRAND OVERRIDES
+   Drawer · Cart page · Notification · Quantity · Checkout btn
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Cart Drawer panel ──────────────────────────────────────── */
+.drawer__inner {
+  background: var(--gw-ivory) !important;
+  border-left: 1px solid var(--gw-border) !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-right: none !important;
+  border-color: var(--gw-border) !important;
+}
+
+.drawer__heading {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  letter-spacing: -0.01em !important;
+  color: var(--gw-ink) !important;
+  margin-bottom: 0 !important;
+}
+
+.drawer__header {
+  border-bottom: 1px solid var(--gw-border) !important;
+  padding: 18px 0 !important;
+}
+
+.drawer__close {
+  color: var(--gw-ink) !important;
+}
+.drawer__close svg { width: 18px; height: 18px; }
+
+.drawer__footer {
+  border-top: 1px solid var(--gw-border) !important;
+}
+
+/* Scrollbar */
+cart-drawer-items::-webkit-scrollbar { width: 2px; }
+cart-drawer-items::-webkit-scrollbar-thumb { background: var(--gw-border); border-radius: 99px; }
+
+/* ── Cart items — shared (drawer + page) ───────────────────── */
+.cart-items th {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--gw-muted) !important;
+  border-bottom: 1px solid var(--gw-border) !important;
+}
+
+.cart-item__name,
+.cart-item__name a,
+a.cart-item__name {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+  font-size: 15px !important;
+  letter-spacing: -0.01em !important;
+  color: var(--gw-ink) !important;
+  text-decoration: none !important;
+}
+
+.cart-item__details .product-option,
+.cart-item__details .cart-item__selling-plan-allocation,
+.product-option {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  color: var(--gw-muted) !important;
+}
+
+.cart-item__image {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+/* ── Prices in cart ─────────────────────────────────────────── */
+.cart-item .price,
+.cart-item .price__regular,
+.price-item,
+.cart-item__price-wrapper .price {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--gw-ink) !important;
+}
+
+/* ── Quantity stepper ───────────────────────────────────────── */
+.quantity {
+  border: 1px solid var(--gw-border) !important;
+  border-radius: 40px !important;
+  background: var(--gw-ivory) !important;
+  color: var(--gw-ink) !important;
+  overflow: hidden;
+}
+.quantity__button,
+.quantity__input {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  color: var(--gw-ink) !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.quantity__button:hover { background: var(--gw-sand) !important; }
+.quantity__input {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* ── Remove button ──────────────────────────────────────────── */
+cart-remove-button button,
+.cart-item__remove {
+  color: var(--gw-muted) !important;
+  font-size: 12px !important;
+}
+cart-remove-button button:hover,
+.cart-item__remove:hover { color: var(--gw-ink) !important; }
+
+/* ── Totals ─────────────────────────────────────────────────── */
+.totals__total {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: var(--gw-muted) !important;
+}
+.totals__total-value {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--gw-ink) !important;
+}
+
+.tax-note {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  color: var(--gw-muted) !important;
+}
+
+/* ── Checkout button ────────────────────────────────────────── */
+.cart__checkout-button,
+.cart__checkout-button.button {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  background: var(--gw-ink) !important;
+  color: var(--gw-ivory) !important;
+  border: none !important;
+  border-radius: 40px !important;
+  padding: 14px 28px !important;
+  cursor: pointer;
+  transition: background 0.2s !important;
+  width: 100%;
+}
+.cart__checkout-button:hover,
+.cart__checkout-button.button:hover {
+  background: rgba(26,22,19,0.85) !important;
+}
+
+/* ── Discounts ──────────────────────────────────────────────── */
+.discounts__discount {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  color: var(--gw-gold) !important;
+}
+
+/* ── Cart notification popup (added to cart banner) ─────────── */
+.cart-notification {
+  background: var(--gw-ivory) !important;
+  border-color: var(--gw-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(26,22,19,0.12) !important;
+  padding: 20px 24px !important;
+}
+.cart-notification__heading {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+  font-size: 16px !important;
+  letter-spacing: -0.01em !important;
+  color: var(--gw-ink) !important;
+}
+.cart-notification-product__name {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: var(--gw-ink) !important;
+}
+.cart-notification-product__image {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+.cart-notification .price {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  color: var(--gw-muted) !important;
+}
+.cart-notification__links a,
+.cart-notification__links .button {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  background: var(--gw-ink) !important;
+  color: var(--gw-ivory) !important;
+  border: none !important;
+  border-radius: 40px !important;
+  padding: 10px 20px !important;
+  text-decoration: none !important;
+}
+
+/* ── Main cart page (/cart) ─────────────────────────────────── */
+.cart__empty-text {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--gw-ink) !important;
+}
+.cart__warnings .button,
+.cart__warnings a.button {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  background: var(--gw-ink) !important;
+  color: var(--gw-ivory) !important;
+  border: none !important;
+  border-radius: 40px !important;
+  padding: 12px 24px !important;
+  text-decoration: none !important;
+}
+.cart__items {
+  border-bottom-color: var(--gw-border) !important;
+}
+.cart__note label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  color: var(--gw-muted) !important;
+}
+.cart__note .text-area,
+.cart__note .field__input {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  border-color: var(--gw-border) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  color: var(--gw-ink) !important;
+}
+
+/* ── Login hint in empty cart ───────────────────────────────── */
+.cart__login-title {
+  font-family: 'Fraunces', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+  color: var(--gw-ink) !important;
+}
+.cart__login-paragraph,
+.cart__login-paragraph a {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  color: var(--gw-muted) !important;
+}
+.cart__login-paragraph a { color: var(--gw-ink) !important; text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE OPTIMIERUNGEN
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 749px) {
+  /* Hero: Bento cards untereinander stacked */
+  .gw-hero__cards { gap: 10px; margin-top: 10px; }
+
+  /* Steps: kein Extra-Padding */
+  .gw-step { padding: 20px 0; }
+
+  /* FAQ Padding */
+  .gw-faq { padding: 64px 16px 0; }
+  .gw-feature { padding: 64px 16px 64px; }
+  .gw-testimonials { padding: 64px 16px; }
+
+  /* Footer kompakter */
+  .gw-footer__nav-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+}
+
+/* ── Cart Addon Inline Display ─────────────────────────────── */
+.gw-cart-addon-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: rgba(26,22,19,0.5);
+  margin-top: 3px;
+  gap: 12px;
+}
+.gw-cart-addon-inline span {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Cart item order summary (wie "Deine Bestellung" Box) ───── */
+.gw-cart-item__order-summary {
+  list-style: none;
+  padding: 8px 12px;
+  margin: 10px 0 0;
+  background: var(--gw-sand, #EDE8DF);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.gw-cart-item__order-summary li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--gw-ink, #1A1613);
+}
+.gw-cart-item__order-summary li svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  stroke: #22c55e;
+  stroke-width: 2.5;
+}
+.gw-cart-item__order-summary li strong {
+  font-weight: 500;
+}

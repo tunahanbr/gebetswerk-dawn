@@ -4,6 +4,8 @@
   assign inv_threshold = section.settings.inventory_threshold | default: 10
 -%}
 
+{{ 'gebetswerk-product.css' | asset_url | stylesheet_tag }}
+
 {%- assign raw_p1 = section.settings.price_name1 | plus: 0 -%}
 {%- assign raw_p2 = section.settings.price_name2 | plus: 0 -%}
 
