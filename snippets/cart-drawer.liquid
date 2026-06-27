@@ -428,6 +428,26 @@
         <!-- Subtotals -->
 
         <div class="cart-drawer__footer" {{ block.shopify_attributes }}>
+          {%- assign gw_free_shipping_threshold = settings.free_shipping_de_threshold_cents | default: 8000 | plus: 0 -%}
+          {%- if cart != empty -%}
+            {%- if cart.total_price < gw_free_shipping_threshold -%}
+              {%- assign gw_ship_remaining = gw_free_shipping_threshold | minus: cart.total_price -%}
+              {%- assign gw_ship_pct = cart.total_price | times: 100 | divided_by: gw_free_shipping_threshold | at_most: 100 -%}
+              <div class="gw-drawer-freeship">
+                <div class="gw-drawer-freeship__bar">
+                  <div class="gw-drawer-freeship__fill" style="width:{{ gw_ship_pct }}%"></div>
+                </div>
+                <p>Nur noch <strong>{{ gw_ship_remaining | money }}</strong> bis zum <strong>kostenlosen Versand</strong> (DE &amp; AT).</p>
+              </div>
+            {%- else -%}
+              <div class="gw-drawer-freeship gw-drawer-freeship--done">
+                <div class="gw-drawer-freeship__bar">
+                  <div class="gw-drawer-freeship__fill" style="width:100%"></div>
+                </div>
+                <p>🎉 Glückwunsch! Dein Versand ist <strong>kostenlos</strong> (DE &amp; AT).</p>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
           <div>
             {%- if cart.cart_level_discount_applications.size > 0 -%}
               <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
