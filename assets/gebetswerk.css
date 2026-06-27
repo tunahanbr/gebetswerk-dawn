@@ -139,11 +139,13 @@ body.gw-home { background: #fff !important; }
 .section-header:not(.scrolled-past-header) .header-wrapper--overlay-dark {
   --color-foreground: 26, 22, 19;
 }
-/* Dezenter Schatten oben → helle Schrift bleibt über hellen Bildstellen lesbar */
+/* Dezenter Schatten oben → helle Schrift bleibt über hellen Bildstellen lesbar.
+   Auf die Kartenbreite eingerückt (--gw-frame), damit er nicht in den weißen
+   Seitenrand blutet und dort einen grauen Verlauf erzeugt. */
 .section-header:not(.scrolled-past-header) .header-wrapper--overlay-light::before {
   content: '';
   position: absolute;
-  left: 0; right: 0; top: 0;
+  left: var(--gw-frame); right: var(--gw-frame); top: 0;
   height: 160px;
   background: linear-gradient(to bottom, rgba(26, 22, 19, 0.38), transparent);
   pointer-events: none;
