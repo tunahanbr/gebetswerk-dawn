@@ -148,6 +148,9 @@ body.gw-home { background: #fff !important; }
   left: var(--gw-frame); right: var(--gw-frame); top: 0;
   height: 160px;
   background: linear-gradient(to bottom, rgba(26, 22, 19, 0.38), transparent);
+  /* Obere Ecken wie die Karte abrunden, damit kein graues Eck aus der
+     abgerundeten Hero-Ecke herausschaut. */
+  border-radius: var(--gw-radius-card) var(--gw-radius-card) 0 0;
   pointer-events: none;
   z-index: -1;
 }
