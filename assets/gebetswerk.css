@@ -15,6 +15,9 @@
   --gw-border:      #DDD8D0;
   --gw-radius-card: 20px;
   --gw-max-width:   1320px;
+  /* Einheitlicher weißer Rahmen rund um den Hero (links = rechts = oben = unten).
+     Nur diesen einen Wert ändern, um den Abstand überall gleichzeitig zu skalieren. */
+  --gw-frame:       14px;
   --gw-font-body:    var(--font-body-family);
   --gw-font-heading: var(--font-heading-family);
 }
@@ -38,15 +41,15 @@ body.gw-home { background: #fff !important; }
 /* ── Hero section ─────────────────────────────────────────── */
 /* Hero — großflächig; reicht unter die transparente Navbar (Startseite) */
 .gw-hero { padding: 0; margin-top: calc(-1 * var(--header-height, 64px)); background: #fff; }
-@media (min-width: 750px) { .gw-hero { margin-top: calc(-1 * var(--header-height, 80px)); } }
-
-/* Seitlicher Abstand auf allen Displays */
-.gw-hero__inner {
-  max-width: calc(100% - 28px);
-  margin: 0 auto;
-}
 @media (min-width: 750px) {
-  .gw-hero__inner { max-width: calc(100% - 48px); }
+  :root { --gw-frame: 24px; }
+  .gw-hero { margin-top: calc(-1 * var(--header-height, 80px)); }
+}
+
+/* Seitlicher Abstand auf allen Displays — exakt --gw-frame links und rechts */
+.gw-hero__inner {
+  max-width: calc(100% - 2 * var(--gw-frame));
+  margin: 0 auto;
 }
 
 .gw-eyebrow {
