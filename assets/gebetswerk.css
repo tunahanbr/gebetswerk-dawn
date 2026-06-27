@@ -113,11 +113,13 @@ body.gw-home { background: #fff !important; }
   overflow: hidden;
   border-radius: var(--gw-radius-card);
   background: #fff;
-  height: calc(100svh - var(--gw-topbar, 40px) - 28px);
+  /* Höhe = Viewport minus Announcement-Bar minus oberer + unterer Rahmen
+     → unten bleibt derselbe weiße Abstand wie oben und an den Seiten. */
+  height: calc(100svh - var(--gw-topbar, 40px) - 2 * var(--gw-frame));
   min-height: 460px;
 }
 @media (min-width: 750px) {
-  .gw-hero__main { height: calc(100svh - var(--gw-topbar, 40px) - 48px); min-height: 540px; }
+  .gw-hero__main { min-height: 540px; }
 }
 
 /* ── Transparente Navbar über dem Hero (nur Startseite, oben) ── */
@@ -149,10 +151,7 @@ body.gw-home { background: #fff !important; }
 }
 /* Oberer weißer Streifen über der Navbar (Teil des Rahmens). Nur Startseite via :has().
    Beim Scrollen (sticky, top:0) wird der Abstand ignoriert. */
-.section-header:has(.header-wrapper--overlay) { margin-top: 14px; }
-@media (min-width: 750px) {
-  .section-header:has(.header-wrapper--overlay) { margin-top: 24px; }
-}
+.section-header:has(.header-wrapper--overlay) { margin-top: var(--gw-frame); }
 
 .gw-hero__main img {
   position: absolute;
