@@ -441,10 +441,18 @@ body.gw-home { background: #fff !important; }
 .gw-trust-item__text  { font-size: 12px; color: var(--gw-muted); margin: 0; line-height: 1.4; }
 .gw-trust__note { font-size: 11px; color: var(--gw-muted); margin-top: 10px; }
 
-/* Ensure announcement bar matches design */
+/* Announcement bar — an das Eyebrow-Pattern angeglichen (Sans-Serif, uppercase,
+   weites Letter-Spacing), statt Dawns Standard-Serif-Stil zu übernehmen. */
 .announcement-bar { background: var(--gw-ink) !important; color: var(--gw-ivory) !important; }
 .announcement-bar__message,
-.announcement-bar a { color: var(--gw-ivory) !important; }
+.announcement-bar a {
+  font-family: var(--gw-font-body) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--gw-ivory) !important;
+}
 
 /* ── Dawn Header overrides ────────────────────────────────── */
 .header-wrapper {
