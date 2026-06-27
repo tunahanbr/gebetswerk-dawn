@@ -451,22 +451,6 @@
     if (stickyBtn) stickyBtn.addEventListener('click', addToCart);
   }
 
-  /* ── Countdown ────────────────────────────────────────────── */
-  function startCountdown() {
-    const el = $('gw-countdown-time');
-    if (!el) return;
-    const cutoffHour = window.GW_COUNTDOWN_HOUR || 17;
-    function tick() {
-      const now = new Date(), cutoff = new Date(now);
-      cutoff.setHours(cutoffHour, 0, 0, 0);
-      if (now >= cutoff) cutoff.setDate(cutoff.getDate() + 1);
-      const d = cutoff - now;
-      el.textContent = [Math.floor(d/3600000), Math.floor(d%3600000/60000), Math.floor(d%60000/1000)]
-        .map(n => String(n).padStart(2,'0')).join(':');
-    }
-    tick(); setInterval(tick, 1000);
-  }
-
   /* ── Order summary ────────────────────────────────────────── */
   function updateOrderSummary() {
     const summary = $('gw-order-summary');
@@ -797,7 +781,6 @@
     updatePrice();
     updateSymbols();
     initStickyAtc();
-    startCountdown();
   }
 
   function updateSymbols() {
