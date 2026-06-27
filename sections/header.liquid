@@ -139,7 +139,7 @@
   endif
 %}
 
-<{{ header_tag }} {% if header_tag == 'sticky-header' %}data-sticky-type="{{ section.settings.sticky_header_type }}"{% endif %} class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}">
+<{{ header_tag }} {% if header_tag == 'sticky-header' %}data-sticky-type="{{ section.settings.sticky_header_type }}"{% endif %} class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}{% if request.page_type == 'index' %} header-wrapper--overlay header-wrapper--overlay-{{ section.settings.transparent_text | default: 'light' }}{% endif %}">
   {%- liquid
     assign social_links = false
     assign localization_forms = false
@@ -589,6 +589,17 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "transparent_text",
+      "label": "Navbar-Schrift auf Startseite (über Hero)",
+      "info": "Die Navbar liegt auf der Startseite transparent über dem Hero. Beim Runterscrollen wird sie wieder normal.",
+      "options": [
+        { "value": "light", "label": "Hell (für dunklen Hintergrund)" },
+        { "value": "dark", "label": "Dunkel (für hellen Hintergrund)" }
+      ],
+      "default": "light"
     },
     {
       "type": "color_scheme",

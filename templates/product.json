@@ -33,7 +33,7 @@
           "settings": {
             "id": "white",
             "name": "Weiß",
-            "hex": "#f5f1e6"
+            "hex": "#ffffff"
           }
         },
         "thread-black": {
@@ -124,6 +124,18 @@
             "addon_variant_id": 53088151601488
           }
         },
+        "addon-express": {
+          "type": "opt_checkbox",
+          "settings": {
+            "label": "Expressanfertigung",
+            "icon": "⚡",
+            "description": "Bevorzugte Fertigung & schnellerer Versand",
+            "field_key": "Expressanfertigung",
+            "default_checked": false,
+            "surcharge_cents": 1000,
+            "addon_variant_id": 0
+          }
+        },
         "addon-beads": {
           "type": "opt_product",
           "settings": {
@@ -166,6 +178,7 @@
         "sym-heart",
         "sym-infinity",
         "addon-giftwrap",
+        "addon-express",
         "addon-beads",
         "acc-shipping",
         "acc-care"

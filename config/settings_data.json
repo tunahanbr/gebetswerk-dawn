@@ -176,7 +176,7 @@
     "cart_type": "notification",
     "show_vendor": false,
     "show_cart_note": false,
-    "free_shipping_de_threshold_cents": 10000,
+    "free_shipping_de_threshold_cents": 8000,
     "cart_drawer_collection": "",
     "blocks": {
       "judgeme_core_embed": {
@@ -355,7 +355,7 @@
       "cart_type": "notification",
       "show_vendor": false,
       "show_cart_note": false,
-      "free_shipping_de_threshold_cents": 10000,
+      "free_shipping_de_threshold_cents": 8000,
       "cart_drawer_collection": ""
     }
   }

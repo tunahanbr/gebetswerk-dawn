@@ -1437,9 +1437,9 @@
       {
         "type": "number",
         "id": "free_shipping_de_threshold_cents",
-        "label": "Kostenloser Versand nach Deutschland ab",
-        "default": 10000,
-        "info": "Betrag in Cent. Österreich bleibt immer kostenlos. Beispiel: 10000 = 100,00 €."
+        "label": "Kostenloser Versand ab (DE & AT)",
+        "default": 8000,
+        "info": "Betrag in Cent. Darunter 4,99 € Versand. Beispiel: 8000 = 80,00 €. Die tatsächlichen Versandtarife musst du zusätzlich im Shopify-Admin unter Versand einrichten."
       },
       {
         "type": "header",

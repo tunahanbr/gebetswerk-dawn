@@ -25,22 +25,28 @@ body {
   color: var(--gw-ink) !important;
   font-family: var(--gw-font-body);
   -webkit-font-smoothing: antialiased;
+  /* Verhindert ungewollten horizontalen Scroll (z.B. auf Mobil) ohne
+     position:sticky zu brechen — clip erzeugt keinen Scroll-Container. */
+  overflow-x: clip;
 }
+/* Startseite: weißer Seiten-Hintergrund → der Rahmen rund um den Hero ist weiß.
+   Kurzform (background) nötig, um das Verlaufs-Hintergrundbild der .gradient-Klasse zu überschreiben. */
+body.gw-home { background: #fff !important; }
 
 .shopify-section { font-family: var(--gw-font-body); }
 
 /* ── Hero section ─────────────────────────────────────────── */
-/* Hero — Mobile 100%, Desktop 80% */
-.gw-hero { padding: 16px 0 0; }
-@media (min-width: 750px) { .gw-hero { padding: 40px 0 0; } }
+/* Hero — großflächig; reicht unter die transparente Navbar (Startseite) */
+.gw-hero { padding: 0; margin-top: calc(-1 * var(--header-height, 64px)); background: #fff; }
+@media (min-width: 750px) { .gw-hero { margin-top: calc(-1 * var(--header-height, 80px)); } }
 
-/* Mobile: volle Breite mit kleinem seitlichen Padding */
+/* Seitlicher Abstand auf allen Displays */
 .gw-hero__inner {
-  max-width: calc(100% - 32px);
+  max-width: calc(100% - 28px);
   margin: 0 auto;
 }
 @media (min-width: 750px) {
-  .gw-hero__inner { max-width: 80%; }
+  .gw-hero__inner { max-width: calc(100% - 48px); }
 }
 
 .gw-eyebrow {
@@ -96,16 +102,54 @@ body {
   color: rgba(249,246,240,0.9);
 }
 
-/* Big hero card */
+/* Hero — eingerückte Karte mit gleich breitem weißem Rahmen rundum, unter der transparenten Navbar.
+   Höhe so, dass unten derselbe Abstand bleibt wie oben/seitlich (2× Rahmen = 28px mobil / 48px Desktop).
+   --gw-topbar = gemessene Höhe der Announcement-Bar (per JS), Fallback 40px. */
 .gw-hero__main {
   position: relative;
   overflow: hidden;
   border-radius: var(--gw-radius-card);
-  background: var(--gw-sand);
-  aspect-ratio: 4/5;
+  background: #fff;
+  height: calc(100svh - var(--gw-topbar, 40px) - 28px);
+  min-height: 460px;
 }
-@media (min-width: 600px)  { .gw-hero__main { aspect-ratio: 16/10; } }
-@media (min-width: 990px)  { .gw-hero__main { aspect-ratio: unset; height: calc(100dvh - 230px); } }
+@media (min-width: 750px) {
+  .gw-hero__main { height: calc(100svh - var(--gw-topbar, 40px) - 48px); min-height: 540px; }
+}
+
+/* ── Transparente Navbar über dem Hero (nur Startseite, oben) ── */
+.header-wrapper--overlay { transition: background-color 0.25s ease, backdrop-filter 0.25s ease; }
+/* Hintergrund, Frosted-Glass-Blur UND Border entfernen → echt transparent über dem Hero */
+.section-header:not(.scrolled-past-header) .header-wrapper--overlay {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+/* Dawn färbt Navbar-Text/Icons über --color-foreground — hier umgesetzt */
+.section-header:not(.scrolled-past-header) .header-wrapper--overlay-light {
+  --color-foreground: 249, 246, 240;
+}
+.section-header:not(.scrolled-past-header) .header-wrapper--overlay-dark {
+  --color-foreground: 26, 22, 19;
+}
+/* Dezenter Schatten oben → helle Schrift bleibt über hellen Bildstellen lesbar */
+.section-header:not(.scrolled-past-header) .header-wrapper--overlay-light::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 160px;
+  background: linear-gradient(to bottom, rgba(26, 22, 19, 0.38), transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+/* Oberer weißer Streifen über der Navbar (Teil des Rahmens). Nur Startseite via :has().
+   Beim Scrollen (sticky, top:0) wird der Abstand ignoriert. */
+.section-header:has(.header-wrapper--overlay) { margin-top: 14px; }
+@media (min-width: 750px) {
+  .section-header:has(.header-wrapper--overlay) { margin-top: 24px; }
+}
 
 .gw-hero__main img {
   position: absolute;
@@ -777,6 +821,24 @@ body {
 }
 .gw-footer__email-btn:hover { background: var(--gw-gold-soft); }
 .gw-footer__email-note { font-size: 11px; color: rgba(249,246,240,0.4); }
+.gw-footer__email-error { color: #f1b0a0; }
+
+/* Willkommensrabatt nach Newsletter-Anmeldung */
+.gw-footer__welcome { max-width: 340px; margin-bottom: 10px; }
+.gw-footer__welcome-title { font-size: 13px; color: var(--gw-ivory); margin: 0 0 10px; }
+.gw-footer__welcome-code {
+  display: inline-flex; align-items: center; gap: 12px;
+  border: 1px dashed var(--gw-gold);
+  border-radius: 100px;
+  background: rgba(200,155,60,0.12);
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.gw-footer__welcome-code:hover { background: rgba(200,155,60,0.22); }
+.gw-footer__welcome-code-value { font-size: 14px; font-weight: 600; letter-spacing: 0.08em; color: var(--gw-gold); }
+.gw-footer__welcome-copy { font-size: 11px; color: rgba(249,246,240,0.6); }
 
 .gw-footer__nav-grid {
   display: grid;

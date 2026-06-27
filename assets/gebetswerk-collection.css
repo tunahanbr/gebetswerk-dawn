@@ -165,6 +165,23 @@
 .gw-col-card__badge--sold { background: var(--gw-ink, #1A1613); color: var(--gw-ivory, #F9F6F0); }
 .gw-col-card__badge--sale { background: var(--gw-gold, #C89B3C); color: #fff; }
 
+.gw-col-card__stock {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(249, 246, 240, 0.92);
+  color: var(--gw-ink, #1A1613);
+  font-family: var(--gw-font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(26, 22, 19, 0.12);
+}
+
 .gw-col-card__info {
   display: flex;
   flex-direction: column;

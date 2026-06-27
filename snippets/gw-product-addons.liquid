@@ -26,26 +26,9 @@
       </div>
     </div>
 
-  {%- comment -%} ── Checkbox ── {%- endcomment -%}
+  {%- comment -%} ── Checkbox: wird unten in einem eigenen Durchlauf gerendert,
+       damit z.B. "Mit Geschenkschleife verpacken" immer ganz unten steht ── {%- endcomment -%}
   {%- elsif block.type == 'opt_checkbox' -%}
-    <label class="gw-giftwrap-row" {{ block.shopify_attributes }}>
-      <span>
-        {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
-        {{ block.settings.label }}
-        {%- if block.settings.description != blank -%}
-          <span class="gw-addon-description">{{ block.settings.description }}</span>
-        {%- endif -%}
-      </span>
-      <span class="gw-giftwrap-right">
-        {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-giftwrap-price">+{{ block.settings.surcharge_cents | money }}</span>{%- endif -%}
-        <input type="checkbox" id="addon-{{ block.id }}"
-          data-addon="checkbox" data-block="{{ block.id }}"
-          data-fkey="{{ block.settings.field_key | escape }}"
-          data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
-          data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
-          {% if block.settings.default_checked %}checked{% endif %}>
-      </span>
-    </label>
 
   {%- comment -%} ── Auswahl-Gruppe ── {%- endcomment -%}
   {%- elsif block.type == 'opt_choice' -%}
@@ -222,5 +205,29 @@
       </div>
     {%- endif -%}
 
+  {%- endif -%}
+{%- endfor -%}
+
+{%- comment -%} ── Checkbox-Optionen (z.B. Geschenkschleife) immer zuletzt ── {%- endcomment -%}
+{%- for block in section.blocks -%}
+  {%- if block.type == 'opt_checkbox' -%}
+    <label class="gw-giftwrap-row" {{ block.shopify_attributes }}>
+      <span class="gw-giftwrap-label">
+        {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
+        {{ block.settings.label }}
+        {%- if block.settings.description != blank -%}
+          <span class="gw-addon-description">{{ block.settings.description }}</span>
+        {%- endif -%}
+      </span>
+      <span class="gw-giftwrap-right">
+        {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-giftwrap-price">+{{ block.settings.surcharge_cents | money }}</span>{%- endif -%}
+        <input type="checkbox" id="addon-{{ block.id }}"
+          data-addon="checkbox" data-block="{{ block.id }}"
+          data-fkey="{{ block.settings.field_key | escape }}"
+          data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
+          data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
+          {% if block.settings.default_checked %}checked{% endif %}>
+      </span>
+    </label>
   {%- endif -%}
 {%- endfor -%}

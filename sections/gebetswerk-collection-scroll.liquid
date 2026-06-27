@@ -129,6 +129,11 @@
                   {%- else -%}
                     {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-cscroll__placeholder' }}
                   {%- endif -%}
+                  {%- if card_variant.available == false -%}
+                    <span class="gw-cscroll__stock gw-cscroll__stock--sold">Ausverkauft</span>
+                  {%- elsif card_variant.inventory_management and card_variant.inventory_quantity > 0 and card_variant.inventory_quantity <= 10 -%}
+                    <span class="gw-cscroll__stock">Nur noch {{ card_variant.inventory_quantity }}</span>
+                  {%- endif -%}
                 </div>
 
                 <div class="gw-cscroll__info">
@@ -166,6 +171,12 @@
                   {%- endif -%}
                 {%- else -%}
                   {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-cscroll__placeholder' }}
+                {%- endif -%}
+                {%- assign single_variant = product.selected_or_first_available_variant -%}
+                {%- if product.available == false -%}
+                  <span class="gw-cscroll__stock gw-cscroll__stock--sold">Ausverkauft</span>
+                {%- elsif single_variant.inventory_management and single_variant.inventory_quantity > 0 and single_variant.inventory_quantity <= 10 -%}
+                  <span class="gw-cscroll__stock">Nur noch {{ single_variant.inventory_quantity }}</span>
                 {%- endif -%}
               </div>
               <div class="gw-cscroll__info">

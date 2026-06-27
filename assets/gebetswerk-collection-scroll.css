@@ -114,6 +114,28 @@
   height: 100%;
 }
 
+.gw-cscroll__stock {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(249, 246, 240, 0.92);
+  color: var(--gw-ink);
+  font-family: var(--gw-font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(26, 22, 19, 0.12);
+}
+
+.gw-cscroll__stock--sold {
+  background: var(--gw-ink);
+  color: var(--gw-ivory);
+}
+
 /* ── Info ─────────────────────────────────────────────────────── */
 .gw-cscroll__info {
   display: flex;

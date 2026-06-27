@@ -31,13 +31,16 @@
     threadHex:    '#c9a24a',
     threadLabel:  'Gold',
     symbol:       'none',
-    symbolPos:    'above',
+    symbolPos:    'left',
     loading:      false,
   };
 
   /* ── Dynamic Addon State ──────────────────────────────────── */
   // Key → { fieldKey, value, surchargeCents, variantId, separateLineItem }
   const addonMap = new Map();
+
+  /* Wird in init() gesetzt — erlaubt addToCart() das Formular zurückzusetzen */
+  let doResetForm = function () {};
 
   function addonTotalCents() {
     let t = 0;
@@ -175,10 +178,14 @@
     setButtonLoading(true);
 
     const items = buildCartItems();
-    const cartDrawer = document.querySelector('cart-drawer');
+    /* Funktioniert in beiden Cart-Modi: Drawer ODER Notification-Popup.
+       Vorher wurde nur cart-drawer gesucht — im Notification-Modus (Standard
+       dieses Themes) gab es deshalb auf Mobil keine Rückmeldung. */
+    const cartUI = document.querySelector('cart-drawer') || document.querySelector('cart-notification');
+    const wantRender = openDrawer !== false && cartUI && typeof cartUI.getSectionsToRender === 'function';
     const addPayload = { items };
-    if (openDrawer !== false && cartDrawer?.getSectionsToRender) {
-      addPayload.sections = cartDrawer.getSectionsToRender().map(section => section.id);
+    if (wantRender) {
+      addPayload.sections = cartUI.getSectionsToRender().map(section => section.id);
       addPayload.sections_url = window.location.pathname;
     }
 
@@ -196,8 +203,14 @@
       }
 
       const parsedState = await res.json();
-      if (openDrawer !== false && cartDrawer?.renderContents && parsedState.sections) {
-        cartDrawer.renderContents(parsedState);
+      if (wantRender && typeof cartUI.renderContents === 'function' && parsedState.sections) {
+        /* Das Notification-Popup braucht den Key der Hauptzeile (Multi-Item-Add
+           liefert keinen Top-Level-Key) — sonst bleibt die Produktvorschau leer. */
+        if (cartUI.tagName === 'CART-NOTIFICATION' && !parsedState.key) {
+          const firstItem = Array.isArray(parsedState.items) ? parsedState.items[0] : null;
+          if (firstItem) parsedState.key = firstItem.key;
+        }
+        cartUI.renderContents(parsedState);
       }
 
       /* Trigger Dawn's pubsub listeners where present */
@@ -212,19 +225,20 @@
         .reduce((sum, i) => sum + i.quantity, 0);
       updateCartBubble(realCount);
 
-      /* Show success state and offer to configure another rug */
-      const btn = $('gw-atc-btn');
-      if (btn) {
-        btn.textContent = '✓ Im Warenkorb';
-        btn.style.background = '#2d6a4f';
-        setTimeout(() => {
-          btn.textContent = 'In den Warenkorb · ' + fmt(totalCents());
-          btn.style.background = '';
-          state.loading = false;
-          setButtonLoading(false);
-        }, 2500);
-        return true;
-      }
+      /* Personalisierung nach dem Hinzufügen zurücksetzen (Daten sind bereits
+         im Warenkorb) — Farbe bleibt erhalten, nur die Personalisierung wird geleert. */
+      if (openDrawer !== false) doResetForm();
+
+      /* Erfolg auf BEIDEN Buttons (Haupt + Sticky-Mobil) anzeigen und danach
+         sauber zurücksetzen — sonst hängt der Sticky-Button auf "Wird hinzugefügt…". */
+      const successBtns = [$('gw-atc-btn'), $('gw-sticky-atc-btn')].filter(Boolean);
+      successBtns.forEach(b => { b.textContent = '✓ Im Warenkorb'; b.style.background = '#2d6a4f'; });
+      setTimeout(() => {
+        successBtns.forEach(b => { b.style.background = ''; });
+        state.loading = false;
+        setButtonLoading(false);
+        resetButtonText();
+      }, 2000);
       return true;
 
     } catch (e) {
@@ -275,6 +289,14 @@
     });
   }
 
+  /* Stellt die normalen Button-Beschriftungen wieder her (nach Erfolg/Abbruch). */
+  function resetButtonText() {
+    const atc = $('gw-atc-btn');
+    if (atc) atc.textContent = 'In den Warenkorb · ' + fmt(totalCents());
+    const sticky = $('gw-sticky-atc-btn');
+    if (sticky) sticky.textContent = 'In den Warenkorb';
+  }
+
   /* ── Build line item properties ─────────────────────────────
      These appear in every Shopify order:
      Admin → Orders → [Order] → Line Items → Notes
@@ -319,14 +341,56 @@
     updateOrderSummary();
   }
 
-  /* ── Gallery ──────────────────────────────────────────────── */
-  function setMainImage(src) {
-    const img = $('gw-gallery-main-img');
+  /* ── Gallery (Swipe-Carousel) ─────────────────────────────── */
+  /* Aktualisiert das erste Slide-Bild (= gewählte Farbe) und scrollt nach vorn */
+  function setVariantImage(src) {
+    const img = $('gw-gallery-variant-img');
     if (img && src) img.src = src;
+    const vp = $('gw-gallery-viewport');
+    if (vp) vp.scrollTo({ left: 0, behavior: 'smooth' });
   }
 
-  function setActiveThumb(idx) {
-    document.querySelectorAll('.gw-gallery__thumb').forEach((t, i) => t.classList.toggle('is-active', i === idx));
+  function initGallery() {
+    const viewport = $('gw-gallery-viewport');
+    const dotsWrap = $('gw-gallery-dots');
+    const prev = $('gw-gallery-prev');
+    const next = $('gw-gallery-next');
+    if (!viewport) return;
+    const slides = Array.from(viewport.children);
+    const single = slides.length <= 1;
+    if (single) {
+      if (dotsWrap) dotsWrap.style.display = 'none';
+      [prev, next].forEach(b => { if (b) b.style.display = 'none'; });
+    }
+
+    if (dotsWrap && !single) {
+      dotsWrap.replaceChildren();
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'gw-gallery__dot' + (i === 0 ? ' is-active' : '');
+        dot.setAttribute('aria-label', 'Bild ' + (i + 1));
+        dot.addEventListener('click', () => {
+          viewport.scrollTo({ left: i * viewport.clientWidth, behavior: 'smooth' });
+        });
+        dotsWrap.appendChild(dot);
+      });
+    }
+
+    function updateControls() {
+      const idx = Math.round(viewport.scrollLeft / viewport.clientWidth);
+      const max = viewport.scrollWidth - viewport.clientWidth - 1;
+      dotsWrap?.querySelectorAll('.gw-gallery__dot').forEach((d, i) => d.classList.toggle('is-active', i === idx));
+      if (prev) prev.disabled = viewport.scrollLeft <= 1;
+      if (next) next.disabled = viewport.scrollLeft >= max;
+    }
+
+    prev?.addEventListener('click', () => viewport.scrollBy({ left: -viewport.clientWidth, behavior: 'smooth' }));
+    next?.addEventListener('click', () => viewport.scrollBy({ left: viewport.clientWidth, behavior: 'smooth' }));
+
+    /* Punkte + Pfeile beim Wischen/Scrollen mitführen */
+    viewport.addEventListener('scroll', updateControls, { passive: true });
+    if (!single) updateControls();
   }
 
   /* ── Variant switching ────────────────────────────────────── */
@@ -347,8 +411,8 @@
     const label = $('gw-color-label');
     if (label) label.textContent = name;
 
-    /* Update gallery */
-    if (img) { setMainImage(img); setActiveThumb(0); }
+    /* Update gallery — erstes Slide zeigt die gewählte Farbe */
+    if (img) { setVariantImage(img); }
 
     /* Update active swatch */
     document.querySelectorAll('.gw-color-swatch[data-variant-id]').forEach(b => b.classList.toggle('is-active', parseInt(b.dataset.variantId) === id));
@@ -585,6 +649,7 @@
       updatePrice();
       updateOrderSummary();
     }
+    doResetForm = resetForm;
 
     /* „Weiteren Teppich personalisieren" → aktuellen Teppich in den Warenkorb,
        dann Formular leeren und hoch zum Namensfeld scrollen (Drawer bleibt zu) */
@@ -659,9 +724,18 @@
         state.threadLabel = btn.dataset.label || btn.dataset.thread;
         document.querySelectorAll('[data-thread]').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
+        updateThreadLabel();
         updateSymbols(); updateOrderSummary();
       });
     });
+    /* State + Label initial mit dem aktiven Swatch synchronisieren */
+    const activeThread = document.querySelector('[data-thread].is-active') || document.querySelector('[data-thread]');
+    if (activeThread) {
+      state.thread      = activeThread.dataset.thread;
+      state.threadHex   = activeThread.dataset.hex;
+      state.threadLabel = activeThread.dataset.label || activeThread.dataset.thread;
+      updateThreadLabel();
+    }
 
     /* Symbols */
     document.querySelectorAll('[data-symbol]').forEach(btn => {
@@ -707,10 +781,8 @@
       });
     });
 
-    /* Gallery thumbs */
-    document.querySelectorAll('.gw-gallery__thumb').forEach((thumb, i) => {
-      thumb.addEventListener('click', () => { setMainImage(thumb.dataset.src); setActiveThumb(i); });
-    });
+    /* Gallery (Swipe-Carousel + Dots) */
+    initGallery();
 
     /* Init */
     if (VARIANTS[0]) {
@@ -732,6 +804,15 @@
     document.querySelectorAll('[data-symbol] .gw-symbol-btn__icon').forEach(el => {
       el.style.color = state.threadHex;
     });
+  }
+
+  /* Zeigt die gewählte Schriftfarbe (Name + Farbpunkt) rechts neben dem Label */
+  function updateThreadLabel() {
+    const label = $('gw-thread-label');
+    if (!label) return;
+    label.textContent = state.threadLabel || '';
+    const dot = $('gw-thread-label-dot');
+    if (dot) dot.style.background = state.threadHex || 'transparent';
   }
 
   if (document.readyState === 'loading') {

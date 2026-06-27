@@ -85,6 +85,8 @@
                   {%- endif -%}
                   {%- unless card_variant.available -%}
                     <span class="gw-col-card__badge gw-col-card__badge--sold">Ausverkauft</span>
+                  {%- elsif card_variant.inventory_management and card_variant.inventory_quantity > 0 and card_variant.inventory_quantity <= 10 -%}
+                    <span class="gw-col-card__stock">Nur noch {{ card_variant.inventory_quantity }}</span>
                   {%- endunless -%}
                   {%- if card_variant.compare_at_price > card_variant.price -%}
                     <span class="gw-col-card__badge gw-col-card__badge--sale">Sale</span>
@@ -117,6 +119,12 @@
                   <img src="{{ product.featured_media | image_url: width: 700 }}" alt="{{ product.featured_media.alt | escape }}" width="700" height="{{ 700 | divided_by: product.featured_media.aspect_ratio | round }}" loading="lazy">
                 {%- else -%}
                   {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-col-card__placeholder' }}
+                {%- endif -%}
+                {%- assign single_variant = product.selected_or_first_available_variant -%}
+                {%- if product.available == false -%}
+                  <span class="gw-col-card__badge gw-col-card__badge--sold">Ausverkauft</span>
+                {%- elsif single_variant.inventory_management and single_variant.inventory_quantity > 0 and single_variant.inventory_quantity <= 10 -%}
+                  <span class="gw-col-card__stock">Nur noch {{ single_variant.inventory_quantity }}</span>
                 {%- endif -%}
               </div>
               <div class="gw-col-card__info">

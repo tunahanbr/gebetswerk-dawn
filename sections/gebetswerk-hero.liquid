@@ -47,10 +47,12 @@
             <span class="gw-hero__trust-stars">
               {%- for i in (1..5) -%}<svg viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
             </span>
-            {%- assign jm_rating = shop.metafields.judgeme.all_reviews_rating | round: 1 -%}
-            {%- assign jm_count = shop.metafields.judgeme.all_reviews_count -%}
-            {%- if jm_rating and jm_rating > 0 -%}
-              <strong>{{ jm_rating | replace: '.', ',' }}</strong>&thinsp;·&thinsp;{{ jm_count }} Bewertungen
+            {%- comment -%} Nur die Bewertung des Haupt-Gebetsteppichs (nicht shop-weit) {%- endcomment -%}
+            {%- assign rating_product = section.settings.rating_product | default: all_products['gebetsteppich'] -%}
+            {%- assign rp_rating = rating_product.metafields.reviews.rating.value -%}
+            {%- assign rp_count = rating_product.metafields.reviews.rating_count -%}
+            {%- if rp_count and rp_count > 0 -%}
+              <strong>{{ rp_rating.rating | round: 1 | replace: '.', ',' }}</strong>&thinsp;·&thinsp;{{ rp_count }} Bewertung{% if rp_count != 1 %}en{% endif %}
             {%- else -%}
               <strong>{{ section.settings.rating_score }}</strong>&thinsp;·&thinsp;{{ section.settings.rating_count }}
             {%- endif -%}
@@ -123,6 +125,21 @@
 
   </div>
 </section>
+
+<script>
+  /* Misst die Höhe der Announcement-Bar und setzt --gw-topbar, damit der untere
+     Rahmen des Heros exakt so breit ist wie oben/seitlich (unabhängig von ihrer Höhe). */
+  (function () {
+    function setTopbar() {
+      var bar = document.querySelector('.utility-bar');
+      var h = bar ? Math.round(bar.getBoundingClientRect().height) : 0;
+      document.documentElement.style.setProperty('--gw-topbar', h + 'px');
+    }
+    setTopbar();
+    window.addEventListener('resize', setTopbar, { passive: true });
+    window.addEventListener('load', setTopbar);
+  })();
+</script>
 
 {% schema %}
 {
@@ -199,15 +216,21 @@
       "info": "Erscheint mit Haken-Icon links in der Vertrauensleiste"
     },
     {
+      "type": "product",
+      "id": "rating_product",
+      "label": "Bewertung von Produkt",
+      "info": "Zeigt die Live-Sternebewertung dieses Produkts (z. B. Haupt-Gebetsteppich). Leer = Produkt mit Handle 'gebetsteppich'. Ohne Reviews werden die festen Werte unten genutzt."
+    },
+    {
       "type": "text",
       "id": "rating_score",
-      "label": "Bewertungs-Score",
+      "label": "Bewertungs-Score (Fallback)",
       "default": "4,9"
     },
     {
       "type": "text",
       "id": "rating_count",
-      "label": "Bewertungsanzahl",
+      "label": "Bewertungsanzahl (Fallback)",
       "default": "1.240 Bewertungen"
     }
   ],

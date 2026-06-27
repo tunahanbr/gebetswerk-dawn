@@ -102,34 +102,48 @@
 
     <div class="gw-product-layout">
 
-      {%- comment -%} ══ GALLERY ══ {%- endcomment -%}
+      {%- comment -%} ══ GALLERY — Swipe-Carousel ══ {%- endcomment -%}
+      {%- assign main_img = current_variant.featured_image | default: product.featured_image -%}
       <div class="gw-gallery">
-        <div class="gw-gallery__main">
-          {%- assign main_img = current_variant.featured_image | default: product.featured_image -%}
-          <img id="gw-gallery-main-img"
-            src="{{ main_img | image_url: width: 1200 }}"
-            alt="{{ main_img.alt | default: product.title | escape }}"
-            width="1200" height="{{ 1200 | divided_by: main_img.aspect_ratio | round }}" loading="eager" fetchpriority="high"
-          >
+        <div class="gw-gallery__frame">
+        <div class="gw-gallery__viewport" id="gw-gallery-viewport">
 
+          {%- comment -%} Slide 1: Bild der ausgewählten Farbe (wird per JS bei Farbwechsel aktualisiert) {%- endcomment -%}
+          <div class="gw-gallery__slide" data-variant-slide>
+            {%- if main_img -%}
+              <img id="gw-gallery-variant-img"
+                src="{{ main_img | image_url: width: 1200 }}"
+                alt="{{ main_img.alt | default: product.title | escape }}"
+                width="1200" height="{{ 1200 | divided_by: main_img.aspect_ratio | round }}" loading="eager" fetchpriority="high"
+              >
+            {%- else -%}
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'gw-gallery__placeholder' }}
+            {%- endif -%}
+          </div>
+
+          {%- comment -%} Weitere Bilder = restliche Medien des Produkts (ohne das Bild der aktuellen Farbe) {%- endcomment -%}
+          {%- assign cur_media_id = current_variant.featured_media.id -%}
+          {%- for media in product.media -%}
+            {%- if cur_media_id and media.id == cur_media_id -%}{%- continue -%}{%- endif -%}
+            <div class="gw-gallery__slide">
+              <img
+                src="{{ media.preview_image | image_url: width: 1200 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                width="1200" height="{{ 1200 | divided_by: media.preview_image.aspect_ratio | round }}" loading="lazy"
+              >
+            </div>
+          {%- endfor -%}
         </div>
 
-        <div class="gw-gallery__thumbs">
-          {%- if product.media.size > 0 -%}
-            {%- for media in product.media limit: 4 -%}
-              <button class="gw-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ media.preview_image | image_url: width: 800 }}" aria-label="Bild {{ forloop.index }}">
-                <img src="{{ media.preview_image | image_url: width: 200 }}" alt="{{ media.alt | default: product.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: media.preview_image.aspect_ratio | round }}">
-              </button>
-            {%- endfor -%}
-          {%- else -%}
-            {%- assign fallback_thumbs = 'product-main.jpg,product-thumb1.jpg,product-thumb2.jpg,product-thumb3.jpg' | split: ',' -%}
-            {%- for img in fallback_thumbs -%}
-              <button class="gw-gallery__thumb{% if forloop.first %} is-active{% endif %}" data-src="{{ img | asset_url }}" aria-label="Bild {{ forloop.index }}">
-                <img src="{{ img | asset_url }}" alt="Produktbild" loading="lazy" width="200" height="200">
-              </button>
-            {%- endfor -%}
-          {%- endif -%}
+          <button type="button" class="gw-gallery__arrow gw-gallery__arrow--prev" id="gw-gallery-prev" aria-label="Vorheriges Bild">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="gw-gallery__arrow gw-gallery__arrow--next" id="gw-gallery-next" aria-label="Nächstes Bild">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
         </div>
+
+        <div class="gw-gallery__dots" id="gw-gallery-dots"></div>
       </div>
 
       {%- comment -%} ══ SIDEBAR ══ {%- endcomment -%}
@@ -259,8 +273,10 @@
               {%- assign thread_blocks = section.blocks | where: 'type', 'thread_color' -%}
               {%- if thread_blocks.size > 0 -%}
                 <div class="gw-form-field">
-                  <p class="gw-form-label">Schriftfarbe</p>
-                  <div class="gw-thread-grid">
+                  <p class="gw-form-label gw-form-label--row">Schriftfarbe
+                    <span class="gw-form-label__value"><span id="gw-thread-label-dot" class="gw-thread-label-dot"></span><span id="gw-thread-label"></span></span>
+                  </p>
+                  <div class="gw-thread-grid gw-thread-grid--row">
                     {%- for block in thread_blocks -%}
                       <button type="button"
                         class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}"
@@ -279,8 +295,10 @@
               {%- else -%}
                 {%- comment -%} Fallback thread colors {%- endcomment -%}
                 <div class="gw-form-field">
-                  <p class="gw-form-label">Schriftfarbe</p>
-                  <div class="gw-thread-grid">
+                  <p class="gw-form-label gw-form-label--row">Schriftfarbe
+                    <span class="gw-form-label__value"><span id="gw-thread-label-dot" class="gw-thread-label-dot"></span><span id="gw-thread-label"></span></span>
+                  </p>
+                  <div class="gw-thread-grid gw-thread-grid--row">
                     {%- assign default_threads = 'gold|Gold|#c9a24a,silver|Silber|#c8c8cc,white|Weiß|#f5f1e6,black|Schwarz|#1a1a1a,brown|Braun|#7a5230' | split: ',' -%}
                     {%- for tc in default_threads -%}
                       {%- assign p = tc | split: '|' -%}
@@ -802,7 +820,7 @@
     "blocks": [
       { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
       { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
-      { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#f5f1e6" } },
+      { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#ffffff" } },
       { "type": "thread_color", "settings": { "id": "black",  "name": "Schwarz", "hex": "#1a1a1a" } },
       { "type": "thread_color", "settings": { "id": "brown",  "name": "Braun",   "hex": "#7a5230" } },
       { "type": "trust_badge", "settings": { "icon": "lock",   "label": "SSL-gesichert" } },

@@ -132,9 +132,9 @@
               <span>Versand</span>
               <span>
                 {%- if cart.total_price >= free_shipping_de_threshold -%}
-                  <span class="gw-cart-summary__free">AT kostenlos · DE kostenlos 🎉</span>
+                  <span class="gw-cart-summary__free">Kostenlos 🎉</span>
                 {%- else -%}
-                  AT kostenlos · DE im Checkout
+                  4,99 €
                 {%- endif -%}
               </span>
             </div>
@@ -142,15 +142,19 @@
 
           {%- if cart.total_price < free_shipping_de_threshold -%}
             {%- assign remaining = free_shipping_de_threshold | minus: cart.total_price -%}
+            {%- assign ship_pct = cart.total_price | times: 100 | divided_by: free_shipping_de_threshold | at_most: 100 -%}
             <div class="gw-cart-summary__freeship">
               <div class="gw-cart-summary__freeship-bar">
-                <div class="gw-cart-summary__freeship-fill" style="width:{{ cart.total_price | times: 100 | divided_by: free_shipping_de_threshold | at_most: 100 }}%"></div>
+                <div class="gw-cart-summary__freeship-fill" style="width:{{ ship_pct }}%"></div>
               </div>
-              <p>Österreich ist kostenlos. Noch <strong>{{ remaining | money }}</strong> bis kostenloser Versand nach Deutschland.</p>
+              <p>Nur noch <strong>{{ remaining | money }}</strong> bis zum <strong>kostenlosen Versand</strong> (DE &amp; AT).</p>
             </div>
           {%- else -%}
-            <div class="gw-cart-summary__freeship">
-              <p>Österreich kostenlos. Deutschland ab diesem Warenwert kostenlos.</p>
+            <div class="gw-cart-summary__freeship gw-cart-summary__freeship--done">
+              <div class="gw-cart-summary__freeship-bar">
+                <div class="gw-cart-summary__freeship-fill" style="width:100%"></div>
+              </div>
+              <p>🎉 Glückwunsch! Dein Versand ist <strong>kostenlos</strong> (DE &amp; AT).</p>
             </div>
           {%- endif -%}
 
@@ -269,9 +273,8 @@
 
   // Remove buttons (Haupt-Produkt)
   page.addEventListener('click', e => {
-    const btn = e.target.closest('.gw-cart-item__remove');
-    if (!btn) return;
-    updateItem(btn.dataset.key, 0);
+    const removeBtn = e.target.closest('.gw-cart-item__remove');
+    if (removeBtn) { updateItem(removeBtn.dataset.key, 0); }
   });
 
 })();

@@ -12,21 +12,36 @@
         <p class="gw-footer__tagline">{{ section.settings.tagline }}</p>
 
         {%- if section.settings.show_newsletter -%}
-          <form class="gw-footer__email-form" action="/contact#contact_form" method="post" accept-charset="UTF-8">
-            <input type="hidden" name="form_type" value="customer">
-            <input type="hidden" name="utf8" value="✓">
-            <input type="hidden" name="contact[tags]" value="newsletter">
-            <input
-              type="email"
-              name="contact[email]"
-              class="gw-footer__email-input"
-              placeholder="{{ section.settings.email_placeholder }}"
-              required
-              autocomplete="email"
-            >
-            <button type="submit" class="gw-footer__email-btn">{{ section.settings.email_button }}</button>
-          </form>
-          <p class="gw-footer__email-note">{{ section.settings.email_note }}</p>
+          {%- assign welcome_code = section.settings.welcome_code | default: 'WILLKOMMEN10' -%}
+          {%- form 'customer', class: 'gw-footer__newsletter', id: 'gw-newsletter-form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter, willkommensrabatt">
+            {%- if form.posted_successfully? -%}
+              <div class="gw-footer__welcome">
+                <p class="gw-footer__welcome-title">{{ section.settings.welcome_success | default: 'Danke! Hier ist dein Willkommensrabatt für deine erste Bestellung:' }}</p>
+                <button type="button" class="gw-footer__welcome-code" data-code="{{ welcome_code | escape }}" aria-label="Rabattcode kopieren">
+                  <span class="gw-footer__welcome-code-value">{{ welcome_code }}</span>
+                  <span class="gw-footer__welcome-copy">Kopieren</span>
+                </button>
+              </div>
+            {%- else -%}
+              <div class="gw-footer__email-form">
+                <input
+                  type="email"
+                  name="contact[email]"
+                  class="gw-footer__email-input"
+                  placeholder="{{ section.settings.email_placeholder }}"
+                  required
+                  autocomplete="email"
+                >
+                <button type="submit" class="gw-footer__email-btn">{{ section.settings.email_button }}</button>
+              </div>
+              {%- if form.errors -%}
+                <p class="gw-footer__email-note gw-footer__email-error">{{ form.errors | default_errors }}</p>
+              {%- else -%}
+                <p class="gw-footer__email-note">{{ section.settings.email_note }}</p>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endform -%}
         {%- endif -%}
       </div>
 
@@ -79,6 +94,25 @@
   </div>
 </footer>
 </div>
+
+<script>
+(function () {
+  var form = document.getElementById('gw-newsletter-form');
+  if (!form) return;
+  var codeBtn = form.querySelector('.gw-footer__welcome-code');
+  if (codeBtn) {
+    /* Nach erfolgreicher Anmeldung sichtbar — zum Code scrollen */
+    codeBtn.closest('.gw-footer__welcome')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    codeBtn.addEventListener('click', function () {
+      var code = codeBtn.dataset.code || '';
+      var label = codeBtn.querySelector('.gw-footer__welcome-copy');
+      navigator.clipboard?.writeText(code).then(function () {
+        if (label) { label.textContent = 'Kopiert ✓'; setTimeout(function () { label.textContent = 'Kopieren'; }, 2000); }
+      }).catch(function () {});
+    });
+  }
+})();
+</script>
 
 {% schema %}
 {
@@ -140,6 +174,19 @@
       "id": "email_note",
       "label": "Hinweis unter dem Formular",
       "default": "10 % Willkommensrabatt für neue Abonnenten."
+    },
+    {
+      "type": "text",
+      "id": "welcome_code",
+      "label": "Willkommens-Rabattcode",
+      "default": "WILLKOMMEN10",
+      "info": "Diesen Code zuerst im Shopify-Admin unter Rabatte anlegen (z. B. 10 % auf erste Bestellung). Wird nach der Anmeldung angezeigt."
+    },
+    {
+      "type": "text",
+      "id": "welcome_success",
+      "label": "Text nach erfolgreicher Anmeldung",
+      "default": "Danke! Hier ist dein Willkommensrabatt für deine erste Bestellung:"
     },
     {
       "type": "header",
