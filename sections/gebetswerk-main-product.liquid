@@ -15,7 +15,6 @@
 {%- comment -%} Pass all data to JS {%- endcomment -%}
 <script>
   window.GW_VARIANTS            = {{ product.variants | json }};
-  window.GW_COUNTDOWN_HOUR      = {{ section.settings.countdown_cutoff_hour | default: 17 }};
 
   {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
   window.GW_SYMBOLS = [
@@ -189,11 +188,6 @@
           </div>
         {%- endif -%}
 
-
-        <div class="gw-product__countdown">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Bestelle in <strong id="gw-countdown-time">--:--:--</strong> für Versand morgen
-        </div>
 
         {%- comment -%} ══ PRODUCT FORM ══ {%- endcomment -%}
         {%- form 'product', product, id: 'gw-product-form', novalidate: 'novalidate' -%}
@@ -556,17 +550,6 @@
       "label": "Versandzeile 2",
       "default": "3–5 Werktage Lieferzeit · Geschenkverpackung optional",
       "info": "Erscheint mit Paket-Icon. Leer lassen → wird ausgeblendet"
-    },
-    {
-      "type": "header",
-      "content": "⏰ Countdown-Timer"
-    },
-    {
-      "type": "number",
-      "id": "countdown_cutoff_hour",
-      "label": "Versand-Cutoff-Uhrzeit (Stunde, 24h)",
-      "default": 17,
-      "info": "Timer zählt bis zu dieser Uhrzeit herunter, z. B. 17 = 17:00 Uhr"
     },
     {
       "type": "header",
