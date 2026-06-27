@@ -412,3 +412,31 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
     margin-left: 0;
   }
 }
+
+.gw-drawer-freeship {
+  background: rgba(var(--color-foreground), 0.04);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0 0 16px;
+}
+.gw-drawer-freeship__bar {
+  height: 8px;
+  background: rgba(var(--color-foreground), 0.1);
+  border-radius: 999px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.gw-drawer-freeship__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8a6820, #c89b3c);
+  border-radius: 999px;
+  min-width: 6px;
+  transition: width 0.4s ease;
+}
+.gw-drawer-freeship--done .gw-drawer-freeship__fill {
+  background: linear-gradient(90deg, #15803d, #22c55e);
+}
+.gw-drawer-freeship p {
+  font-size: 1.2rem;
+  margin: 0;
+}
