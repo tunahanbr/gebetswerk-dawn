@@ -262,7 +262,8 @@
   height: 8px; background: var(--gw-border, #E5E0D8);
   border-radius: 999px; margin-bottom: 8px; overflow: hidden;
 }
-.gw-cart-summary__freeship-fill {
+.gw-cart-summary__freeship-bar .gw-cart-summary__freeship-fill {
+  display: block; /* override Dawn base.css "div:empty { display:none }" */
   height: 100%;
   background: linear-gradient(90deg, var(--gw-gold-deep, #8A6820), var(--gw-gold, #C89B3C));
   border-radius: 999px;

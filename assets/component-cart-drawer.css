@@ -426,7 +426,8 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   margin-bottom: 8px;
   overflow: hidden;
 }
-.gw-drawer-freeship__fill {
+.gw-drawer-freeship__bar .gw-drawer-freeship__fill {
+  display: block; /* override Dawn base.css "div:empty { display:none }" */
   height: 100%;
   background: linear-gradient(90deg, #8a6820, #c89b3c);
   border-radius: 999px;
