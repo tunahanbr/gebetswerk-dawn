@@ -211,6 +211,17 @@
           if (firstItem) parsedState.key = firstItem.key;
         }
         cartUI.renderContents(parsedState);
+
+        /* renderContents ersetzt nur das innere HTML von #CartDrawer, lässt aber
+           die is-empty-Klasse auf <cart-drawer> stehen. Dadurch bleibt das
+           Items-Layout im Leer-Zustand hängen (CSS: cart-drawer.is-empty
+           .drawer__inner { display:grid } + .drawer__header { display:none }) und
+           der Warenkorb wirkt leer, bis man die Seite neu lädt. Nach dem
+           Hinzufügen ist der Warenkorb nie leer → Klasse entfernen. */
+        if (cartUI.tagName === 'CART-DRAWER') {
+          cartUI.classList.remove('is-empty');
+          cartUI.querySelector('cart-drawer-items')?.classList.remove('is-empty');
+        }
       }
 
       /* Trigger Dawn's pubsub listeners where present */
