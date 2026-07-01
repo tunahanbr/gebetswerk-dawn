@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "name": "t:sections.footer.name",
   "type": "footer",
@@ -9,49 +18,74 @@
           "type": "nav_column",
           "settings": {
             "heading": "Shop",
-            "link_1_label": "Alle Produkte",    "link_1_url": "/collections/all",
-            "link_2_label": "Gebetsteppiche",   "link_2_url": "/collections/all",
-            "link_3_label": "Gebetsketten",     "link_3_url": "/collections/all",
-            "link_4_label": "Personalisierung", "link_4_url": "/products/gebetsteppich"
+            "link_1_label": "Alle Produkte",
+            "link_1_url": "/collections/all",
+            "link_2_label": "Gebetsteppiche",
+            "link_2_url": "/collections/all",
+            "link_3_label": "Gebetsketten",
+            "link_3_url": "/collections/all",
+            "link_4_label": "Personalisierung",
+            "link_4_url": "/products/gebetsteppich",
+            "link_5_label": "",
+            "link_5_url": ""
           }
         },
         "nav-2": {
           "type": "nav_column",
           "settings": {
             "heading": "Hilfe",
-            "link_1_label": "Kontakt",              "link_1_url": "/pages/contact",
-            "link_2_label": "FAQ",                  "link_2_url": "/#shopify-section-gebetswerk_faq",
-            "link_3_label": "Versand & Lieferung",  "link_3_url": "/policies/shipping-policy",
-            "link_4_label": "Rückgabe & Widerruf",  "link_4_url": "/policies/refund-policy",
-            "link_5_label": "Über uns",             "link_5_url": "/pages/about"
+            "link_1_label": "Kontakt",
+            "link_1_url": "/pages/contact",
+            "link_2_label": "FAQ",
+            "link_2_url": "/#shopify-section-gebetswerk_faq",
+            "link_3_label": "Versand & Lieferung",
+            "link_3_url": "/policies/shipping-policy",
+            "link_4_label": "Rückgabe & Widerruf",
+            "link_4_url": "/policies/refund-policy",
+            "link_5_label": "Über uns",
+            "link_5_url": "/pages/about"
           }
         },
         "nav-3": {
           "type": "nav_column",
           "settings": {
             "heading": "Rechtliches",
-            "link_1_label": "Impressum",             "link_1_url": "/policies/legal-notice",
-            "link_2_label": "Datenschutzerklärung",  "link_2_url": "/policies/privacy-policy",
-            "link_3_label": "AGB",                   "link_3_url": "/policies/terms-of-service",
-            "link_4_label": "Widerrufsrecht",        "link_4_url": "/policies/refund-policy",
-            "link_5_label": "Cookie-Einstellungen",  "link_5_url": "#shopifyReshowConsentBanner"
+            "link_1_label": "Impressum",
+            "link_1_url": "/policies/legal-notice",
+            "link_2_label": "Datenschutzerklärung",
+            "link_2_url": "/policies/privacy-policy",
+            "link_3_label": "AGB",
+            "link_3_url": "/policies/terms-of-service",
+            "link_4_label": "Widerrufsrecht",
+            "link_4_url": "/policies/refund-policy",
+            "link_5_label": "Cookie-Einstellungen",
+            "link_5_url": "#shopifyReshowConsentBanner"
           }
         }
       },
-      "block_order": ["nav-1", "nav-2", "nav-3"],
+      "block_order": [
+        "nav-1",
+        "nav-2",
+        "nav-3"
+      ],
       "settings": {
         "logo_initials": "GW",
         "brand_name": "Gebetswerk",
         "tagline": "Handgefertigte, personalisierte Gebetsteppiche – ein Geschenk, das Generationen bleibt.",
         "copyright_suffix": "Mit Liebe gefertigt.",
-        "show_newsletter": true,
+        "show_newsletter": false,
         "email_placeholder": "Deine E-Mail",
         "email_button": "Abonnieren",
         "email_note": "10 % Willkommensrabatt für neue Abonnenten.",
+        "welcome_code": "WILLKOMMEN10",
+        "welcome_success": "Danke! Hier ist dein Willkommensrabatt für deine erste Bestellung:",
         "instagram": "https://www.instagram.com/gebetswerk/",
+        "facebook": "",
         "email": "gebetswerk@gmail.com"
       }
     }
   },
-  "order": ["gebetswerk_footer"]
+  "order": [
+    "gebetswerk_footer"
+  ]
 }
