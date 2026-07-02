@@ -37,6 +37,7 @@
         "pill-2": {
           "type": "rating_pill",
           "settings": {
+            "rating_product": "",
             "rating_score": "4,9",
             "rating_count": "1.240 Bewertungen"
           }
@@ -109,9 +110,9 @@
         "step-3"
       ],
       "settings": {
-        "hero_image": "shopify://shop_images/hero-section-banner.png",
+        "hero_image": "shopify://shop_images/hero-bg-new.png",
         "hero_sub": "Personalisierte Gebetsteppiche",
-        "hero_heading": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
+        "hero_heading": "<p>Ein Name.<em> Ein Gebet</em>. Ein Geschenk fürs Leben.</p>",
         "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt."
       }
     },
@@ -120,7 +121,7 @@
       "settings": {
         "title": "Unsere Gebetsteppiche",
         "collection": "gebetsteppiche-neu",
-        "products_to_show": 20,
+        "products_to_show": 6,
         "name_prefix": "Personalisierter Gebetsteppich",
         "name_suffix": "· Geschenk für Mama & Baba und deine Liebsten",
         "show_view_all": true
@@ -171,10 +172,10 @@
       "settings": {
         "eyebrow": "Gebetsteppich mit Namen & Farbe",
         "heading": "<p>Ein Geschenk, das <em>Bedeutung</em> trägt.</p>",
-        "image": "shopify://shop_images/yahya.png",
+        "image": "shopify://shop_images/gebetsteppich-personalisiert-name-weiss-verpackt_a8a46d92-6b8d-4e61-b5a0-370834b9afa8.jpg",
         "badge_eyebrow": "Bestseller",
-        "badge_name": "Klassik · Creme",
-        "badge_price": "€24,90",
+        "badge_name": "Klassik · Weiß",
+        "badge_price": "ab €24,90",
         "badge_link": "/collections/all"
       }
     },
