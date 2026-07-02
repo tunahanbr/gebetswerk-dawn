@@ -35,6 +35,8 @@
 
 .drawer__footer {
   border-top: 1px solid var(--gw-border) !important;
+  padding-top: 18px !important;
+  padding-bottom: max(28px, env(safe-area-inset-bottom, 0px)) !important;
 }
 
 /* Scrollbar */

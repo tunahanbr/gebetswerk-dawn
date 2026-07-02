@@ -6,6 +6,11 @@
       {%- if section.settings.hero_image != blank -%}
         <img
           src="{{ section.settings.hero_image | image_url: width: 2000 }}"
+          srcset="{{ section.settings.hero_image | image_url: width: 750 }} 750w,
+                  {{ section.settings.hero_image | image_url: width: 1100 }} 1100w,
+                  {{ section.settings.hero_image | image_url: width: 1600 }} 1600w,
+                  {{ section.settings.hero_image | image_url: width: 2000 }} 2000w"
+          sizes="100vw"
           alt="{{ section.settings.hero_image.alt | escape }}"
           width="{{ section.settings.hero_image.width }}"
           height="{{ section.settings.hero_image.height }}"
@@ -23,41 +28,57 @@
         <p class="gw-hero__sub">{{ section.settings.hero_sub }}</p>
         <h1 class="gw-hero__heading">{{ section.settings.hero_heading | remove: '<p>' | remove: '</p>' }}</h1>
         <p class="gw-hero__desc">{{ section.settings.hero_desc }}</p>
-        <div class="gw-hero__buttons">
-          {%- if section.settings.button1_label != blank -%}
-            <a href="{{ section.settings.button1_url }}" class="gw-btn-primary">
-              {{ section.settings.button1_label }}
-              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
-            </a>
-          {%- endif -%}
-          {%- if section.settings.button2_label != blank -%}
-            <a href="{{ section.settings.button2_url }}" class="gw-btn-secondary">
-              {{ section.settings.button2_label }}
-            </a>
-          {%- endif -%}
-        </div>
+        {%- comment -%} Buttons — eigene Blöcke im Theme-Editor {%- endcomment -%}
+        {%- assign button_blocks = section.blocks | where: 'type', 'button' -%}
+        {%- if button_blocks.size > 0 -%}
+          <div class="gw-hero__buttons">
+            {%- for block in button_blocks -%}
+              {%- if block.settings.label != blank -%}
+                {%- if block.settings.style == 'secondary' -%}
+                  <a href="{{ block.settings.url }}" class="gw-btn-secondary" {{ block.shopify_attributes }}>
+                    {{ block.settings.label }}
+                  </a>
+                {%- else -%}
+                  <a href="{{ block.settings.url }}" class="gw-btn-primary" {{ block.shopify_attributes }}>
+                    {{ block.settings.label }}
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 15L15 5M15 5H7M15 5v8"/></svg>
+                  </a>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
 
-        {%- comment -%} Trust bar — inside the dark hero card ─ {%- endcomment -%}
-        <div class="gw-hero__trust-bar">
-          <span class="gw-hero__trust-pill">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3 5-6"/><path d="M20 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
-            {{ section.settings.eyebrow_text }}
-          </span>
-          <span class="gw-hero__trust-pill">
-            <span class="gw-hero__trust-stars">
-              {%- for i in (1..5) -%}<svg viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
-            </span>
-            {%- comment -%} Nur die Bewertung des Haupt-Gebetsteppichs (nicht shop-weit) {%- endcomment -%}
-            {%- assign rating_product = section.settings.rating_product | default: all_products['gebetsteppich'] -%}
-            {%- assign rp_rating = rating_product.metafields.reviews.rating.value -%}
-            {%- assign rp_count = rating_product.metafields.reviews.rating_count -%}
-            {%- if rp_count and rp_count > 0 -%}
-              <strong>{{ rp_rating.rating | round: 1 | replace: '.', ',' }}</strong>&thinsp;·&thinsp;{{ rp_count }} Bewertung{% if rp_count != 1 %}en{% endif %}
-            {%- else -%}
-              <strong>{{ section.settings.rating_score }}</strong>&thinsp;·&thinsp;{{ section.settings.rating_count }}
-            {%- endif -%}
-          </span>
-        </div>
+        {%- comment -%} Trust bar — Pills als eigene Blöcke {%- endcomment -%}
+        {%- assign trust_pills = section.blocks | where: 'type', 'trust_pill' -%}
+        {%- assign rating_pills = section.blocks | where: 'type', 'rating_pill' -%}
+        {%- if trust_pills.size > 0 or rating_pills.size > 0 -%}
+          <div class="gw-hero__trust-bar">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'trust_pill' -%}
+                <span class="gw-hero__trust-pill" {{ block.shopify_attributes }}>
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 11l3 3 5-6"/><path d="M20 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+                  {{ block.settings.text }}
+                </span>
+              {%- elsif block.type == 'rating_pill' -%}
+                <span class="gw-hero__trust-pill" {{ block.shopify_attributes }}>
+                  <span class="gw-hero__trust-stars">
+                    {%- for i in (1..5) -%}<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>{%- endfor -%}
+                  </span>
+                  {%- comment -%} Live-Bewertung des gewählten Produkts, sonst Fallback-Texte {%- endcomment -%}
+                  {%- assign rating_product = block.settings.rating_product | default: all_products['gebetsteppich'] -%}
+                  {%- assign rp_rating = rating_product.metafields.reviews.rating.value -%}
+                  {%- assign rp_count = rating_product.metafields.reviews.rating_count | times: 1 -%}
+                  {%- if rp_count > 0 -%}
+                    <strong>{{ rp_rating.rating | round: 1 | replace: '.', ',' }}</strong>&thinsp;·&thinsp;{{ rp_count }} Bewertung{% if rp_count != 1 %}en{% endif %}
+                  {%- else -%}
+                    <strong>{{ block.settings.rating_score }}</strong>&thinsp;·&thinsp;{{ block.settings.rating_count }}
+                  {%- endif -%}
+                </span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
       </div>
     </div>
 
@@ -176,65 +197,53 @@
       "default": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt."
     },
     {
-      "type": "header",
-      "content": "🔘 Buttons"
-    },
-    {
-      "type": "text",
-      "id": "button1_label",
-      "label": "Button 1 – Beschriftung",
-      "default": "Jetzt personalisieren",
-      "info": "Leer lassen → Button wird ausgeblendet"
-    },
-    {
-      "type": "url",
-      "id": "button1_url",
-      "label": "Button 1 – Link"
-    },
-    {
-      "type": "text",
-      "id": "button2_label",
-      "label": "Button 2 – Beschriftung",
-      "default": "Kollektion ansehen",
-      "info": "Leer lassen → Button wird ausgeblendet"
-    },
-    {
-      "type": "text",
-      "id": "button2_url",
-      "label": "Button 2 – Link",
-      "default": "#shopify-section-featured_collection"
-    },
-    {
-      "type": "header",
-      "content": "⭐ Vertrauensleiste"
-    },
-    {
-      "type": "text",
-      "id": "eyebrow_text",
-      "label": "Qualitäts-Label",
-      "default": "Manufaktur · Made in Europe",
-      "info": "Erscheint mit Haken-Icon links in der Vertrauensleiste"
-    },
-    {
-      "type": "product",
-      "id": "rating_product",
-      "label": "Bewertung von Produkt",
-      "info": "Zeigt die Live-Sternebewertung dieses Produkts (z. B. Haupt-Gebetsteppich). Leer = Produkt mit Handle 'gebetsteppich'. Ohne Reviews werden die festen Werte unten genutzt."
-    },
-    {
-      "type": "text",
-      "id": "rating_score",
-      "label": "Bewertungs-Score (Fallback)",
-      "default": "4,9"
-    },
-    {
-      "type": "text",
-      "id": "rating_count",
-      "label": "Bewertungsanzahl (Fallback)",
-      "default": "1.240 Bewertungen"
+      "type": "paragraph",
+      "content": "Buttons und Vertrauens-Pills sind eigene Blöcke — links unter 'Blöcke' hinzufügen und sortieren."
     }
   ],
   "blocks": [
+    {
+      "type": "button",
+      "name": "🔘 Button",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Beschriftung", "default": "Jetzt personalisieren" },
+        { "type": "url",  "id": "url",   "label": "Link" },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Stil",
+          "options": [
+            { "value": "primary",   "label": "Gold (mit Pfeil)" },
+            { "value": "secondary", "label": "Transparent" }
+          ],
+          "default": "primary"
+        }
+      ]
+    },
+    {
+      "type": "trust_pill",
+      "name": "✓ Vertrauens-Pill",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Manufaktur · Made in Europe" }
+      ]
+    },
+    {
+      "type": "rating_pill",
+      "name": "⭐ Bewertungs-Pill",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "product",
+          "id": "rating_product",
+          "label": "Bewertung von Produkt",
+          "info": "Zeigt die Live-Sternebewertung dieses Produkts. Leer = Produkt mit Handle 'gebetsteppich'. Ohne Reviews werden die Fallback-Werte genutzt."
+        },
+        { "type": "text", "id": "rating_score", "label": "Bewertungs-Score (Fallback)", "default": "4,9" },
+        { "type": "text", "id": "rating_count", "label": "Bewertungsanzahl (Fallback)", "default": "1.240 Bewertungen" }
+      ]
+    },
     {
       "type": "bento_card",
       "name": "📦 Bento-Karte",
@@ -309,6 +318,22 @@
     {
       "name": "Hero – Gebetswerk",
       "blocks": [
+        {
+          "type": "button",
+          "settings": { "label": "Jetzt personalisieren", "style": "primary" }
+        },
+        {
+          "type": "button",
+          "settings": { "label": "Kollektion ansehen", "style": "secondary" }
+        },
+        {
+          "type": "trust_pill",
+          "settings": { "text": "Manufaktur · Made in Europe" }
+        },
+        {
+          "type": "rating_pill",
+          "settings": { "rating_score": "4,9", "rating_count": "1.240 Bewertungen" }
+        },
         {
           "type": "bento_card",
           "settings": { "card_eyebrow": "Handarbeit", "card_title": "Bestickt mit echtem Goldfaden", "card_style": "dark" }

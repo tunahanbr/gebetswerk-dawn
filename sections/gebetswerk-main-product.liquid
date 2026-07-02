@@ -2,19 +2,46 @@
   assign current_variant = product.selected_or_first_available_variant
   assign inv = current_variant.inventory_quantity | default: 0
   assign inv_threshold = section.settings.inventory_threshold | default: 10
+  assign name_max = section.settings.name_max | default: 11 | at_least: 1
+  assign atc_label = section.settings.atc_label | default: 'In den Warenkorb'
+  assign soldout_label = section.settings.soldout_label | default: 'Ausverkauft'
+  assign urgency_tpl = section.settings.urgency_text | default: 'Nur noch [Anzahl] Stück verfügbar'
 -%}
 
 {{ 'gebetswerk-product.css' | asset_url | stylesheet_tag }}
 
-{%- assign raw_p1 = section.settings.price_name1 | plus: 0 -%}
-{%- assign raw_p2 = section.settings.price_name2 | plus: 0 -%}
-
-{%- if raw_p1 < 100 -%}{%- assign price_name1 = raw_p1 | times: 100 -%}{%- else -%}{%- assign price_name1 = raw_p1 -%}{%- endif -%}
-{%- if raw_p2 < 100 -%}{%- assign price_name2 = raw_p2 | times: 100 -%}{%- else -%}{%- assign price_name2 = raw_p2 -%}{%- endif -%}
+{%- liquid
+  comment
+    Aufpreise: Wenn das Aufpreise-Produkt verknüpft ist, gelten dessen echte
+    Variantenpreise (= was Shopify tatsächlich berechnet). Die Zahlenfelder
+    unten sind nur Fallback für die Anzeige, solange nichts verknüpft ist.
+  endcomment
+  assign price_name1 = section.settings.price_name1 | default: 1000 | plus: 0
+  assign price_name2 = section.settings.price_name2 | default: 1500 | plus: 0
+  assign price_symbol = section.settings.price_symbol | default: 400 | plus: 0
+  assign addon_product = section.settings.addon_product
+  if addon_product != blank
+    for v in addon_product.variants
+      if v.id == section.settings.addon_name1_variant_id
+        assign price_name1 = v.price
+      endif
+      if v.id == section.settings.addon_name2_variant_id
+        assign price_name2 = v.price
+      endif
+      if v.id == section.settings.addon_symbol_variant_id
+        assign price_symbol = v.price
+      endif
+    endfor
+  endif
+-%}
 
 {%- comment -%} Pass all data to JS {%- endcomment -%}
 <script>
-  window.GW_VARIANTS            = {{ product.variants | json }};
+  window.GW_VARIANTS = [
+    {%- for v in product.variants -%}
+      { "id": {{ v.id }}, "price": {{ v.price }}, "available": {{ v.available }} }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ];
 
   {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
   window.GW_SYMBOLS = [
@@ -30,11 +57,11 @@
     {%- endif -%}
   ];
 
-  {%- comment -%} Personalization pricing — hardcoded in cents {%- endcomment -%}
+  {%- comment -%} Personalization pricing in cents (aus Aufpreise-Produkt oder Fallback-Settings) {%- endcomment -%}
   window.GW_PRICES = {
-    name1:    {{ price_name1 | default: 1000 }},
-    name2:    {{ price_name2 | default: 1500 }},
-    symbol:   {{ section.settings.price_symbol   | default: 400 }}
+    name1:    {{ price_name1 }},
+    name2:    {{ price_name2 }},
+    symbol:   {{ price_symbol }}
   };
 
   {%- comment -%} Add-on variant IDs — separate Shopify line items for correct cart total {%- endcomment -%}
@@ -43,39 +70,81 @@
     name2:    {{ section.settings.addon_name2_variant_id    | default: 0 }},
     symbol:   {{ section.settings.addon_symbol_variant_id   | default: 0 }}
   };
+
+  {%- comment -%} Beschriftungen für dynamische JS-Texte (Buttons, Verfügbarkeit) {%- endcomment -%}
+  window.GW_STRINGS = {
+    atc:     {{ atc_label | json }},
+    soldOut: {{ soldout_label | json }},
+    added:   {{ section.settings.added_label | default: '✓ Im Warenkorb' | json }},
+    buyNow:  {{ section.settings.buy_now_label | default: 'Jetzt kaufen' | json }},
+    urgency: {{ urgency_tpl | json }}
+  };
 </script>
 
 {%- comment -%} SEO: BreadcrumbList + Product schema {%- endcomment -%}
+{%- assign bc_collection = product.collections.first -%}
+{%- if bc_collection -%}
+  {%- assign bc_name = bc_collection.title -%}
+  {%- assign bc_url = bc_collection.url -%}
+{%- else -%}
+  {%- assign bc_name = 'Gebetsteppiche' -%}
+  {%- assign bc_url = routes.all_products_collection_url -%}
+{%- endif -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type":"ListItem","position":1,"name":"Home","item":"{{ shop.url }}"},
-    {"@type":"ListItem","position":2,"name":"Gebetsteppiche","item":"{{ shop.url }}/collections/all"},
+    {"@type":"ListItem","position":2,"name":{{ bc_name | json }},"item":"{{ shop.url }}{{ bc_url }}"},
     {"@type":"ListItem","position":3,"name":{{ product.title | json }},"item":"{{ shop.url }}{{ product.url }}"}
   ]
 }
 </script>
+{%- assign price_valid_year = 'now' | date: '%Y' | plus: 1 -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Product",
+  "@id": "{{ shop.url }}{{ product.url }}#product",
   "name": {{ product.title | json }},
   "description": {{ product.description | strip_html | truncate: 300 | json }},
-  "image": {{ product.featured_image | image_url: width: 1200 | json }},
+  "image": [
+    {%- if product.images.size > 0 -%}
+      {%- for image in product.images -%}
+        {{ image | image_url: width: 1200 | prepend: 'https:' | json }}{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    {%- else -%}
+      {{ product.featured_image | image_url: width: 1200 | prepend: 'https:' | json }}
+    {%- endif -%}
+  ],
+  "url": "{{ shop.url }}{{ product.url }}",
   "brand": { "@type": "Brand", "name": {{ shop.name | json }} },
   "sku": {{ current_variant.sku | json }},
+  {%- if current_variant.sku != blank -%}"mpn": {{ current_variant.sku | json }},{%- endif -%}
+  {%- assign gw_barcode = current_variant.barcode | strip -%}
+  {%- assign gw_barcode_len = gw_barcode | size -%}
+  {%- if gw_barcode_len == 8 or gw_barcode_len == 12 or gw_barcode_len == 13 or gw_barcode_len == 14 -%}"gtin": {{ gw_barcode | json }},{%- endif -%}
   "offers": {
     "@type": "Offer",
     "url": "{{ shop.url }}{{ product.url }}",
     "priceCurrency": "EUR",
     "price": {{ current_variant.price | divided_by: 100.0 }},
+    "priceValidUntil": "{{ price_valid_year }}-12-31",
+    "itemCondition": "https://schema.org/NewCondition",
     "availability": "{% if current_variant.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
-    "seller": { "@type": "Organization", "name": {{ shop.name | json }} }
+    "seller": { "@type": "Organization", "name": {{ shop.name | json }} },
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "{{ shop.address.country_code | default: 'AT' }}",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 14,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "returnFees": "https://schema.org/FreeReturn"
+    }
   },
-  {%- assign ld_count = product.metafields.reviews.rating_count -%}
-  {%- if ld_count and ld_count > 0 -%}
+  {%- assign ld_count = product.metafields.reviews.rating_count | times: 1 -%}
+  {%- if ld_count > 0 -%}
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "{{ product.metafields.reviews.rating.value.rating | round: 2 }}",
@@ -92,9 +161,9 @@
 
     {%- comment -%} Breadcrumb {%- endcomment -%}
     <nav class="gw-breadcrumb" aria-label="Breadcrumb">
-      <a href="{{ routes.root_url }}"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l7-7 7 7"/><path d="M5 8v9h4v-5h2v5h4V8"/></svg> Home</a>
+      <a href="{{ routes.root_url }}"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 10l7-7 7 7"/><path d="M5 8v9h4v-5h2v5h4V8"/></svg> Home</a>
       <span class="gw-breadcrumb__sep">/</span>
-      <a href="{{ routes.all_products_collection_url }}">Gebetsteppiche</a>
+      <a href="{{ bc_url }}">{{ bc_name }}</a>
       <span class="gw-breadcrumb__sep">/</span>
       <span>{{ product.title }}</span>
     </nav>
@@ -112,6 +181,12 @@
             {%- if main_img -%}
               <img id="gw-gallery-variant-img"
                 src="{{ main_img | image_url: width: 1200 }}"
+                srcset="{{ main_img | image_url: width: 400 }} 400w,
+                        {{ main_img | image_url: width: 600 }} 600w,
+                        {{ main_img | image_url: width: 800 }} 800w,
+                        {{ main_img | image_url: width: 1200 }} 1200w,
+                        {{ main_img | image_url: width: 1600 }} 1600w"
+                sizes="(min-width: 990px) 50vw, 100vw"
                 alt="{{ main_img.alt | default: product.title | escape }}"
                 width="1200" height="{{ 1200 | divided_by: main_img.aspect_ratio | round }}" loading="eager" fetchpriority="high"
               >
@@ -127,6 +202,12 @@
             <div class="gw-gallery__slide">
               <img
                 src="{{ media.preview_image | image_url: width: 1200 }}"
+                srcset="{{ media.preview_image | image_url: width: 400 }} 400w,
+                        {{ media.preview_image | image_url: width: 600 }} 600w,
+                        {{ media.preview_image | image_url: width: 800 }} 800w,
+                        {{ media.preview_image | image_url: width: 1200 }} 1200w,
+                        {{ media.preview_image | image_url: width: 1600 }} 1600w"
+                sizes="(min-width: 990px) 50vw, 100vw"
                 alt="{{ media.alt | default: product.title | escape }}"
                 width="1200" height="{{ 1200 | divided_by: media.preview_image.aspect_ratio | round }}" loading="lazy"
               >
@@ -149,15 +230,15 @@
       <aside class="gw-product-sidebar">
 
         <span class="gw-product__chip">
-          <svg viewBox="0 0 20 20"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z"/></svg>
           {{ section.settings.badge_text }}
         </span>
 
         <h1 class="gw-product__title">{{ product.title }}</h1>
 
         {%- assign jm_rating = product.metafields.reviews.rating.value -%}
-        {%- assign jm_count = product.metafields.reviews.rating_count -%}
-        {%- if jm_count and jm_count > 0 -%}
+        {%- assign jm_count = product.metafields.reviews.rating_count | times: 1 -%}
+        {%- if jm_count > 0 -%}
           <div class="gw-product__rating">
             <div class="gw-product__rating-fallback">
               {% render 'gw-rating-stars', product: product, show_count: false %}
@@ -167,26 +248,21 @@
         {%- endif -%}
 
         <div class="gw-product__price-row">
-          <span id="gw-price" class="gw-product__price">{{ current_variant.price | money }}</span>
-          {%- if current_variant.compare_at_price > current_variant.price -%}
-            <span class="gw-product__price-original">{{ current_variant.compare_at_price | money }}</span>
-          {%- endif -%}
+          <span id="gw-price" class="gw-product__price" aria-live="polite">{{ current_variant.price | money }}</span>
+          <span id="gw-price-original" class="gw-product__price-original"{% unless current_variant.compare_at_price > current_variant.price %} hidden{% endunless %}>{{ current_variant.compare_at_price | money }}</span>
         </div>
 
-        {%- comment -%} Real inventory from Shopify {%- endcomment -%}
-        {%- if current_variant.available -%}
-          {%- if inv > 0 and inv <= inv_threshold -%}
-            <div class="gw-product__urgency" id="gw-urgency">
-              <span class="gw-product__urgency-dot"></span>
-              <span id="gw-urgency-text">Nur noch {{ inv }} Stück verfügbar</span>
-            </div>
-          {%- endif -%}
-        {%- else -%}
-          <div class="gw-product__urgency" id="gw-urgency">
-            <span class="gw-product__urgency-dot"></span>
-            <span id="gw-urgency-text">Ausverkauft</span>
-          </div>
+        {%- comment -%} Real inventory from Shopify — immer gerendert, JS blendet je Variante ein/aus {%- endcomment -%}
+        {%- assign show_urgency = false -%}
+        {%- if current_variant.available == false -%}
+          {%- assign show_urgency = true -%}
+        {%- elsif inv > 0 and inv <= inv_threshold -%}
+          {%- assign show_urgency = true -%}
         {%- endif -%}
+        <div class="gw-product__urgency" id="gw-urgency" data-threshold="{{ inv_threshold }}" aria-live="polite"{% unless show_urgency %} hidden{% endunless %}>
+          <span class="gw-product__urgency-dot"></span>
+          <span id="gw-urgency-text">{% if current_variant.available %}{{ urgency_tpl | replace: '[Anzahl]', inv }}{% else %}{{ soldout_label }}{% endif %}</span>
+        </div>
 
 
         {%- comment -%} ══ PRODUCT FORM ══ {%- endcomment -%}
@@ -195,27 +271,22 @@
           <input type="hidden" name="id"       id="gw-variant-id" value="{{ current_variant.id }}">
           <input type="hidden" name="quantity" id="gw-qty-input"   value="1">
 
-          {%- comment -%} LINE ITEM PROPERTIES — saved with every Shopify order, visible in admin + emails {%- endcomment -%}
-          <input type="hidden" name="properties[Name 1]"           id="prop-name1"      value="">
-          <input type="hidden" name="properties[Name 2]"           id="prop-name2"      value="">
-          <input type="hidden" name="properties[Schriftfarbe]"     id="prop-thread"     value="">
-          <input type="hidden" name="properties[Symbol]"           id="prop-symbol"     value="">
-          <input type="hidden" name="properties[Symbolposition]"   id="prop-symbol-pos" value="">
-          <input type="hidden" name="properties[Gebetskette]"      id="prop-bead"       value="">
           {%- comment -%} ─ Color variant picker ─ {%- endcomment -%}
           {%- if product.variants.size > 1 -%}
             <div class="gw-form-field">
-              <p class="gw-product__section-label">Farbe <span id="gw-color-label">{{ current_variant.title }}</span></p>
+              <p class="gw-product__section-label">{{ section.settings.label_color | default: 'Farbe' }} <span id="gw-color-label">{{ current_variant.title }}</span></p>
               <div class="gw-product__colors">
                 {%- for variant in product.variants -%}
                   <button type="button"
                     class="gw-color-swatch{% if variant.id == current_variant.id %} is-active{% endif %}{% unless variant.available %} is-unavailable{% endunless %}"
                     data-variant-id="{{ variant.id }}"
                     data-variant-price="{{ variant.price }}"
+                    data-variant-compare="{{ variant.compare_at_price | default: 0 }}"
                     data-color-name="{{ variant.title | escape }}"
-                    data-variant-img="{{ variant.featured_image | image_url: width: 800 }}"
-                    data-variant-inventory="{{ variant.inventory_quantity }}"
+                    data-variant-img="{{ variant.featured_image | image_url: width: 1200 }}"
+                    data-variant-inventory="{{ variant.inventory_quantity | at_most: 99 }}"
                     data-variant-available="{{ variant.available }}"
+                    aria-pressed="{% if variant.id == current_variant.id %}true{% else %}false{% endif %}"
                     aria-label="{{ variant.title | escape }}"
                     title="{% if variant.available %}{{ variant.title }}{% else %}{{ variant.title }} – ausverkauft{% endif %}"
                   >
@@ -236,30 +307,30 @@
               <input type="checkbox" id="gw-personalize-toggle" checked>
               <div class="gw-personalize-toggle-text">
                 <p>{{ section.settings.personalize_title | default: 'Gebetsteppich personalisieren?' }}</p>
-                <p>{{ section.settings.personalize_desc | default: 'Mit gestickten Namen wird dein Geschenk einzigartig.' }} (+{{ section.settings.price_name1 | default: 1000 | money_without_currency }}€)</p>
+                <p>{{ section.settings.personalize_desc | default: 'Mit gestickten Namen wird dein Geschenk einzigartig.' }} (+{{ price_name1 | money }})</p>
               </div>
             </label>
 
             <div id="gw-personalize-fields" class="gw-personalize-fields">
 
               <div class="gw-form-field">
-                <label class="gw-form-label" for="gw-name1-input">Name 1 * <span class="gw-form-label__hint">(max. 11 Zeichen)</span></label>
+                <label class="gw-form-label" for="gw-name1-input">{{ section.settings.label_name1 | default: 'Name 1' }} * <span class="gw-form-label__hint">(max. {{ name_max }} Zeichen)</span></label>
                 <div class="gw-form-input-wrap">
-                  <input type="text" id="gw-name1-input" class="gw-form-input" placeholder="z. B. Amina" maxlength="11" autocomplete="off">
-                  <span id="gw-name1-count" class="gw-char-count">0/11</span>
+                  <input type="text" id="gw-name1-input" class="gw-form-input" placeholder="{{ section.settings.placeholder_name1 | default: 'z. B. Amina' | escape }}" maxlength="{{ name_max }}" autocomplete="off">
+                  <span id="gw-name1-count" class="gw-char-count">0/{{ name_max }}</span>
                 </div>
               </div>
 
               <div class="gw-option-toggle">
-                <label><input type="checkbox" id="gw-twonames-toggle"> Zweiten Namen hinzufügen</label>
-                <span class="gw-option-price">+ €15,00</span>
+                <label><input type="checkbox" id="gw-twonames-toggle"> {{ section.settings.toggle_two_names | default: 'Zweiten Namen hinzufügen' }}</label>
+                <span class="gw-option-price">+ {{ price_name2 | money }}</span>
               </div>
 
               <div id="gw-name2-section" class="gw-form-field" hidden>
-                <label class="gw-form-label" for="gw-name2-input">Name 2</label>
+                <label class="gw-form-label" for="gw-name2-input">{{ section.settings.label_name2 | default: 'Name 2' }}</label>
                 <div class="gw-form-input-wrap">
-                  <input type="text" id="gw-name2-input" class="gw-form-input" placeholder="z. B. Yusuf" maxlength="11" autocomplete="off">
-                  <span id="gw-name2-count" class="gw-char-count">0/11</span>
+                  <input type="text" id="gw-name2-input" class="gw-form-input" placeholder="{{ section.settings.placeholder_name2 | default: 'z. B. Yusuf' | escape }}" maxlength="{{ name_max }}" autocomplete="off">
+                  <span id="gw-name2-count" class="gw-char-count">0/{{ name_max }}</span>
                 </div>
               </div>
 
@@ -267,7 +338,7 @@
               {%- assign thread_blocks = section.blocks | where: 'type', 'thread_color' -%}
               {%- if thread_blocks.size > 0 -%}
                 <div class="gw-form-field">
-                  <p class="gw-form-label gw-form-label--row">Schriftfarbe
+                  <p class="gw-form-label gw-form-label--row">{{ section.settings.label_thread | default: 'Schriftfarbe' }}
                     <span class="gw-form-label__value"><span id="gw-thread-label-dot" class="gw-thread-label-dot"></span><span id="gw-thread-label"></span></span>
                   </p>
                   <div class="gw-thread-grid gw-thread-grid--row">
@@ -279,6 +350,7 @@
                         data-label="{{ block.settings.name | escape }}"
                         title="{{ block.settings.name | escape }}"
                         aria-label="{{ block.settings.name | escape }}"
+                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
                         {{ block.shopify_attributes }}
                       >
                         <span class="gw-thread-swatch__dot" style="background:{{ block.settings.hex | escape }};"></span>
@@ -289,14 +361,14 @@
               {%- else -%}
                 {%- comment -%} Fallback thread colors {%- endcomment -%}
                 <div class="gw-form-field">
-                  <p class="gw-form-label gw-form-label--row">Schriftfarbe
+                  <p class="gw-form-label gw-form-label--row">{{ section.settings.label_thread | default: 'Schriftfarbe' }}
                     <span class="gw-form-label__value"><span id="gw-thread-label-dot" class="gw-thread-label-dot"></span><span id="gw-thread-label"></span></span>
                   </p>
                   <div class="gw-thread-grid gw-thread-grid--row">
                     {%- assign default_threads = 'gold|Gold|#c9a24a,silver|Silber|#c8c8cc,white|Weiß|#f5f1e6,black|Schwarz|#1a1a1a,brown|Braun|#7a5230' | split: ',' -%}
                     {%- for tc in default_threads -%}
                       {%- assign p = tc | split: '|' -%}
-                      <button type="button" class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}" data-thread="{{ p[0] }}" data-hex="{{ p[2] }}" data-label="{{ p[1] }}" title="{{ p[1] }}" aria-label="{{ p[1] }}">
+                      <button type="button" class="gw-thread-swatch{% if forloop.first %} is-active{% endif %}" data-thread="{{ p[0] }}" data-hex="{{ p[2] }}" data-label="{{ p[1] }}" title="{{ p[1] }}" aria-label="{{ p[1] }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
                         <span class="gw-thread-swatch__dot" style="background:{{ p[2] }};"></span>
                       </button>
                     {%- endfor -%}
@@ -305,17 +377,17 @@
               {%- endif -%}
 
               {%- comment -%} Symbols — from blocks or fallback {%- endcomment -%}
-              {%- assign symbol_blocks = section.blocks | where: 'type', 'symbol' -%}
               <div class="gw-form-field">
                 <div class="gw-option-toggle gw-option-toggle--compact">
-                  <p class="gw-form-label gw-form-label--flush">Symbol</p>
-                  <span class="gw-option-price" id="gw-symbol-price-tag" hidden>+{{ section.settings.price_symbol | default: 400 | money_without_currency }}€</span>
+                  <p class="gw-form-label gw-form-label--flush">{{ section.settings.label_symbol | default: 'Symbol' }}</p>
+                  <span class="gw-option-price" id="gw-symbol-price-tag" hidden>+{{ price_symbol | money }}</span>
                 </div>
                 <div class="gw-symbol-grid">
                   {%- if symbol_blocks.size > 0 -%}
                     {%- for block in symbol_blocks -%}
                       <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}"
                         data-symbol="{{ block.settings.symbol_id }}"
+                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
                         {{ block.shopify_attributes }}>
                         <span class="gw-symbol-btn__icon">{{ block.settings.icon }}</span>
                         <span class="gw-symbol-btn__label">{{ block.settings.label }}</span>
@@ -325,7 +397,7 @@
                     {%- assign fallback_symbols = 'none|Keins|—,moon|Halbmond|☾,heart|Herz|♥,infinity|Unendlich|∞' | split: ',' -%}
                     {%- for sym in fallback_symbols -%}
                       {%- assign sp = sym | split: '|' -%}
-                      <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}">
+                      <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
                         <span class="gw-symbol-btn__icon">{{ sp[2] }}</span>
                         <span class="gw-symbol-btn__label">{{ sp[1] }}</span>
                       </button>
@@ -335,23 +407,23 @@
               </div>
 
               <div id="gw-sympos-section" class="gw-form-field" hidden>
-                <p class="gw-form-label">Position des Symbols</p>
+                <p class="gw-form-label">{{ section.settings.label_sympos | default: 'Position des Symbols' }}</p>
                 <div class="gw-sympos-grid">
-                  <button type="button" class="gw-sympos-btn is-active" data-sympos="left">
+                  <button type="button" class="gw-sympos-btn is-active" data-sympos="left" aria-pressed="true">
                     <span>Links</span>
                     <span class="gw-sympos-preview" data-dir="row">
                       <span class="gw-sympos-preview__symbol">☾</span>
                       <span class="gw-sympos-preview__name">Aa</span>
                     </span>
                   </button>
-                  <button type="button" class="gw-sympos-btn" data-sympos="right">
+                  <button type="button" class="gw-sympos-btn" data-sympos="right" aria-pressed="false">
                     <span>Rechts</span>
                     <span class="gw-sympos-preview" data-dir="row-rev">
                       <span class="gw-sympos-preview__symbol">☾</span>
                       <span class="gw-sympos-preview__name">Aa</span>
                     </span>
                   </button>
-                  <button type="button" class="gw-sympos-btn" id="gw-sympos-between" data-sympos="between" hidden>
+                  <button type="button" class="gw-sympos-btn" id="gw-sympos-between" data-sympos="between" aria-pressed="false" hidden>
                     <span>Zwischen den Namen</span>
                     <span class="gw-sympos-preview" data-dir="row">
                       <span class="gw-sympos-preview__name gw-sympos-preview__name--small">Aa</span>
@@ -369,7 +441,7 @@
 
           {%- comment -%} ─ Order confirmation summary ─ {%- endcomment -%}
           <div id="gw-order-summary" class="gw-order-summary" hidden>
-            <p class="gw-order-summary__label">Deine Bestellung:</p>
+            <p class="gw-order-summary__label">{{ section.settings.summary_label | default: 'Deine Bestellung:' }}</p>
             <ul id="gw-order-summary-list" class="gw-order-summary__list"></ul>
           </div>
 
@@ -377,11 +449,11 @@
           <div class="gw-product__actions">
             <div class="gw-qty">
               <button type="button" id="gw-qty-minus" class="gw-qty__btn" aria-label="Weniger">−</button>
-              <span id="gw-qty-val" class="gw-qty__val">1</span>
+              <span id="gw-qty-val" class="gw-qty__val" role="status" aria-live="polite" aria-label="Menge">1</span>
               <button type="button" id="gw-qty-plus"  class="gw-qty__btn" aria-label="Mehr">+</button>
             </div>
             <button type="button" id="gw-atc-btn" class="gw-add-to-cart"{% unless current_variant.available %} disabled{% endunless %}>
-              {% if current_variant.available %}In den Warenkorb · {{ current_variant.price | money }}{% else %}Ausverkauft{% endif %}
+              {% if current_variant.available %}{{ atc_label }} · {{ current_variant.price | money }}{% else %}{{ soldout_label }}{% endif %}
             </button>
           </div>
 
@@ -389,7 +461,7 @@
               leert das Formular und scrollt hoch zum Namensfeld ─ {%- endcomment -%}
           <button type="button" id="gw-reset-btn" class="gw-reset-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Weiteren Teppich personalisieren
+            {{ section.settings.reset_label | default: 'Weiteren Teppich personalisieren' }}
           </button>
 
           {%- comment -%}
@@ -400,7 +472,7 @@
           {%- if current_variant.available -%}
             <button type="button" id="gw-buy-now-btn" class="gw-buy-now-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
-              Jetzt kaufen
+              {{ section.settings.buy_now_label | default: 'Jetzt kaufen' }}
             </button>
           {%- endif -%}
 
@@ -411,14 +483,14 @@
               {%- for block in trust_blocks -%}
                 <div class="gw-trust-badge" {{ block.shopify_attributes }}>
                   {%- case block.settings.icon -%}
-                    {%- when 'lock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    {%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                    {%- when 'star' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    {%- when 'gift' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-                    {%- when 'check' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    {%- when 'lock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    {%- when 'star' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    {%- when 'gift' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    {%- when 'check' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                   {%- endcase -%}
                   <span>{{ block.settings.label }}</span>
                 </div>
@@ -428,21 +500,24 @@
 
         {%- endform -%}
 
-        {%- comment -%} ─ Shipping info ─ {%- endcomment -%}
-        {%- if section.settings.shipping_row1 != blank or section.settings.shipping_row2 != blank -%}
+        {%- comment -%} ─ Shipping info — eigene Blöcke im Theme-Editor ─ {%- endcomment -%}
+        {%- assign shipping_blocks = section.blocks | where: 'type', 'shipping_row' -%}
+        {%- if shipping_blocks.size > 0 -%}
           <div class="gw-product__shipping">
-            {%- if section.settings.shipping_row1 != blank -%}
-              <div class="gw-product__shipping-row">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                <span>{{ section.settings.shipping_row1 }}</span>
-              </div>
-            {%- endif -%}
-            {%- if section.settings.shipping_row2 != blank -%}
-              <div class="gw-product__shipping-row">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                <span>{{ section.settings.shipping_row2 }}</span>
-              </div>
-            {%- endif -%}
+            {%- for block in shipping_blocks -%}
+              {%- if block.settings.text != blank -%}
+                <div class="gw-product__shipping-row" {{ block.shopify_attributes }}>
+                  {%- case block.settings.icon -%}
+                    {%- when 'package' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    {%- when 'gift' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {%- when 'check' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    {%- else -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                  {%- endcase -%}
+                  <span>{{ block.settings.text }}</span>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
           </div>
         {%- endif -%}
 
@@ -452,7 +527,7 @@
           <div class="gw-product-accordion">
             {%- if product.description != blank -%}
               <details>
-                <summary>Beschreibung & Material</summary>
+                <summary>{{ section.settings.desc_accordion_title | default: 'Beschreibung & Material' }}</summary>
                 <div class="gw-product-accordion__body">{{ product.description }}</div>
               </details>
             {%- endif -%}
@@ -478,7 +553,7 @@
       <p id="gw-sticky-price" class="gw-sticky-atc__price">{{ current_variant.price | money }}</p>
     </div>
     <button type="button" id="gw-sticky-atc-btn" class="gw-add-to-cart gw-sticky-atc__button">
-      In den Warenkorb
+      {{ atc_label }}
     </button>
   </div>
 </div>
@@ -490,6 +565,28 @@
   "name": "Produktseite",
   "tag": "section",
   "settings": [
+    {
+      "type": "header",
+      "content": "📝 Beschriftungen & Buttons"
+    },
+    { "type": "text", "id": "label_color", "label": "Label: Farbauswahl", "default": "Farbe" },
+    { "type": "text", "id": "label_name1", "label": "Label: 1. Name", "default": "Name 1" },
+    { "type": "text", "id": "placeholder_name1", "label": "Platzhalter: 1. Name", "default": "z. B. Amina" },
+    { "type": "text", "id": "toggle_two_names", "label": "Text: Zweiter-Name-Schalter", "default": "Zweiten Namen hinzufügen" },
+    { "type": "text", "id": "label_name2", "label": "Label: 2. Name", "default": "Name 2" },
+    { "type": "text", "id": "placeholder_name2", "label": "Platzhalter: 2. Name", "default": "z. B. Yusuf" },
+    { "type": "number", "id": "name_max", "label": "Max. Zeichen pro Name", "default": 11 },
+    { "type": "text", "id": "label_thread", "label": "Label: Schriftfarbe", "default": "Schriftfarbe" },
+    { "type": "text", "id": "label_symbol", "label": "Label: Symbol", "default": "Symbol" },
+    { "type": "text", "id": "label_sympos", "label": "Label: Symbolposition", "default": "Position des Symbols" },
+    { "type": "text", "id": "summary_label", "label": "Label: Bestellübersicht", "default": "Deine Bestellung:" },
+    { "type": "text", "id": "atc_label", "label": "Button: In den Warenkorb", "default": "In den Warenkorb" },
+    { "type": "text", "id": "added_label", "label": "Button: Erfolgs-Text", "default": "✓ Im Warenkorb" },
+    { "type": "text", "id": "buy_now_label", "label": "Button: Jetzt kaufen", "default": "Jetzt kaufen" },
+    { "type": "text", "id": "reset_label", "label": "Button: Weiterer Teppich", "default": "Weiteren Teppich personalisieren" },
+    { "type": "text", "id": "soldout_label", "label": "Text: Ausverkauft", "default": "Ausverkauft" },
+    { "type": "text", "id": "urgency_text", "label": "Text: Niedriger Lagerbestand", "default": "Nur noch [Anzahl] Stück verfügbar", "info": "[Anzahl] wird automatisch durch den Lagerbestand ersetzt" },
+    { "type": "text", "id": "desc_accordion_title", "label": "Titel: Beschreibungs-Klappbox", "default": "Beschreibung & Material" },
     {
       "type": "header",
       "content": "✏️ Personalisierungsbox"
@@ -520,38 +617,6 @@
       "info": "Kleines goldenes Label, z. B. 'Bestseller' oder 'Neu'"
     },
     {
-      "type": "text",
-      "id": "review_display",
-      "label": "Bewertungstext",
-      "default": "2.627 Bewertungen",
-      "info": "Wird neben den Sternen als klickbarer Link angezeigt"
-    },
-    {
-      "type": "number",
-      "id": "review_count_number",
-      "label": "Bewertungsanzahl (nur für Google-SEO)",
-      "default": 2627,
-      "info": "Muss mit dem Bewertungstext übereinstimmen"
-    },
-    {
-      "type": "header",
-      "content": "📦 Versand-Hinweise (unter dem Preis)"
-    },
-    {
-      "type": "text",
-      "id": "shipping_row1",
-      "label": "Versandzeile 1",
-      "default": "Österreich kostenlos · Deutschland kostenlos ab 100 €",
-      "info": "Erscheint mit LKW-Icon. Leer lassen → wird ausgeblendet"
-    },
-    {
-      "type": "text",
-      "id": "shipping_row2",
-      "label": "Versandzeile 2",
-      "default": "3–5 Werktage Lieferzeit · Geschenkverpackung optional",
-      "info": "Erscheint mit Paket-Icon. Leer lassen → wird ausgeblendet"
-    },
-    {
       "type": "header",
       "content": "📊 Lagerbestand-Warnung"
     },
@@ -567,8 +632,14 @@
       "content": "💰 Aufpreise für Personalisierung"
     },
     {
+      "type": "product",
+      "id": "addon_product",
+      "label": "Aufpreise-Produkt",
+      "info": "Das versteckte 'Aufpreise'-Produkt auswählen. Dann gelten automatisch dessen echte Variantenpreise und die Cent-Felder unten werden ignoriert."
+    },
+    {
       "type": "paragraph",
-      "content": "Preise in Cent eingeben: 1000 = €10,00 · 199 = €1,99"
+      "content": "Fallback-Preise in Cent (nur wenn kein Aufpreise-Produkt verknüpft ist): 1000 = €10,00 · 199 = €1,99"
     },
     {
       "type": "number",
@@ -614,6 +685,32 @@
     }
   ],
   "blocks": [
+    {
+      "type": "shipping_row",
+      "name": "📦 Versand-Hinweis",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "truck",   "label": "🚚 LKW (Versand)" },
+            { "value": "package", "label": "📦 Paket (Lieferung)" },
+            { "value": "gift",    "label": "🎁 Geschenk (Verpackung)" },
+            { "value": "clock",   "label": "🕐 Uhr (Lieferzeit)" },
+            { "value": "check",   "label": "✓ Haken" }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Österreich kostenlos · Deutschland kostenlos ab 100 €"
+        }
+      ]
+    },
     {
       "type": "thread_color",
       "name": "🎨 Schriftfarbe",
@@ -801,6 +898,8 @@
   "presets": [{
     "name": "Produktseite",
     "blocks": [
+      { "type": "shipping_row", "settings": { "icon": "truck",   "text": "Österreich kostenlos · Deutschland kostenlos ab 100 €" } },
+      { "type": "shipping_row", "settings": { "icon": "package", "text": "3–5 Werktage Lieferzeit · Geschenkverpackung optional" } },
       { "type": "thread_color", "settings": { "id": "gold",   "name": "Gold",    "hex": "#c9a24a" } },
       { "type": "thread_color", "settings": { "id": "silver", "name": "Silber",  "hex": "#c8c8cc" } },
       { "type": "thread_color", "settings": { "id": "white",  "name": "Weiß",    "hex": "#ffffff" } },

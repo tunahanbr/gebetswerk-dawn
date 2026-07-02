@@ -7,6 +7,11 @@
 (function () {
   'use strict';
 
+  var ROUTES = window.routes || {};
+  var CART_URL = ROUTES.cart_url || '/cart';
+  var CART_JS_URL = CART_URL + '.js';
+  var CART_UPDATE_URL = (ROUTES.cart_update_url || '/cart/update') + '.js';
+
   /* Ein "Kind" (Aufpreis, Gebetskette, Addon) ist jede Zeile, die per
      _TeppichVariant an einen Teppich gekoppelt ist — egal welches Produkt.
      So wird auch eine verwaiste Gebetskette als Kind erkannt und nicht
@@ -49,7 +54,7 @@
     if (syncing) return;
     syncing = true;
     try {
-      const cart = await fetch('/cart.js').then(r => r.json());
+      const cart = await fetch(CART_JS_URL).then(r => r.json());
       updateBadge(cart);
       if (cart.item_count === 0) return;
 
@@ -82,7 +87,7 @@
           if (want !== a.quantity) updates[a.key] = want;
         });
         if (Object.keys(updates).length > 0) {
-          await fetch('/cart/update.js', {
+          await fetch(CART_UPDATE_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ updates })
@@ -93,13 +98,13 @@
 
       if (!changed) return;
 
-      const newCart = await fetch('/cart.js').then(r => r.json());
+      const newCart = await fetch(CART_JS_URL).then(r => r.json());
       updateBadge(newCart);
       document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
 
       if (newCart.item_count === 0) {
         setTimeout(() => window.location.reload(), 150);
-      } else if (window.location.pathname === '/cart') {
+      } else if (window.location.pathname === CART_URL) {
         window.location.reload();
       }
     } catch (e) {

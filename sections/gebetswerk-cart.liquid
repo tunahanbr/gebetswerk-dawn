@@ -8,9 +8,9 @@
       <div class="gw-cart-empty__icon">
         <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="22" cy="54" r="4"/><circle cx="46" cy="54" r="4"/><path d="M2 4h8l8 32h28l6-22H16"/></svg>
       </div>
-      <h1 class="gw-cart-empty__title">Dein Warenkorb ist leer</h1>
-      <p class="gw-cart-empty__text">Entdecke unsere personalisierten Gebetsteppiche – ein Geschenk, das bleibt.</p>
-      <a href="{{ routes.all_products_collection_url }}" class="gw-cart-empty__btn">Zur Kollektion</a>
+      <h1 class="gw-cart-empty__title">{{ section.settings.empty_title | default: 'Dein Warenkorb ist leer' }}</h1>
+      <p class="gw-cart-empty__text">{{ section.settings.empty_text | default: 'Entdecke unsere personalisierten Gebetsteppiche – ein Geschenk, das bleibt.' }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="gw-cart-empty__btn">{{ section.settings.empty_button | default: 'Zur Kollektion' }}</a>
     </div>
   </div>
 
@@ -21,7 +21,7 @@
 
     {%- comment -%} ── Header ── {%- endcomment -%}
     <div class="gw-cart-header">
-      <h1 class="gw-cart-header__title">Dein Warenkorb</h1>
+      <h1 class="gw-cart-header__title">{{ section.settings.title | default: 'Dein Warenkorb' }}</h1>
     </div>
 
     <div class="gw-cart-layout">
@@ -103,8 +103,13 @@
                 {%- endif -%}
 
                 <div class="gw-cart-item__actions">
+                  <div class="gw-cart-qty" aria-label="Menge">
+                    <button type="button" class="gw-cart-qty__btn" data-qty-change="-1" aria-label="Menge verringern">−</button>
+                    <span class="gw-cart-qty__val" aria-live="polite">{{ item.quantity }}</span>
+                    <button type="button" class="gw-cart-qty__btn" data-qty-change="1" aria-label="Menge erhöhen">+</button>
+                  </div>
                   <button type="button" class="gw-cart-item__remove" data-key="{{ item.key }}" aria-label="Entfernen">
-                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M8 6V4h4v2M16 6l-1 11H5L4 6"/></svg>
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 6h14M8 6V4h4v2M16 6l-1 11H5L4 6"/></svg>
                     Entfernen
                   </button>
                 </div>
@@ -121,20 +126,20 @@
       <aside class="gw-cart-summary">
         <div class="gw-cart-summary__box">
 
-          <h2 class="gw-cart-summary__title">Bestellübersicht</h2>
+          <h2 class="gw-cart-summary__title">{{ section.settings.summary_title | default: 'Bestellübersicht' }}</h2>
 
           <div class="gw-cart-summary__rows">
             <div class="gw-cart-summary__row">
-              <span>Zwischensumme</span>
+              <span>{{ section.settings.subtotal_label | default: 'Zwischensumme' }}</span>
               <span id="gw-cart-subtotal">{{ cart.total_price | money }}</span>
             </div>
             <div class="gw-cart-summary__row gw-cart-summary__row--shipping">
-              <span>Versand</span>
+              <span>{{ section.settings.shipping_label | default: 'Versand' }}</span>
               <span>
                 {%- if cart.total_price >= free_shipping_de_threshold -%}
-                  <span class="gw-cart-summary__free">Kostenlos 🎉</span>
+                  <span class="gw-cart-summary__free">{{ section.settings.shipping_free_label | default: 'Kostenlos 🎉' }}</span>
                 {%- else -%}
-                  4,99 €
+                  {{ section.settings.shipping_price_text | default: '4,99 €' }}
                 {%- endif -%}
               </span>
             </div>
@@ -143,54 +148,61 @@
           {%- if cart.total_price < free_shipping_de_threshold -%}
             {%- assign remaining = free_shipping_de_threshold | minus: cart.total_price -%}
             {%- assign ship_pct = cart.total_price | times: 100 | divided_by: free_shipping_de_threshold | at_most: 100 -%}
+            {%- assign remaining_html = remaining | money | prepend: '<strong>' | append: '</strong>' -%}
+            {%- assign freeship_text = section.settings.freeship_remaining | default: 'Nur noch [Betrag] bis zum kostenlosen Versand.' -%}
             <div class="gw-cart-summary__freeship">
               <div class="gw-cart-summary__freeship-bar">
                 <div class="gw-cart-summary__freeship-fill" style="width:{{ ship_pct }}%"></div>
               </div>
-              <p>Nur noch <strong>{{ remaining | money }}</strong> bis zum <strong>kostenlosen Versand</strong>.</p>
+              <p>{{ freeship_text | escape | replace: '[Betrag]', remaining_html }}</p>
             </div>
           {%- else -%}
             <div class="gw-cart-summary__freeship gw-cart-summary__freeship--done">
               <div class="gw-cart-summary__freeship-bar">
                 <div class="gw-cart-summary__freeship-fill" style="width:100%"></div>
               </div>
-              <p>🎉 Glückwunsch! Dein Versand ist <strong>kostenlos</strong>.</p>
+              <p>{{ section.settings.freeship_done | default: '🎉 Glückwunsch! Dein Versand ist kostenlos.' }}</p>
             </div>
           {%- endif -%}
 
           <div class="gw-cart-summary__total">
-            <span>Gesamt</span>
+            <span>{{ section.settings.total_label | default: 'Gesamt' }}</span>
             <span id="gw-cart-total">{{ cart.total_price | money }}</span>
           </div>
-          <p class="gw-cart-summary__tax">inkl. MwSt.</p>
+          <p class="gw-cart-summary__tax">{{ section.settings.tax_note | default: 'inkl. MwSt.' }}</p>
 
           <a href="/checkout" class="gw-cart-checkout-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Sicher zur Kasse
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            {{ section.settings.checkout_label | default: 'Sicher zur Kasse' }}
           </a>
 
           <a href="{{ routes.all_products_collection_url }}" class="gw-cart-continue">
-            ← Weiter einkaufen
+            {{ section.settings.continue_label | default: '← Weiter einkaufen' }}
           </a>
 
-          {%- comment -%} Trust badges {%- endcomment -%}
-          <div class="gw-cart-trust">
-            <div class="gw-cart-trust__item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>SSL-gesichert</span>
+          {%- comment -%} Trust badges — eigene Blöcke im Theme-Editor {%- endcomment -%}
+          {%- assign trust_blocks = section.blocks | where: 'type', 'trust_item' -%}
+          {%- if trust_blocks.size > 0 -%}
+            <div class="gw-cart-trust">
+              {%- for block in trust_blocks -%}
+                <div class="gw-cart-trust__item" {{ block.shopify_attributes }}>
+                  {%- case block.settings.icon -%}
+                    {%- when 'lock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    {%- when 'shield' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    {%- when 'heart' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    {%- when 'clock' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {%- when 'truck' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    {%- when 'gift' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                    {%- when 'check' -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  {%- endcase -%}
+                  <span>{{ block.settings.label }}</span>
+                </div>
+              {%- endfor -%}
             </div>
-            <div class="gw-cart-trust__item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              <span>14 Tage Rückgabe</span>
-            </div>
-            <div class="gw-cart-trust__item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-              <span>3–5 Tage Lieferzeit</span>
-            </div>
-          </div>
+          {%- endif -%}
 
           {%- comment -%} Payment icons {%- endcomment -%}
-          <p class="gw-cart-payment-label">Wir akzeptieren</p>
+          <p class="gw-cart-payment-label">{{ section.settings.payment_label | default: 'Wir akzeptieren' }}</p>
           <div class="gw-cart-payment">
             {%- for type in shop.enabled_payment_types -%}
               {{ type | payment_type_svg_tag: class: 'gw-cart-payment__icon' }}
@@ -212,31 +224,25 @@
   const page = document.getElementById('gw-cart-page');
   if (!page) return;
 
+  const CART_JS_URL = '{{ routes.cart_url }}.js';
+  const CART_UPDATE_URL = '{{ routes.cart_update_url }}.js';
+
   function isAddon(item) {
     return item.properties && item.properties._TeppichVariant !== undefined && item.properties._TeppichVariant !== null;
   }
 
-  function findCartItem(key) {
-    return Array.from(page.querySelectorAll('.gw-cart-item')).find(item => item.dataset.key === key);
-  }
-
-  async function removeItemGroup(key, ref) {
-    if (!ref) {
-      await fetch('/cart/change.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: key, quantity: 0 })
+  /* Menge für den Teppich UND alle per _ref gekoppelten Aufpreis-Zeilen in
+     einem Aufruf setzen — danach neu laden, damit alle Preise aus Liquid
+     konsistent neu berechnet werden. */
+  async function updateGroup(key, ref, qty) {
+    const updates = { [key]: qty };
+    if (ref) {
+      const cart = await fetch(CART_JS_URL).then(r => r.json());
+      cart.items.forEach(item => {
+        if (isAddon(item) && item.properties._ref === ref) updates[item.key] = qty;
       });
-      location.reload();
-      return;
     }
-
-    const cart = await fetch('/cart.js').then(response => response.json());
-    const updates = { [key]: 0 };
-    cart.items.forEach(item => {
-      if (isAddon(item) && item.properties._ref === ref) updates[item.key] = 0;
-    });
-    await fetch('/cart/update.js', {
+    await fetch(CART_UPDATE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ updates })
@@ -244,39 +250,23 @@
     location.reload();
   }
 
-  async function updateItem(key, qty) {
-    if (qty === 0) {
-      const itemEl = findCartItem(key);
-      await removeItemGroup(key, itemEl?.dataset.ref || '');
+  page.addEventListener('click', e => {
+    const qtyBtn = e.target.closest('[data-qty-change]');
+    if (qtyBtn) {
+      const itemEl = qtyBtn.closest('.gw-cart-item');
+      const val = itemEl.querySelector('.gw-cart-qty__val');
+      const next = Math.max(0, parseInt(val.textContent, 10) + parseInt(qtyBtn.dataset.qtyChange, 10));
+      itemEl.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      updateGroup(itemEl.dataset.key, itemEl.dataset.ref, next);
       return;
     }
-
-    const res = await fetch('/cart/change.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: key, quantity: qty })
-    });
-    const cart = await res.json();
-    document.getElementById('gw-cart-subtotal').textContent = formatMoney(cart.total_price);
-    document.getElementById('gw-cart-total').textContent = formatMoney(cart.total_price);
-    const el = findCartItem(key)?.querySelector('.gw-cart-qty__val');
-    if (el) el.textContent = qty;
-    const realCount = cart.items.filter(item => !isAddon(item)).reduce((sum, item) => sum + item.quantity, 0);
-    document.querySelectorAll('.cart-count-bubble span[aria-hidden]').forEach(b => {
-      b.textContent = realCount;
-    });
-  }
-
-  function formatMoney(cents) {
-    return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
-  }
-
-  // Remove buttons (Haupt-Produkt)
-  page.addEventListener('click', e => {
     const removeBtn = e.target.closest('.gw-cart-item__remove');
-    if (removeBtn) { updateItem(removeBtn.dataset.key, 0); }
+    if (removeBtn) {
+      const itemEl = removeBtn.closest('.gw-cart-item');
+      itemEl.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      updateGroup(itemEl.dataset.key, itemEl.dataset.ref, 0);
+    }
   });
-
 })();
 </script>
 
@@ -284,7 +274,63 @@
 {
   "name": "Warenkorb – Gebetswerk",
   "tag": "section",
-  "settings": [],
-  "presets": [{ "name": "Warenkorb – Gebetswerk" }]
+  "settings": [
+    { "type": "header", "content": "🛒 Warenkorb" },
+    { "type": "text", "id": "title", "label": "Überschrift", "default": "Dein Warenkorb" },
+    { "type": "header", "content": "📭 Leerer Warenkorb" },
+    { "type": "text", "id": "empty_title", "label": "Überschrift", "default": "Dein Warenkorb ist leer" },
+    { "type": "textarea", "id": "empty_text", "label": "Text", "default": "Entdecke unsere personalisierten Gebetsteppiche – ein Geschenk, das bleibt." },
+    { "type": "text", "id": "empty_button", "label": "Button-Text", "default": "Zur Kollektion" },
+    { "type": "header", "content": "🧾 Bestellübersicht" },
+    { "type": "text", "id": "summary_title", "label": "Überschrift", "default": "Bestellübersicht" },
+    { "type": "text", "id": "subtotal_label", "label": "Zwischensumme-Label", "default": "Zwischensumme" },
+    { "type": "text", "id": "shipping_label", "label": "Versand-Label", "default": "Versand" },
+    { "type": "text", "id": "shipping_price_text", "label": "Versandkosten (Anzeige)", "default": "4,99 €", "info": "Nur Anzeige — die echten Versandkosten kommen aus den Shopify-Versandeinstellungen" },
+    { "type": "text", "id": "shipping_free_label", "label": "Text bei kostenlosem Versand", "default": "Kostenlos 🎉" },
+    { "type": "text", "id": "total_label", "label": "Gesamt-Label", "default": "Gesamt" },
+    { "type": "text", "id": "tax_note", "label": "Steuer-Hinweis", "default": "inkl. MwSt." },
+    { "type": "header", "content": "🚚 Kostenloser-Versand-Balken" },
+    { "type": "text", "id": "freeship_remaining", "label": "Text (Betrag fehlt noch)", "default": "Nur noch [Betrag] bis zum kostenlosen Versand.", "info": "[Betrag] wird automatisch durch den Restbetrag ersetzt" },
+    { "type": "text", "id": "freeship_done", "label": "Text (Ziel erreicht)", "default": "🎉 Glückwunsch! Dein Versand ist kostenlos." },
+    { "type": "header", "content": "🔘 Buttons" },
+    { "type": "text", "id": "checkout_label", "label": "Zur-Kasse-Button", "default": "Sicher zur Kasse" },
+    { "type": "text", "id": "continue_label", "label": "Weiter-einkaufen-Link", "default": "← Weiter einkaufen" },
+    { "type": "text", "id": "payment_label", "label": "Text über den Zahlungsarten", "default": "Wir akzeptieren" }
+  ],
+  "blocks": [
+    {
+      "type": "trust_item",
+      "name": "✅ Vertrauens-Badge",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "lock",   "label": "🔒 Schloss (Sicherheit)" },
+            { "value": "shield", "label": "🛡️ Schild (Garantie)" },
+            { "value": "heart",  "label": "❤️ Herz (Handarbeit)" },
+            { "value": "clock",  "label": "🕐 Uhr (Lieferzeit)" },
+            { "value": "truck",  "label": "🚚 LKW (Versand)" },
+            { "value": "gift",   "label": "🎁 Geschenk (Verpackung)" },
+            { "value": "check",  "label": "✓ Haken (Bestätigung)" }
+          ],
+          "default": "check"
+        },
+        { "type": "text", "id": "label", "label": "Text", "default": "SSL-gesichert" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Warenkorb – Gebetswerk",
+      "blocks": [
+        { "type": "trust_item", "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
+        { "type": "trust_item", "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
+        { "type": "trust_item", "settings": { "icon": "truck",  "label": "3–5 Tage Lieferzeit" } }
+      ]
+    }
+  ]
 }
 {% endschema %}

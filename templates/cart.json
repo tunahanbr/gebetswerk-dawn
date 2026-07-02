@@ -2,6 +2,12 @@
   "sections": {
     "gebetswerk_cart": {
       "type": "gebetswerk-cart",
+      "blocks": {
+        "trust-1": { "type": "trust_item", "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
+        "trust-2": { "type": "trust_item", "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
+        "trust-3": { "type": "trust_item", "settings": { "icon": "truck",  "label": "3–5 Tage Lieferzeit" } }
+      },
+      "block_order": ["trust-1", "trust-2", "trust-3"],
       "settings": {}
     }
   },

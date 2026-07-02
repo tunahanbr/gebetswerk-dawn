@@ -12,6 +12,35 @@
     "gebetswerk_hero": {
       "type": "gebetswerk-hero",
       "blocks": {
+        "btn-1": {
+          "type": "button",
+          "settings": {
+            "label": "Jetzt personalisieren",
+            "url": "/products/gebetsteppich",
+            "style": "primary"
+          }
+        },
+        "btn-2": {
+          "type": "button",
+          "settings": {
+            "label": "Kollektion ansehen",
+            "url": "#shopify-section-featured_collection",
+            "style": "secondary"
+          }
+        },
+        "pill-1": {
+          "type": "trust_pill",
+          "settings": {
+            "text": "Manufaktur · Made in Austria"
+          }
+        },
+        "pill-2": {
+          "type": "rating_pill",
+          "settings": {
+            "rating_score": "4,9",
+            "rating_count": "1.240 Bewertungen"
+          }
+        },
         "card-1": {
           "type": "bento_card",
           "settings": {
@@ -68,6 +97,10 @@
         }
       },
       "block_order": [
+        "btn-1",
+        "btn-2",
+        "pill-1",
+        "pill-2",
         "card-1",
         "card-2",
         "card-3",
@@ -79,14 +112,7 @@
         "hero_image": "shopify://shop_images/hero-section-banner.png",
         "hero_sub": "Personalisierte Gebetsteppiche",
         "hero_heading": "<p>Ein Name. <em>Ein Gebet.</em> Ein Geschenk fürs Leben.</p>",
-        "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt.",
-        "button1_label": "Jetzt personalisieren",
-        "button1_url": "/products/gebetsteppich",
-        "button2_label": "Kollektion ansehen",
-        "button2_url": "#shopify-section-featured_collection",
-        "eyebrow_text": "Manufaktur · Made in Austria",
-        "rating_score": "4,9",
-        "rating_count": "1.240 Bewertungen"
+        "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt."
       }
     },
     "featured_collection": {

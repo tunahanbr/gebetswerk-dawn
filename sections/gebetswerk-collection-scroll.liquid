@@ -6,7 +6,7 @@
   assign suffix = section.settings.name_suffix | default: '· Geschenk'
 -%}
 
-<section class="gw-cscroll" id="shopify-section-featured_collection">
+<section class="gw-cscroll" id="gw-cscroll-{{ section.id }}">
 
   <div class="gw-cscroll__header">
     <div class="gw-cscroll__header-inner">
@@ -217,20 +217,27 @@
 
 <script>
 (function() {
-  var wrap  = document.querySelector('#shopify-section-featured_collection .gw-cscroll__track-wrap');
+  var root  = document.getElementById('gw-cscroll-{{ section.id }}');
+  var wrap  = root && root.querySelector('.gw-cscroll__track-wrap');
   var prev  = document.getElementById('gw-prev-{{ section.id }}');
   var next  = document.getElementById('gw-next-{{ section.id }}');
   if (!wrap || !prev || !next) return;
 
-  var STEP = 260; // card width + gap
+  function step() {
+    var track = wrap.querySelector('.gw-cscroll__track');
+    var card  = track && track.querySelector('.gw-cscroll__card');
+    if (!card) return 780;
+    var gap = track ? parseInt(getComputedStyle(track).columnGap) || 16 : 16;
+    return (card.offsetWidth + gap) * 3;
+  }
 
   function update() {
     prev.disabled = wrap.scrollLeft <= 1;
     next.disabled = wrap.scrollLeft >= wrap.scrollWidth - wrap.clientWidth - 1;
   }
 
-  prev.addEventListener('click', function() { wrap.scrollBy({ left: -STEP * 3, behavior: 'smooth' }); });
-  next.addEventListener('click', function() { wrap.scrollBy({ left:  STEP * 3, behavior: 'smooth' }); });
+  prev.addEventListener('click', function() { wrap.scrollBy({ left: -step(), behavior: 'smooth' }); });
+  next.addEventListener('click', function() { wrap.scrollBy({ left:  step(), behavior: 'smooth' }); });
   wrap.addEventListener('scroll', update, { passive: true });
   update();
 })();

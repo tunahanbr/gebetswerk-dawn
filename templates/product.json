@@ -12,6 +12,20 @@
     "main": {
       "type": "gebetswerk-main-product",
       "blocks": {
+        "ship-1": {
+          "type": "shipping_row",
+          "settings": {
+            "icon": "truck",
+            "text": "Österreich kostenlos · Deutschland kostenlos ab 100 €"
+          }
+        },
+        "ship-2": {
+          "type": "shipping_row",
+          "settings": {
+            "icon": "package",
+            "text": "3–5 Werktage Lieferzeit · Geschenkverpackung optional"
+          }
+        },
         "thread-gold": {
           "type": "thread_color",
           "settings": {
@@ -164,6 +178,8 @@
         }
       },
       "block_order": [
+        "ship-1",
+        "ship-2",
         "thread-gold",
         "thread-silver",
         "thread-white",
@@ -187,10 +203,6 @@
         "personalize_title": "Gebetsteppich personalisieren?",
         "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
         "badge_text": "Personalisiertes Set",
-        "review_display": "2.627 Bewertungen",
-        "review_count_number": 2627,
-        "shipping_row1": "Österreich kostenlos · Deutschland kostenlos ab 100 €",
-        "shipping_row2": "3–5 Werktage Lieferzeit · Geschenkverpackung optional",
         "inventory_threshold": 10,
         "price_name1": 1000,
         "price_name2": 1500,

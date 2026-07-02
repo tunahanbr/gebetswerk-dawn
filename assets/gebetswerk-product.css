@@ -118,6 +118,7 @@
 }
 .gw-product__price-original { font-size: 14px; color: var(--gw-muted); text-decoration: line-through; }
 
+.gw-product__urgency[hidden] { display: none; }
 .gw-product__urgency {
   display: flex;
   align-items: center;
@@ -398,6 +399,26 @@
 }
 .gw-add-to-cart:hover { background: #b8871f; box-shadow: 0 6px 20px rgba(200,155,60,0.45); color: #fff; }
 .gw-add-to-cart:disabled { opacity: 0.5; cursor: not-allowed; }
+.gw-add-to-cart.is-success,
+.gw-add-to-cart.is-success:disabled {
+  background: var(--gw-success, #2D6A4F);
+  color: #fff;
+  opacity: 1;
+  cursor: default;
+  box-shadow: none;
+}
+
+.gw-cart-error {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #FBEDEA;
+  border: 1px solid #E8C4BC;
+  color: #A13E2C;
+  font-family: var(--gw-font-body);
+  font-size: 13px;
+  line-height: 1.4;
+}
 
 .gw-buy-now-btn {
   display: flex;

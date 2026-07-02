@@ -11,6 +11,7 @@
   --gw-gold:        #C89B3C;
   --gw-gold-soft:   #F0E6C8;
   --gw-gold-deep:   #8A6820;
+  --gw-success:     #2D6A4F;
   --gw-muted:       #7A6F65;
   --gw-border:      #DDD8D0;
   --gw-radius-card: 20px;
@@ -467,19 +468,19 @@ body.gw-home { background: #fff !important; }
   font-weight: 400;
   letter-spacing: -0.02em;
 }
-/* Nav links */
+/* Nav links — folgen dem Farbschema des Headers (hell auf dunkel, dunkel auf hell) */
 .header__menu-item,
 .header__menu-item .link,
 .list-menu__item {
   font-family: var(--gw-font-body) !important;
   font-size: 14px !important;
   font-weight: 400;
-  color: rgba(26,22,19,0.75) !important;
+  color: rgba(var(--color-foreground), 0.75) !important;
   letter-spacing: 0;
 }
 .header__menu-item:hover .link,
 .list-menu__item:hover {
-  color: var(--gw-ink) !important;
+  color: rgb(var(--color-foreground)) !important;
 }
 /* Cart icon badge */
 .cart-count-bubble {

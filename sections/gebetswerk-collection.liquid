@@ -39,7 +39,6 @@
     <div class="gw-col-grid">
 
       {%- if col != blank -%}
-        {%- assign card_count = 0 -%}
         {%- assign limit = section.settings.products_per_page | default: 24 -%}
 
         {%- paginate col.products by limit -%}
@@ -55,8 +54,6 @@
 
           {%- if color_opt != nil -%}
             {%- for color_val in color_opt.values -%}
-              {%- if card_count >= limit -%}{%- break -%}{%- endif -%}
-
               {%- assign card_variant = nil -%}
               {%- for v in product.variants -%}
                 {%- if v.options contains color_val -%}
@@ -108,12 +105,11 @@
                 </a>
 
               </article>
-
-              {%- assign card_count = card_count | plus: 1 -%}
             {%- endfor -%}
 
           {%- else -%}
-            <a href="{{ product.url }}" class="gw-col-card" aria-label="{{ product.title | escape }}">
+            <article class="gw-col-card">
+              <a href="{{ product.url }}" class="gw-col-card__link" aria-label="{{ product.title | escape }}">
               <div class="gw-col-card__img-wrap">
                 {%- if product.featured_media -%}
                   <img src="{{ product.featured_media | image_url: width: 700 }}" alt="{{ product.featured_media.alt | escape }}" width="700" height="{{ 700 | divided_by: product.featured_media.aspect_ratio | round }}" loading="lazy">
@@ -136,8 +132,8 @@
                   {%- if product.price_varies -%}ab {% endif %}{{ product.price | money }}
                 </p>
               </div>
-            </a>
-            {%- assign card_count = card_count | plus: 1 -%}
+              </a>
+            </article>
           {%- endif -%}
 
         {%- endfor -%}

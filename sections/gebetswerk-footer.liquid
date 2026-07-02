@@ -45,20 +45,17 @@
         {%- endif -%}
       </div>
 
-      {%- comment -%} Nav columns {%- endcomment -%}
+      {%- comment -%} Nav: 'column' startet eine neue Spalte, alle 'link'-Blöcke bis zur nächsten Spalte gehören dazu {%- endcomment -%}
       <div class="gw-footer__nav-grid">
         {%- for block in section.blocks -%}
-          {%- if block.type == 'nav_column' -%}
+          {%- if block.type == 'column' -%}
             <div {{ block.shopify_attributes }}>
               <p class="gw-footer__nav-heading">{{ block.settings.heading }}</p>
               <ul class="gw-footer__nav-list">
-                {%- for i in (1..5) -%}
-                  {%- assign label_key = 'link_' | append: i | append: '_label' -%}
-                  {%- assign url_key   = 'link_' | append: i | append: '_url' -%}
-                  {%- assign label = block.settings[label_key] -%}
-                  {%- assign url   = block.settings[url_key] -%}
-                  {%- if label != blank -%}
-                    <li><a href="{{ url | default: '#' }}">{{ label }}</a></li>
+                {%- for inner in section.blocks offset: forloop.index -%}
+                  {%- if inner.type == 'column' -%}{%- break -%}{%- endif -%}
+                  {%- if inner.type == 'link' and inner.settings.label != blank -%}
+                    <li {{ inner.shopify_attributes }}><a href="{{ inner.settings.url | default: '#' }}">{{ inner.settings.label }}</a></li>
                   {%- endif -%}
                 {%- endfor -%}
               </ul>
@@ -210,25 +207,27 @@
   ],
   "blocks": [
     {
-      "type": "nav_column",
-      "name": "Nav-Spalte",
+      "type": "column",
+      "name": "📁 Spalte",
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Startet eine neue Link-Spalte. Alle 'Link'-Blöcke darunter gehören zu dieser Spalte."
+        },
         {
           "type": "text",
           "id": "heading",
           "label": "Überschrift",
           "default": "Shop"
-        },
-        { "type": "text", "id": "link_1_label", "label": "Link 1 – Text" },
-        { "type": "url",  "id": "link_1_url",   "label": "Link 1 – URL" },
-        { "type": "text", "id": "link_2_label", "label": "Link 2 – Text" },
-        { "type": "url",  "id": "link_2_url",   "label": "Link 2 – URL" },
-        { "type": "text", "id": "link_3_label", "label": "Link 3 – Text" },
-        { "type": "url",  "id": "link_3_url",   "label": "Link 3 – URL" },
-        { "type": "text", "id": "link_4_label", "label": "Link 4 – Text" },
-        { "type": "url",  "id": "link_4_url",   "label": "Link 4 – URL" },
-        { "type": "text", "id": "link_5_label", "label": "Link 5 – Text" },
-        { "type": "url",  "id": "link_5_url",   "label": "Link 5 – URL" }
+        }
+      ]
+    },
+    {
+      "type": "link",
+      "name": "🔗 Link",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Text", "default": "Neuer Link" },
+        { "type": "url",  "id": "url",   "label": "URL" }
       ]
     }
   ],
@@ -236,37 +235,14 @@
     {
       "name": "Footer – Gebetswerk",
       "blocks": [
-        {
-          "type": "nav_column",
-          "settings": {
-            "heading": "Shop",
-            "link_1_label": "Gebetsteppiche", "link_1_url": "/collections/all",
-            "link_2_label": "Sets",           "link_2_url": "/collections/all",
-            "link_3_label": "Gebetsketten",   "link_3_url": "/collections/all",
-            "link_4_label": "Geschenkkarten", "link_4_url": "/collections/all"
-          }
-        },
-        {
-          "type": "nav_column",
-          "settings": {
-            "heading": "Service",
-            "link_1_label": "Versand & Lieferung", "link_1_url": "/pages/versand",
-            "link_2_label": "Rückgabe",            "link_2_url": "/pages/rueckgabe",
-            "link_3_label": "FAQ",                 "link_3_url": "/pages/faq",
-            "link_4_label": "Kontakt",             "link_4_url": "/pages/contact"
-          }
-        },
-        {
-          "type": "nav_column",
-          "settings": {
-            "heading": "Über",
-            "link_1_label": "Unsere Geschichte", "link_1_url": "/pages/about",
-            "link_2_label": "Manufaktur",        "link_2_url": "/pages/about",
-            "link_3_label": "Impressum",         "link_3_url": "/pages/impressum",
-            "link_4_label": "AGB",               "link_4_url": "/pages/agb",
-            "link_5_label": "Datenschutz",       "link_5_url": "/pages/datenschutz"
-          }
-        }
+        { "type": "column", "settings": { "heading": "Shop" } },
+        { "type": "link", "settings": { "label": "Gebetsteppiche", "url": "/collections/all" } },
+        { "type": "link", "settings": { "label": "Gebetsketten",   "url": "/collections/all" } },
+        { "type": "column", "settings": { "heading": "Service" } },
+        { "type": "link", "settings": { "label": "FAQ",     "url": "/pages/faq" } },
+        { "type": "link", "settings": { "label": "Kontakt", "url": "/pages/contact" } },
+        { "type": "column", "settings": { "heading": "Über" } },
+        { "type": "link", "settings": { "label": "Unsere Geschichte", "url": "/pages/about" } }
       ]
     }
   ]
