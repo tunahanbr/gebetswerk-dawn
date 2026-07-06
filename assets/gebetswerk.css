@@ -144,6 +144,12 @@ body.gw-home { background: #fff !important; }
 .section-header:not(.scrolled-past-header) .header-wrapper--overlay-light {
   --color-foreground: 249, 246, 240;
 }
+/* Das Such-Modal (und die Sofort-Suche darin) liegt im Header-Wrapper und
+   würde die weiße Overlay-Schrift erben → weißer Text auf weißem Modal.
+   Hier zurück auf dunkle Schrift. */
+.section-header:not(.scrolled-past-header) .header-wrapper--overlay-light .search-modal {
+  --color-foreground: 26, 22, 19;
+}
 .section-header:not(.scrolled-past-header) .header-wrapper--overlay-dark {
   --color-foreground: 26, 22, 19;
 }

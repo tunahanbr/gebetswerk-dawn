@@ -272,6 +272,14 @@
 .gw-symbol-btn.is-active { border-color: var(--gw-ink); }
 .gw-symbol-btn:hover:not(.is-active) { border-color: var(--gw-muted); }
 .gw-symbol-btn__icon { font-size: 20px; line-height: 1; color: var(--gw-gold); }
+/* Kontur für helle Schriftfarben (Weiß/Silber) — sonst unsichtbar auf Weiß */
+.gw-symbol-icon--outlined {
+  text-shadow:
+    -1px 0 0 rgba(26,22,19,0.45),
+    1px 0 0 rgba(26,22,19,0.45),
+    0 -1px 0 rgba(26,22,19,0.45),
+    0 1px 0 rgba(26,22,19,0.45);
+}
 .gw-symbol-btn__label { font-size: 10px; color: var(--gw-muted); }
 
 .gw-sympos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }

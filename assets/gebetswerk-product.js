@@ -883,8 +883,19 @@
   }
 
   function updateSymbols() {
+    /* Helle Schriftfarben (z. B. Weiß) wären auf dem weißen Button unsichtbar
+       → dunkle Kontur dazuschalten */
+    const hex = (state.threadHex || '').replace('#', '');
+    let isLight = false;
+    if (hex.length >= 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      isLight = (0.299 * r + 0.587 * g + 0.114 * b) > 186;
+    }
     document.querySelectorAll('[data-symbol] .gw-symbol-btn__icon').forEach(el => {
       el.style.color = state.threadHex;
+      el.classList.toggle('gw-symbol-icon--outlined', isLight);
     });
   }
 

@@ -1433,7 +1433,7 @@
       {
         "type": "text",
         "id": "search_hidden_handles",
-        "default": "aufpreise, gebetskette",
+        "default": "aufpreise",
         "label": "Versteckte Produkte (Handles)",
         "info": "Kommagetrennte Produkt-Handles (URL-Namen), die nie in Suchergebnissen erscheinen sollen — z. B. interne Aufpreis-Produkte. Zusätzlich wird jedes Produkt mit dem Tag „gw-hidden“ ausgeblendet."
       }
