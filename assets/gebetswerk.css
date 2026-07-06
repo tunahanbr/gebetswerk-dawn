@@ -172,7 +172,8 @@ body.gw-home { background: #fff !important; }
    Beim Scrollen (sticky, top:0) wird der Abstand ignoriert. */
 .section-header:has(.header-wrapper--overlay) { margin-top: var(--gw-frame); }
 
-.gw-hero__main img {
+.gw-hero__main img,
+.gw-hero__main video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -180,7 +181,8 @@ body.gw-home { background: #fff !important; }
   object-fit: cover;
   transition: transform 1.2s ease;
 }
-.gw-hero__main:hover img { transform: scale(1.03); }
+.gw-hero__main:hover img,
+.gw-hero__main:hover video { transform: scale(1.03); }
 
 .gw-hero__gradient {
   position: absolute;

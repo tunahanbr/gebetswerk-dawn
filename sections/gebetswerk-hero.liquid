@@ -3,7 +3,17 @@
 
     {%- comment -%} Big hero card {%- endcomment -%}
     <div class="gw-hero__main">
-      {%- if section.settings.hero_image != blank -%}
+      {%- if section.settings.hero_video != blank -%}
+        {{ section.settings.hero_video | video_tag:
+          autoplay: true,
+          loop: true,
+          muted: true,
+          controls: false,
+          playsinline: true,
+          preload: 'auto',
+          class: 'gw-hero__video'
+        }}
+      {%- elsif section.settings.hero_image != blank -%}
         <img
           src="{{ section.settings.hero_image | image_url: width: 2000 }}"
           srcset="{{ section.settings.hero_image | image_url: width: 750 }} 750w,
@@ -176,6 +186,12 @@
       "id": "hero_image",
       "label": "Hintergrundbild",
       "info": "Empfohlen: mind. 2000 px breit"
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Hintergrundvideo (optional)",
+      "info": "Hat Vorrang vor dem Bild. Läuft automatisch, stumm und in Schleife."
     },
     {
       "type": "text",
