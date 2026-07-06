@@ -215,6 +215,12 @@
       <span class="gw-giftwrap-label">
         {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
         {{ block.settings.label }}
+        {%- if block.settings.tooltip != blank -%}
+          <span class="gw-info-tip">
+            <button type="button" class="gw-info-tip__btn" aria-expanded="false" aria-label="Mehr Informationen zu {{ block.settings.label | escape }}">?</button>
+            <span class="gw-info-tip__bubble" role="tooltip">{{ block.settings.tooltip | escape | newline_to_br }}</span>
+          </span>
+        {%- endif -%}
         {%- if block.settings.description != blank -%}
           <span class="gw-addon-description">{{ block.settings.description }}</span>
         {%- endif -%}

@@ -102,6 +102,54 @@
     ]
   },
   {
+    "name": "🎨 Gebetswerk – Farben",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Diese Farben gelten für alle Gebetswerk-Bereiche (Startseite, Produktseite, Warenkorb, Footer). Die 'Farbschemata' oben betreffen nur Standard-Dawn-Elemente wie die Navigationsleiste."
+      },
+      {
+        "type": "color",
+        "id": "gw_color_background",
+        "label": "Hintergrund",
+        "default": "#F9F6F0"
+      },
+      {
+        "type": "color",
+        "id": "gw_color_surface",
+        "label": "Flächen & Karten",
+        "default": "#EDE8DF",
+        "info": "z. B. Info-Boxen, Bestellübersicht"
+      },
+      {
+        "type": "color",
+        "id": "gw_color_text",
+        "label": "Textfarbe",
+        "default": "#1A1613"
+      },
+      {
+        "type": "color",
+        "id": "gw_color_text_muted",
+        "label": "Sekundäre Textfarbe",
+        "default": "#7A6F65",
+        "info": "Beschreibungen, Hinweise, kleinere Texte"
+      },
+      {
+        "type": "color",
+        "id": "gw_color_accent",
+        "label": "Akzentfarbe (Gold)",
+        "default": "#C89B3C",
+        "info": "Buttons, Sterne, Preise, Hervorhebungen"
+      },
+      {
+        "type": "color",
+        "id": "gw_color_border",
+        "label": "Rahmen & Linien",
+        "default": "#DDD8D0"
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.typography.name",
     "settings": [
       {
@@ -1381,6 +1429,13 @@
         "default": false,
         "label": "t:settings_schema.search_input.settings.predictive_search_show_price.label",
         "info": "t:settings_schema.search_input.settings.predictive_search_show_price.info"
+      },
+      {
+        "type": "text",
+        "id": "search_hidden_handles",
+        "default": "aufpreise, gebetskette",
+        "label": "Versteckte Produkte (Handles)",
+        "info": "Kommagetrennte Produkt-Handles (URL-Namen), die nie in Suchergebnissen erscheinen sollen — z. B. interne Aufpreis-Produkte. Zusätzlich wird jedes Produkt mit dem Tag „gw-hidden“ ausgeblendet."
       }
     ]
   },
@@ -1440,6 +1495,13 @@
         "label": "Kostenloser Versand ab (DE & AT)",
         "default": 8000,
         "info": "Betrag in Cent. Darunter 4,99 € Versand. Beispiel: 8000 = 80,00 €. Die tatsächlichen Versandtarife musst du zusätzlich im Shopify-Admin unter Versand einrichten."
+      },
+      {
+        "type": "textarea",
+        "id": "shipping_countries_info",
+        "label": "Versandkosten je Land",
+        "default": "Deutschland: 4,99 € — kostenlos ab 80 €\nÖsterreich: kostenlos",
+        "info": "Eine Zeile pro Land, Format „Land: Kosten“. Wird im Warenkorb und im Warenkorb-Drawer unter „Versandkosten je Land“ angezeigt, da das Zielland erst im Checkout bekannt ist. Muss zu den Versandtarifen im Shopify-Admin passen."
       },
       {
         "type": "header",

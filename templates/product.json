@@ -144,6 +144,7 @@
             "label": "Expressanfertigung",
             "icon": "⚡",
             "description": "Bevorzugte Fertigung & schnellerer Versand",
+            "tooltip": "Deine Bestellung wird bevorzugt gefertigt und vor allen regulären Bestellungen bearbeitet. Dadurch verkürzt sich die Lieferzeit deutlich.",
             "field_key": "Expressanfertigung",
             "default_checked": false,
             "surcharge_cents": 1000,

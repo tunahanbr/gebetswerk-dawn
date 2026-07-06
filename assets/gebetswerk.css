@@ -24,13 +24,20 @@
 }
 
 /* ── Base overrides ───────────────────────────────────────── */
+/* Horizontalen Scroll (seitliches Wischen auf Mobil) komplett unterbinden.
+   Muss auch auf html liegen: body-Overflow propagiert nicht in allen Browsern
+   zum Viewport. `hidden` als Fallback für Safari < 16, das `clip` nicht kennt;
+   clip erzeugt keinen Scroll-Container und bricht daher position:sticky nicht. */
+html {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
 body {
   background-color: var(--gw-ivory) !important;
   color: var(--gw-ink) !important;
   font-family: var(--gw-font-body);
   -webkit-font-smoothing: antialiased;
-  /* Verhindert ungewollten horizontalen Scroll (z.B. auf Mobil) ohne
-     position:sticky zu brechen — clip erzeugt keinen Scroll-Container. */
+  overflow-x: hidden;
   overflow-x: clip;
 }
 /* Startseite: weißer Seiten-Hintergrund → der Rahmen rund um den Hero ist weiß.

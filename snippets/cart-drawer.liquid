@@ -162,6 +162,9 @@
                             {{- item.product.title | escape -}}
                           </a>
 
+                          {%- comment -%} Einzelpreis unter dem Titel bewusst entfernt —
+                              schafft Platz für die Personalisierungs-Liste, der
+                              Gesamtpreis steht rechts in der Preisspalte {%- endcomment -%}
                           {%- if item.original_price != item.final_price -%}
                             <div class="cart-item__discounted-prices">
                               <span class="visually-hidden">
@@ -176,10 +179,6 @@
                               <strong class="cart-item__final-price product-option">
                                 {{ item.final_price | money }}
                               </strong>
-                            </div>
-                          {%- else -%}
-                            <div class="product-option">
-                              {{ item.original_price | money }}
                             </div>
                           {%- endif -%}
 
@@ -220,91 +219,14 @@
                             <p class="product-option">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>
                           {%- endif -%}
 
-                          {%- if item.properties['Schriftfarbe'] != blank -%}
-                            <p class="product-option">Schriftfarbe: {{ item.properties['Schriftfarbe'] | escape }}</p>
-                          {%- endif -%}
-
-                          {%- for addon in cart.items -%}
-                            {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == 'Name 1' -%}{%- continue -%}{%- endunless -%}
-                            {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
-                            {%- assign addon_ref = addon.properties['_ref'] | default: '' -%}
-                            {%- assign matches_current_item = false -%}
-                            {%- if item_ref != blank and addon_ref == item_ref -%}
-                              {%- assign matches_current_item = true -%}
-                            {%- elsif item_ref == blank -%}
-                              {%- if tv == item_vid -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- elsif tv == '' and item.index == last_rug_index -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- endif -%}
-                            {%- endif -%}
-                            {%- if matches_current_item -%}
-                              {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
-                              <div class="gw-cart-addon-inline">1. Name{%- if addon_name != '' -%} · {{ addon_name | escape }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
-                            {%- endif -%}
-                          {%- endfor -%}
-
-                          {%- for addon in cart.items -%}
-                            {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == '2. Name' -%}{%- continue -%}{%- endunless -%}
-                            {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
-                            {%- assign addon_ref = addon.properties['_ref'] | default: '' -%}
-                            {%- assign matches_current_item = false -%}
-                            {%- if item_ref != blank and addon_ref == item_ref -%}
-                              {%- assign matches_current_item = true -%}
-                            {%- elsif item_ref == blank -%}
-                              {%- if tv == item_vid -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- elsif tv == '' and item.index == last_rug_index -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- endif -%}
-                            {%- endif -%}
-                            {%- if matches_current_item -%}
-                              {%- assign addon_name = addon.properties['_Name'] | default: '' -%}
-                              <div class="gw-cart-addon-inline">2. Name{%- if addon_name != '' -%} · {{ addon_name | escape }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
-                            {%- endif -%}
-                          {%- endfor -%}
-
-                          {%- for addon in cart.items -%}
-                            {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == 'Symbol' -%}{%- continue -%}{%- endunless -%}
-                            {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
-                            {%- assign addon_ref = addon.properties['_ref'] | default: '' -%}
-                            {%- assign matches_current_item = false -%}
-                            {%- if item_ref != blank and addon_ref == item_ref -%}
-                              {%- assign matches_current_item = true -%}
-                            {%- elsif item_ref == blank -%}
-                              {%- if tv == item_vid -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- elsif tv == '' and item.index == last_rug_index -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- endif -%}
-                            {%- endif -%}
-                            {%- if matches_current_item -%}
-                              {%- assign sym_type = item.properties['Symbol'] | default: '' -%}
-                              <div class="gw-cart-addon-inline">Symbol{%- if sym_type != '' -%} · {{ sym_type | escape }}{%- endif -%}<span>+{{ addon.final_line_price | money }}</span></div>
-                            {%- endif -%}
-                          {%- endfor -%}
-
-                          {%- if item.properties['Symbolposition'] != blank -%}
-                            <p class="product-option">Symbolposition: {{ item.properties['Symbolposition'] | escape }}</p>
-                          {%- endif -%}
-
-                          {%- for addon in cart.items -%}
-                            {%- unless addon.properties['_TeppichVariant'] != blank and addon.variant.title == 'Geschenkverpackung' -%}{%- continue -%}{%- endunless -%}
-                            {%- assign tv = addon.properties['_TeppichVariant'] | default: '' -%}
-                            {%- assign addon_ref = addon.properties['_ref'] | default: '' -%}
-                            {%- assign matches_current_item = false -%}
-                            {%- if item_ref != blank and addon_ref == item_ref -%}
-                              {%- assign matches_current_item = true -%}
-                            {%- elsif item_ref == blank -%}
-                              {%- if tv == item_vid -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- elsif tv == '' and item.index == last_rug_index -%}
-                                {%- assign matches_current_item = true -%}
-                              {%- endif -%}
-                            {%- endif -%}
-                            {%- if matches_current_item -%}
-                              <div class="gw-cart-addon-inline">Geschenkschleife<span>+{{ addon.final_line_price | money }}</span></div>
-                            {%- endif -%}
+                          {%- comment -%} Alle Personalisierungen generisch listen (ohne Preise) —
+                              gleiche Logik wie auf der Warenkorb-Seite: jede Property,
+                              die nicht mit „_“ beginnt (Name 1, Schriftfarbe, Symbol,
+                              Symbolposition, Expressanfertigung, Gebetskette, …) {%- endcomment -%}
+                          {%- for p in item.properties -%}
+                            {%- unless p.first == blank or p.first contains '_' or p.last == blank -%}
+                              <p class="product-option gw-drawer-prop">{{ p.first | escape }}: <strong>{{ p.last | escape }}</strong></p>
+                            {%- endunless -%}
                           {%- endfor -%}
 
                           <ul
@@ -466,6 +388,20 @@
             <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
             <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
           </div>
+
+          {%- comment -%} Versandkosten je Land — Zielland ist erst im Checkout bekannt {%- endcomment -%}
+          {%- if settings.shipping_countries_info != blank -%}
+            <details class="gw-drawer-shipinfo">
+              <summary>Versandkosten je Land</summary>
+              <ul>
+                {%- assign gw_ship_lines = settings.shipping_countries_info | newline_to_br | split: '<br />' -%}
+                {%- for line in gw_ship_lines -%}
+                  {%- assign gw_ship_line = line | strip_newlines | strip -%}
+                  {%- if gw_ship_line != blank -%}<li>{{ gw_ship_line }}</li>{%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- endif -%}
 
           <small class="tax-note caption-large rte">
             {%- if cart.duties_included and cart.taxes_included -%}

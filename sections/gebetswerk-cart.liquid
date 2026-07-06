@@ -139,10 +139,25 @@
                 {%- if cart.total_price >= free_shipping_de_threshold -%}
                   <span class="gw-cart-summary__free">{{ section.settings.shipping_free_label | default: 'Kostenlos 🎉' }}</span>
                 {%- else -%}
-                  {{ section.settings.shipping_price_text | default: '4,99 €' }}
+                  {{ section.settings.shipping_price_text | default: 'Wird im Checkout berechnet' }}
                 {%- endif -%}
               </span>
             </div>
+
+            {%- comment -%} Das Zielland ist erst im Checkout bekannt — deshalb hier
+                die Kosten je Land transparent aufklappbar (Theme-Einstellungen → Warenkorb) {%- endcomment -%}
+            {%- if settings.shipping_countries_info != blank -%}
+              <details class="gw-cart-shipinfo">
+                <summary>{{ section.settings.shipinfo_label | default: 'Versandkosten je Land' }}</summary>
+                <ul>
+                  {%- assign gw_ship_lines = settings.shipping_countries_info | newline_to_br | split: '<br />' -%}
+                  {%- for line in gw_ship_lines -%}
+                    {%- assign gw_ship_line = line | strip_newlines | strip -%}
+                    {%- if gw_ship_line != blank -%}<li>{{ gw_ship_line }}</li>{%- endif -%}
+                  {%- endfor -%}
+                </ul>
+              </details>
+            {%- endif -%}
           </div>
 
           {%- if cart.total_price < free_shipping_de_threshold -%}
@@ -285,7 +300,8 @@
     { "type": "text", "id": "summary_title", "label": "Überschrift", "default": "Bestellübersicht" },
     { "type": "text", "id": "subtotal_label", "label": "Zwischensumme-Label", "default": "Zwischensumme" },
     { "type": "text", "id": "shipping_label", "label": "Versand-Label", "default": "Versand" },
-    { "type": "text", "id": "shipping_price_text", "label": "Versandkosten (Anzeige)", "default": "4,99 €", "info": "Nur Anzeige — die echten Versandkosten kommen aus den Shopify-Versandeinstellungen" },
+    { "type": "text", "id": "shipping_price_text", "label": "Versandkosten (Anzeige)", "default": "Wird im Checkout berechnet", "info": "Nur Anzeige — die echten Versandkosten kommen aus den Shopify-Versandeinstellungen. Das Zielland ist erst im Checkout bekannt." },
+    { "type": "text", "id": "shipinfo_label", "label": "Label der Länder-Aufklappliste", "default": "Versandkosten je Land", "info": "Die Länder-Liste selbst pflegst du unter Theme-Einstellungen → Warenkorb → „Versandkosten je Land“" },
     { "type": "text", "id": "shipping_free_label", "label": "Text bei kostenlosem Versand", "default": "Kostenlos 🎉" },
     { "type": "text", "id": "total_label", "label": "Gesamt-Label", "default": "Gesamt" },
     { "type": "text", "id": "tax_note", "label": "Steuer-Hinweis", "default": "inkl. MwSt." },

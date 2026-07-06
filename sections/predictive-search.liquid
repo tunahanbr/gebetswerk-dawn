@@ -129,7 +129,12 @@
               role="group"
               aria-labelledby="predictive-search-products"
             >
+              {%- assign gw_hidden_handles = settings.search_hidden_handles | default: '' | downcase | replace: ' ', '' | prepend: ',' | append: ',' -%}
               {%- for product in predictive_search.resources.products -%}
+                {%- assign gw_handle_token = product.handle | prepend: ',' | append: ',' -%}
+                {%- if gw_hidden_handles contains gw_handle_token or product.tags contains 'gw-hidden' -%}
+                  {%- continue -%}
+                {%- endif -%}
                 <li
                   id="predictive-search-option-product-{{ forloop.index }}"
                   class="predictive-search__list-item"

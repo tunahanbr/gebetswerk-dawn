@@ -413,6 +413,18 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
   }
 }
 
+/* Personalisierungs-Liste unter dem Produkttitel (ohne Preise) */
+.cart-drawer .gw-drawer-prop {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin: 0.2rem 0 0;
+  color: rgba(var(--color-foreground), 0.75);
+}
+.cart-drawer .gw-drawer-prop strong {
+  font-weight: 500;
+  color: rgb(var(--color-foreground));
+}
+
 .gw-drawer-freeship {
   background: rgba(var(--color-foreground), 0.04);
   border-radius: 8px;
@@ -440,4 +452,30 @@ cart-drawer-items::-webkit-scrollbar-track-piece {
 .gw-drawer-freeship p {
   font-size: 1.2rem;
   margin: 0;
+}
+
+/* Versandkosten je Land (aufklappbar) */
+.gw-drawer-shipinfo {
+  margin: 0.4rem 0 0.8rem;
+  font-size: 1.2rem;
+}
+.gw-drawer-shipinfo summary {
+  cursor: pointer;
+  color: rgba(var(--color-foreground), 0.75);
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+  list-style: none;
+}
+.gw-drawer-shipinfo summary::-webkit-details-marker { display: none; }
+.gw-drawer-shipinfo[open] summary { margin-bottom: 0.4rem; }
+.gw-drawer-shipinfo ul {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  list-style: none;
+  background: rgba(var(--color-foreground), 0.04);
+  border-radius: 8px;
+}
+.gw-drawer-shipinfo li {
+  padding: 0.2rem 0;
+  color: rgba(var(--color-foreground), 0.85);
 }

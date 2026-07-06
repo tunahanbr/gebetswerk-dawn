@@ -14,84 +14,28 @@
     "gebetswerk_footer": {
       "type": "gebetswerk-footer",
       "blocks": {
-<<<<<<< HEAD
-        "nav-1": {
-          "type": "nav_column",
-          "settings": {
-            "heading": "Shop",
-            "link_1_label": "Alle Produkte",
-            "link_1_url": "/collections/all",
-            "link_2_label": "Gebetsteppiche",
-            "link_2_url": "/collections/all",
-            "link_3_label": "Gebetsketten",
-            "link_3_url": "/collections/all",
-            "link_4_label": "Personalisierung",
-            "link_4_url": "/products/gebetsteppich",
-            "link_5_label": "",
-            "link_5_url": ""
-          }
-        },
-        "nav-2": {
-          "type": "nav_column",
-          "settings": {
-            "heading": "Hilfe",
-            "link_1_label": "Kontakt",
-            "link_1_url": "/pages/contact",
-            "link_2_label": "FAQ",
-            "link_2_url": "/#shopify-section-gebetswerk_faq",
-            "link_3_label": "Versand & Lieferung",
-            "link_3_url": "/policies/shipping-policy",
-            "link_4_label": "Rückgabe & Widerruf",
-            "link_4_url": "/policies/refund-policy",
-            "link_5_label": "Über uns",
-            "link_5_url": "/pages/about"
-          }
-        },
-        "nav-3": {
-          "type": "nav_column",
-          "settings": {
-            "heading": "Rechtliches",
-            "link_1_label": "Impressum",
-            "link_1_url": "/policies/legal-notice",
-            "link_2_label": "Datenschutzerklärung",
-            "link_2_url": "/policies/privacy-policy",
-            "link_3_label": "AGB",
-            "link_3_url": "/policies/terms-of-service",
-            "link_4_label": "Widerrufsrecht",
-            "link_4_url": "/policies/refund-policy",
-            "link_5_label": "Cookie-Einstellungen",
-            "link_5_url": "#shopifyReshowConsentBanner"
-          }
-        }
-      },
-      "block_order": [
-        "nav-1",
-        "nav-2",
-        "nav-3"
-=======
         "col-shop": { "type": "column", "settings": { "heading": "Shop" } },
-        "shop-1": { "type": "link", "settings": { "label": "Alle Produkte",    "url": "/collections/all" } },
-        "shop-2": { "type": "link", "settings": { "label": "Gebetsteppiche",   "url": "/collections/all" } },
-        "shop-3": { "type": "link", "settings": { "label": "Gebetsketten",     "url": "/collections/all" } },
+        "shop-1": { "type": "link", "settings": { "label": "Alle Produkte", "url": "/collections/all" } },
+        "shop-2": { "type": "link", "settings": { "label": "Gebetsteppiche", "url": "/collections/all" } },
+        "shop-3": { "type": "link", "settings": { "label": "Gebetsketten", "url": "/collections/all" } },
         "shop-4": { "type": "link", "settings": { "label": "Personalisierung", "url": "/products/gebetsteppich" } },
         "col-hilfe": { "type": "column", "settings": { "heading": "Hilfe" } },
-        "hilfe-1": { "type": "link", "settings": { "label": "Kontakt",             "url": "/pages/contact" } },
-        "hilfe-2": { "type": "link", "settings": { "label": "FAQ",                 "url": "/#shopify-section-gebetswerk_faq" } },
+        "hilfe-1": { "type": "link", "settings": { "label": "Kontakt", "url": "/pages/contact" } },
+        "hilfe-2": { "type": "link", "settings": { "label": "FAQ", "url": "/#shopify-section-gebetswerk_faq" } },
         "hilfe-3": { "type": "link", "settings": { "label": "Versand & Lieferung", "url": "/policies/shipping-policy" } },
         "hilfe-4": { "type": "link", "settings": { "label": "Rückgabe & Widerruf", "url": "/policies/refund-policy" } },
-        "hilfe-5": { "type": "link", "settings": { "label": "Über uns",            "url": "/pages/about" } },
+        "hilfe-5": { "type": "link", "settings": { "label": "Über uns", "url": "/pages/about" } },
         "col-recht": { "type": "column", "settings": { "heading": "Rechtliches" } },
-        "recht-1": { "type": "link", "settings": { "label": "Impressum",            "url": "/policies/legal-notice" } },
+        "recht-1": { "type": "link", "settings": { "label": "Impressum", "url": "/policies/legal-notice" } },
         "recht-2": { "type": "link", "settings": { "label": "Datenschutzerklärung", "url": "/policies/privacy-policy" } },
-        "recht-3": { "type": "link", "settings": { "label": "AGB",                  "url": "/policies/terms-of-service" } },
-        "recht-4": { "type": "link", "settings": { "label": "Widerrufsrecht",       "url": "/policies/refund-policy" } },
+        "recht-3": { "type": "link", "settings": { "label": "AGB", "url": "/policies/terms-of-service" } },
+        "recht-4": { "type": "link", "settings": { "label": "Widerrufsrecht", "url": "/policies/refund-policy" } },
         "recht-5": { "type": "link", "settings": { "label": "Cookie-Einstellungen", "url": "#shopifyReshowConsentBanner" } }
       },
       "block_order": [
         "col-shop", "shop-1", "shop-2", "shop-3", "shop-4",
         "col-hilfe", "hilfe-1", "hilfe-2", "hilfe-3", "hilfe-4", "hilfe-5",
         "col-recht", "recht-1", "recht-2", "recht-3", "recht-4", "recht-5"
->>>>>>> ad65129 (Bugfixes + Theme-Editor Rework)
       ],
       "settings": {
         "logo_initials": "GW",

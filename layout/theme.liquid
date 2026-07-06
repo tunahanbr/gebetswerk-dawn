@@ -259,6 +259,19 @@
           font-size: 1.6rem;
         }
       }
+
+      :root {
+        --gw-ivory: {{ settings.gw_color_background | default: '#F9F6F0' }};
+        --gw-ink: {{ settings.gw_color_text | default: '#1A1613' }};
+        --gw-sand: {{ settings.gw_color_surface | default: '#EDE8DF' }};
+        --gw-sand-light: {{ settings.gw_color_surface | default: '#EDE8DF' | color_lighten: 3 }};
+        --gw-gold: {{ settings.gw_color_accent | default: '#C89B3C' }};
+        --gw-gold-soft: {{ settings.gw_color_accent | default: '#C89B3C' | color_lighten: 35 }};
+        --gw-gold-hover: {{ settings.gw_color_accent | default: '#C89B3C' | color_darken: 8 }};
+        --gw-gold-deep: {{ settings.gw_color_accent | default: '#C89B3C' | color_darken: 18 }};
+        --gw-muted: {{ settings.gw_color_text_muted | default: '#7A6F65' }};
+        --gw-border: {{ settings.gw_color_border | default: '#DDD8D0' }};
+      }
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}

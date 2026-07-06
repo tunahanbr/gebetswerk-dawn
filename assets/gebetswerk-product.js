@@ -660,6 +660,23 @@
 
   function init() {
 
+    /* Info-Tooltips (?) — Tap öffnet/schließt, Tap außerhalb schließt */
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.gw-info-tip__btn');
+      document.querySelectorAll('.gw-info-tip.is-open').forEach(tip => {
+        if (!btn || tip !== btn.parentElement) {
+          tip.classList.remove('is-open');
+          tip.querySelector('.gw-info-tip__btn')?.setAttribute('aria-expanded', 'false');
+        }
+      });
+      if (btn) {
+        e.preventDefault();
+        const tip = btn.parentElement;
+        const open = tip.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+    });
+
     /* ATC button → Cart API */
     const atcBtn = $('gw-atc-btn');
     if (atcBtn) atcBtn.addEventListener('click', addToCart);

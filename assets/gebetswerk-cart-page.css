@@ -345,3 +345,23 @@
   display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
 }
 .gw-cart-payment__icon { height: 24px; width: auto; border-radius: 3px; }
+
+/* ── Versandkosten je Land (aufklappbar) ──────────────────── */
+.gw-cart-shipinfo { margin: -6px 0 4px; font-size: 12px; }
+.gw-cart-shipinfo summary {
+  cursor: pointer;
+  color: var(--gw-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  list-style: none;
+}
+.gw-cart-shipinfo summary::-webkit-details-marker { display: none; }
+.gw-cart-shipinfo[open] summary { margin-bottom: 6px; }
+.gw-cart-shipinfo ul {
+  margin: 0;
+  padding: 8px 10px;
+  list-style: none;
+  background: var(--gw-sand-light, #f6f1e7);
+  border-radius: 8px;
+}
+.gw-cart-shipinfo li { padding: 2px 0; color: var(--gw-ink); }

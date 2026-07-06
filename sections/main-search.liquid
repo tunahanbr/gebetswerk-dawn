@@ -257,7 +257,16 @@
                 role="list"
               >
                 {%- assign skip_card_product_styles = false -%}
+                {%- comment -%} Interne Hilfsprodukte (Aufpreise, Gebetskette) nie anzeigen —
+                    pflegbar unter Theme-Einstellungen → Suche {%- endcomment -%}
+                {%- assign gw_hidden_handles = settings.search_hidden_handles | default: '' | downcase | replace: ' ', '' | prepend: ',' | append: ',' -%}
                 {%- for item in search.results -%}
+                  {%- if item.object_type == 'product' -%}
+                    {%- assign gw_handle_token = item.handle | prepend: ',' | append: ',' -%}
+                    {%- if gw_hidden_handles contains gw_handle_token or item.tags contains 'gw-hidden' -%}
+                      {%- continue -%}
+                    {%- endif -%}
+                  {%- endif -%}
                   {% assign lazy_load = false %}
                   {%- if forloop.index > 2 -%}
                     {%- assign lazy_load = true -%}
