@@ -12,6 +12,7 @@
     "gebetswerk_collection": {
       "type": "gebetswerk-collection",
       "settings": {
+        "collection": "gebetsteppiche-neu",
         "eyebrow": "Manufaktur · Made in Europe",
         "heading": "Unsere Gebetsteppiche",
         "description": "Personalisierte Gebetsteppiche mit echter Goldstickerei – gefertigt in unserer Manufaktur.",
