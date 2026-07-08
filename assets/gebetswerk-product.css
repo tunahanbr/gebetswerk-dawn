@@ -271,29 +271,35 @@
 }
 .gw-symbol-btn.is-active { border-color: var(--gw-ink); }
 .gw-symbol-btn:hover:not(.is-active) { border-color: var(--gw-muted); }
-.gw-symbol-btn__icon { font-size: 20px; line-height: 1; color: var(--gw-gold); font-variant-emoji: text; }
-/* Kontur für helle Schriftfarben (Weiß/Silber) — sonst unsichtbar auf Weiß */
+.gw-symbol-btn__icon { font-size: 20px; line-height: 1; color: var(--gw-gold); font-variant-emoji: text; display: inline-flex; }
+.gw-symbol-btn__icon .gw-symbol-svg { width: 24px; height: 24px; display: block; }
+/* Kontur nur bei Weiß — sonst wäre das Symbol auf dem weißen Button unsichtbar.
+   filter statt text-shadow, damit es auch auf den SVG-Icons greift. */
 .gw-symbol-icon--outlined {
-  text-shadow:
-    -1px 0 0 rgba(26,22,19,0.45),
-    1px 0 0 rgba(26,22,19,0.45),
-    0 -1px 0 rgba(26,22,19,0.45),
-    0 1px 0 rgba(26,22,19,0.45);
+  filter:
+    drop-shadow(1px 0 0 rgba(26,22,19,0.55))
+    drop-shadow(-1px 0 0 rgba(26,22,19,0.55))
+    drop-shadow(0 1px 0 rgba(26,22,19,0.55))
+    drop-shadow(0 -1px 0 rgba(26,22,19,0.55));
 }
 .gw-symbol-btn__label { font-size: 10px; color: var(--gw-muted); }
 
-.gw-sympos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+.gw-sympos-grid { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; }
+.gw-sympos-grid .gw-sympos-btn { flex: 1 1 0; min-width: 0; }
 .gw-sympos-btn {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
   border-radius: 10px;
   border: 2px solid var(--gw-border);
-  padding: 10px 12px;
+  padding: 10px 6px;
   cursor: pointer;
   background: #fff;
   font-size: 11px;
+  line-height: 1.2;
   transition: border-color 0.15s;
   font-family: inherit;
   color: var(--gw-ink);
@@ -316,8 +322,9 @@
 .gw-sympos-preview[data-dir="col"] { flex-direction: column; }
 .gw-sympos-preview[data-dir="col-rev"] { flex-direction: column-reverse; }
 .gw-sympos-preview[data-dir="row-rev"] { flex-direction: row-reverse; }
-.gw-sympos-preview__symbol { color: var(--gw-gold); font-size: 13px; font-variant-emoji: text; }
-.gw-sympos-preview__symbol--small { font-size: 11px; }
+.gw-sympos-preview__symbol { color: var(--gw-gold); font-size: 13px; font-variant-emoji: text; display: inline-flex; }
+.gw-sympos-preview__symbol .gw-symbol-svg { width: 14px; height: 14px; display: block; }
+.gw-sympos-preview__symbol--small .gw-symbol-svg { width: 12px; height: 12px; }
 .gw-sympos-preview__name { color: var(--gw-gold); font-size: 11px; }
 .gw-sympos-preview__name--small { font-size: 9px; }
 .gw-sympos-grid--wrap { display: flex; flex-wrap: wrap; gap: 8px; }

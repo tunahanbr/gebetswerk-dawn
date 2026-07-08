@@ -389,7 +389,7 @@
                         data-symbol="{{ block.settings.symbol_id }}"
                         aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
                         {{ block.shopify_attributes }}>
-                        <span class="gw-symbol-btn__icon">{{ block.settings.icon }}&#xFE0E;</span>
+                        <span class="gw-symbol-btn__icon">{%- render 'gw-symbol-svg', id: block.settings.symbol_id, fallback: block.settings.icon -%}</span>
                         <span class="gw-symbol-btn__label">{{ block.settings.label }}</span>
                       </button>
                     {%- endfor -%}
@@ -398,7 +398,7 @@
                     {%- for sym in fallback_symbols -%}
                       {%- assign sp = sym | split: '|' -%}
                       <button type="button" class="gw-symbol-btn{% if forloop.first %} is-active{% endif %}" data-symbol="{{ sp[0] }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
-                        <span class="gw-symbol-btn__icon">{{ sp[2] }}&#xFE0E;</span>
+                        <span class="gw-symbol-btn__icon">{%- render 'gw-symbol-svg', id: sp[0], fallback: sp[2] -%}</span>
                         <span class="gw-symbol-btn__label">{{ sp[1] }}</span>
                       </button>
                     {%- endfor -%}
@@ -412,14 +412,14 @@
                   <button type="button" class="gw-sympos-btn is-active" data-sympos="left" aria-pressed="true">
                     <span>Links</span>
                     <span class="gw-sympos-preview" data-dir="row">
-                      <span class="gw-sympos-preview__symbol">☾&#xFE0E;</span>
+                      <span class="gw-sympos-preview__symbol">{%- render 'gw-symbol-svg', id: 'moon' -%}</span>
                       <span class="gw-sympos-preview__name">Aa</span>
                     </span>
                   </button>
                   <button type="button" class="gw-sympos-btn" data-sympos="right" aria-pressed="false">
                     <span>Rechts</span>
                     <span class="gw-sympos-preview" data-dir="row-rev">
-                      <span class="gw-sympos-preview__symbol">☾&#xFE0E;</span>
+                      <span class="gw-sympos-preview__symbol">{%- render 'gw-symbol-svg', id: 'moon' -%}</span>
                       <span class="gw-sympos-preview__name">Aa</span>
                     </span>
                   </button>
@@ -427,7 +427,7 @@
                     <span>Zwischen den Namen</span>
                     <span class="gw-sympos-preview" data-dir="row">
                       <span class="gw-sympos-preview__name gw-sympos-preview__name--small">Aa</span>
-                      <span class="gw-sympos-preview__symbol gw-sympos-preview__symbol--small">☾&#xFE0E;</span>
+                      <span class="gw-sympos-preview__symbol gw-sympos-preview__symbol--small">{%- render 'gw-symbol-svg', id: 'moon' -%}</span>
                       <span class="gw-sympos-preview__name gw-sympos-preview__name--small">Bb</span>
                     </span>
                   </button>

@@ -885,19 +885,19 @@
   }
 
   function updateSymbols() {
-    /* Helle Schriftfarben (z. B. Weiß) wären auf dem weißen Button unsichtbar
-       → dunkle Kontur dazuschalten */
+    /* Nur (nahezu) Weiß wäre auf dem weißen Button unsichtbar → dunkle Kontur dazuschalten.
+       Schwelle 230 fasst Weiß (#ffffff/#f5f1e6 ≈ 241–255), lässt aber Silber/Beige (≈ 200) aus. */
     const hex = (state.threadHex || '').replace('#', '');
-    let isLight = false;
+    let isWhite = false;
     if (hex.length >= 6) {
       const r = parseInt(hex.slice(0, 2), 16);
       const g = parseInt(hex.slice(2, 4), 16);
       const b = parseInt(hex.slice(4, 6), 16);
-      isLight = (0.299 * r + 0.587 * g + 0.114 * b) > 186;
+      isWhite = (0.299 * r + 0.587 * g + 0.114 * b) > 230;
     }
     document.querySelectorAll('[data-symbol] .gw-symbol-btn__icon').forEach(el => {
       el.style.color = state.threadHex;
-      el.classList.toggle('gw-symbol-icon--outlined', isLight);
+      el.classList.toggle('gw-symbol-icon--outlined', isWhite);
     });
   }
 
