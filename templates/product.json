@@ -66,6 +66,14 @@
             "hex": "#7a5230"
           }
         },
+        "thread_color_FDfRGA": {
+          "type": "thread_color",
+          "settings": {
+            "id": "beige",
+            "name": "Beige",
+            "hex": "#DDC7A0"
+          }
+        },
         "badge-lock": {
           "type": "trust_badge",
           "settings": {
@@ -161,6 +169,7 @@
             "display_type": "image_grid",
             "include_none": true,
             "none_label": "Keine",
+            "none_image": "shopify://shop_images/keine-strich-gold.png",
             "separate_line_item": true
           }
         },
@@ -187,6 +196,7 @@
         "thread-white",
         "thread-black",
         "thread-brown",
+        "thread_color_FDfRGA",
         "badge-lock",
         "badge-shield",
         "badge-heart",
