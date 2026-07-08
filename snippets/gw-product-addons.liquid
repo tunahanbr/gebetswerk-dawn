@@ -96,6 +96,8 @@
                       <img src="{{ inner.settings.choice_image | image_url: width: 200 }}" alt="{{ inner.settings.choice_label | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: inner.settings.choice_image.aspect_ratio | round }}">
                     {%- elsif inner.settings.hex_color != blank -%}
                       <div class="gw-bead-btn__color" style="background:{{ inner.settings.hex_color | escape }};"></div>
+                    {%- elsif inner.settings.choice_value == blank -%}
+                      <div class="gw-bead-btn__none gw-bead-btn__none--dash">&mdash;</div>
                     {%- else -%}
                       <div class="gw-bead-btn__none">{{ inner.settings.choice_label | slice: 0 }}</div>
                     {%- endif -%}
@@ -186,7 +188,7 @@
                   {%- if block.settings.none_image != blank -%}
                     <img src="{{ block.settings.none_image | image_url: width: 200 }}" alt="{{ block.settings.none_label | default: 'Keine' | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: block.settings.none_image.aspect_ratio | round }}">
                   {%- else -%}
-                    <div class="gw-bead-btn__none">{{ block.settings.none_label | default: 'Keine' | slice: 0 }}</div>
+                    <div class="gw-bead-btn__none gw-bead-btn__none--dash">&mdash;</div>
                   {%- endif -%}
                 </div>
                 <div class="gw-bead-btn__info">
