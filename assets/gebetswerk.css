@@ -230,6 +230,7 @@ body.gw-home { background: #fff !important; }
   line-height: 0.97;
   letter-spacing: -0.02em;
   max-width: 16ch;
+  color: var(--gw-text-light);
   text-shadow: 0 2px 24px rgba(26,22,19,0.55);
   margin: 0 0 16px;
 }
