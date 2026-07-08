@@ -110,13 +110,12 @@
         "step-3"
       ],
       "settings": {
-        "hero_image": "shopify://shop_images/IMG_0088.png",
-        "hero_video": "shopify://files/videos/IMG_0207.MOV",
+        "hero_video": "shopify://files/videos/hero vid.mp4",
         "hero_sub": "Personalisierte Gebetsteppiche",
         "hero_heading": "<p>Ein Name.<em> Ein Gebet</em>. Ein Geschenk fürs Leben.</p>",
         "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt.",
-        "hero_text_color": "#FFFFFF",
-        "hero_accent_color": "#DCB724"
+        "hero_text_color": "#ffffff",
+        "hero_accent_color": "#dcb724"
       }
     },
     "featured_collection": {
