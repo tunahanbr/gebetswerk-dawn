@@ -144,20 +144,6 @@
               </span>
             </div>
 
-            {%- comment -%} Das Zielland ist erst im Checkout bekannt — deshalb hier
-                die Kosten je Land transparent aufklappbar (Theme-Einstellungen → Warenkorb) {%- endcomment -%}
-            {%- if settings.shipping_countries_info != blank -%}
-              <details class="gw-cart-shipinfo">
-                <summary>{{ section.settings.shipinfo_label | default: 'Versandkosten je Land' }}</summary>
-                <ul>
-                  {%- assign gw_ship_lines = settings.shipping_countries_info | newline_to_br | split: '<br />' -%}
-                  {%- for line in gw_ship_lines -%}
-                    {%- assign gw_ship_line = line | strip_newlines | strip -%}
-                    {%- if gw_ship_line != blank -%}<li>{{ gw_ship_line }}</li>{%- endif -%}
-                  {%- endfor -%}
-                </ul>
-              </details>
-            {%- endif -%}
           </div>
 
           {%- if cart.total_price < free_shipping_de_threshold -%}

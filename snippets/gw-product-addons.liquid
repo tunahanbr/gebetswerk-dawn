@@ -4,10 +4,12 @@
 
   {%- comment -%} ── Textfeld ── {%- endcomment -%}
   {%- if block.type == 'opt_text' -%}
+    {%- capture ap_price -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: block.settings.addon_variant_id, fallback: block.settings.surcharge_cents -%}{%- endcapture -%}
+    {%- assign ap_price = ap_price | plus: 0 -%}
     <div class="gw-form-field" {{ block.shopify_attributes }}>
       <label class="gw-form-label" for="addon-{{ block.id }}">
         {{ block.settings.label }}
-        {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-option-price gw-option-price--inline">(+{{ block.settings.surcharge_cents | money_without_currency }}€)</span>{%- endif -%}
+        {%- if ap_price > 0 -%}<span class="gw-option-price gw-option-price--inline">(+{{ ap_price | money_without_currency }}€)</span>{%- endif -%}
         {%- if block.settings.required -%}<span class="gw-required-mark"> *</span>{%- endif -%}
       </label>
       <div class="gw-form-input-wrap">
@@ -16,7 +18,7 @@
           {%- if block.settings.max_chars > 0 %}maxlength="{{ block.settings.max_chars }}"{%- endif %}
           data-addon="text" data-block="{{ block.id }}"
           data-fkey="{{ block.settings.field_key | escape }}"
-          data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
+          data-surcharge="{{ ap_price }}"
           data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
           data-required="{{ block.settings.required }}"
           autocomplete="off">
@@ -44,11 +46,13 @@
           <select class="gw-form-input" data-addon="choice-select" data-gid="{{ gid }}">
             {%- for inner in section.blocks -%}
               {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                {%- capture ap_price -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: inner.settings.addon_variant_id, fallback: inner.settings.surcharge_cents -%}{%- endcapture -%}
+                {%- assign ap_price = ap_price | plus: 0 -%}
                 <option value="{{ inner.settings.choice_value | escape }}"
-                  data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                  data-surcharge="{{ ap_price }}"
                   data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
                   {% if inner.settings.is_default %}selected{% endif %}>
-                  {{ inner.settings.choice_label }}{% if inner.settings.surcharge_cents > 0 %} (+{{ inner.settings.surcharge_cents | money_without_currency }}€){% endif %}
+                  {{ inner.settings.choice_label }}{% if ap_price > 0 %} (+{{ ap_price | money_without_currency }}€){% endif %}
                 </option>
               {%- endif -%}
             {%- endfor -%}
@@ -57,12 +61,14 @@
           <div class="gw-thread-grid">
             {%- for inner in section.blocks -%}
               {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                {%- capture ap_price -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: inner.settings.addon_variant_id, fallback: inner.settings.surcharge_cents -%}{%- endcapture -%}
+                {%- assign ap_price = ap_price | plus: 0 -%}
                 <button type="button"
                   class="gw-thread-swatch{% if inner.settings.is_default %} is-active{% endif %}"
                   data-addon="choice-btn" data-gid="{{ gid }}"
                   data-val="{{ inner.settings.choice_value | escape }}"
                   data-lbl="{{ inner.settings.choice_label | escape }}"
-                  data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                  data-surcharge="{{ ap_price }}"
                   data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
                   title="{{ inner.settings.choice_label | escape }}" aria-label="{{ inner.settings.choice_label | escape }}"
                   {{ inner.shopify_attributes }}>
@@ -75,12 +81,14 @@
           <div class="gw-beads-grid">
             {%- for inner in section.blocks -%}
               {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                {%- capture ap_price -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: inner.settings.addon_variant_id, fallback: inner.settings.surcharge_cents -%}{%- endcapture -%}
+                {%- assign ap_price = ap_price | plus: 0 -%}
                 <button type="button"
                   class="gw-bead-btn{% if inner.settings.is_default %} is-active{% endif %}"
                   data-addon="choice-btn" data-gid="{{ gid }}"
                   data-val="{{ inner.settings.choice_value | escape }}"
                   data-lbl="{{ inner.settings.choice_label | escape }}"
-                  data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                  data-surcharge="{{ ap_price }}"
                   data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
                   {{ inner.shopify_attributes }}>
                   <div class="gw-bead-btn__img">
@@ -94,7 +102,7 @@
                   </div>
                   <div class="gw-bead-btn__info">
                     <span class="gw-bead-btn__name">{{ inner.settings.choice_label }}</span>
-                    <span class="gw-bead-btn__price">{% if inner.settings.surcharge_cents > 0 %}+{{ inner.settings.surcharge_cents | money_without_currency }}€{% else %}—{% endif %}</span>
+                    <span class="gw-bead-btn__price">{% if ap_price > 0 %}+{{ ap_price | money_without_currency }}€{% else %}—{% endif %}</span>
                   </div>
                 </button>
               {%- endif -%}
@@ -104,16 +112,18 @@
           <div class="gw-sympos-grid gw-sympos-grid--wrap">
             {%- for inner in section.blocks -%}
               {%- if inner.type == 'opt_choice' and inner.settings.group_id == gid -%}
+                {%- capture ap_price -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: inner.settings.addon_variant_id, fallback: inner.settings.surcharge_cents -%}{%- endcapture -%}
+                {%- assign ap_price = ap_price | plus: 0 -%}
                 <button type="button"
                   class="gw-sympos-btn{% if inner.settings.is_default %} is-active{% endif %}"
                   data-addon="choice-btn" data-gid="{{ gid }}"
                   data-val="{{ inner.settings.choice_value | escape }}"
                   data-lbl="{{ inner.settings.choice_label | escape }}"
-                  data-surcharge="{{ inner.settings.surcharge_cents | default: 0 }}"
+                  data-surcharge="{{ ap_price }}"
                   data-variant="{{ inner.settings.addon_variant_id | default: 0 }}"
                   {{ inner.shopify_attributes }}>
                   {{ inner.settings.choice_label }}
-                  {%- if inner.settings.surcharge_cents > 0 -%}<span class="gw-choice-price"> +{{ inner.settings.surcharge_cents | money_without_currency }}€</span>{%- endif -%}
+                  {%- if ap_price > 0 -%}<span class="gw-choice-price"> +{{ ap_price | money_without_currency }}€</span>{%- endif -%}
                 </button>
               {%- endif -%}
             {%- endfor -%}
@@ -172,7 +182,13 @@
                 data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
                 data-separate="{{ block.settings.separate_line_item }}"
                 data-val="" data-price="0" data-variant="0">
-                <div class="gw-bead-btn__img"><div class="gw-bead-btn__none">{{ block.settings.none_label | default: 'Keine' | slice: 0 }}</div></div>
+                <div class="gw-bead-btn__img">
+                  {%- if block.settings.none_image != blank -%}
+                    <img src="{{ block.settings.none_image | image_url: width: 200 }}" alt="{{ block.settings.none_label | default: 'Keine' | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: block.settings.none_image.aspect_ratio | round }}">
+                  {%- else -%}
+                    <div class="gw-bead-btn__none">{{ block.settings.none_label | default: 'Keine' | slice: 0 }}</div>
+                  {%- endif -%}
+                </div>
                 <div class="gw-bead-btn__info">
                   <span class="gw-bead-btn__name">{{ block.settings.none_label | default: 'Keine' }}</span>
                   <span class="gw-bead-btn__price">—</span>
@@ -211,6 +227,8 @@
 {%- comment -%} ── Checkbox-Optionen (z.B. Geschenkschleife) immer zuletzt ── {%- endcomment -%}
 {%- for block in section.blocks -%}
   {%- if block.type == 'opt_checkbox' -%}
+    {%- capture ap_price -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: block.settings.addon_variant_id, fallback: block.settings.surcharge_cents -%}{%- endcapture -%}
+    {%- assign ap_price = ap_price | plus: 0 -%}
     <label class="gw-giftwrap-row" {{ block.shopify_attributes }}>
       <span class="gw-giftwrap-label">
         {%- if block.settings.icon != blank -%}{{ block.settings.icon }} {%- endif -%}
@@ -226,11 +244,11 @@
         {%- endif -%}
       </span>
       <span class="gw-giftwrap-right">
-        {%- if block.settings.surcharge_cents > 0 -%}<span class="gw-giftwrap-price">+{{ block.settings.surcharge_cents | money }}</span>{%- endif -%}
+        {%- if ap_price > 0 -%}<span class="gw-giftwrap-price">+{{ ap_price | money }}</span>{%- endif -%}
         <input type="checkbox" id="addon-{{ block.id }}"
           data-addon="checkbox" data-block="{{ block.id }}"
           data-fkey="{{ block.settings.field_key | escape }}"
-          data-surcharge="{{ block.settings.surcharge_cents | default: 0 }}"
+          data-surcharge="{{ ap_price }}"
           data-variant="{{ block.settings.addon_variant_id | default: 0 }}"
           {% if block.settings.default_checked %}checked{% endif %}>
       </span>

@@ -1,0 +1,23 @@
+{%- comment -%}
+  Gibt den Aufpreis in Cent zurück.
+  Wenn das Aufpreise-Produkt (product) verknüpft ist und die Variante (vid)
+  existiert, wird der ECHTE Shopify-Variantenpreis genutzt — sonst der
+  Fallback (fallback, z.B. surcharge_cents). So bleibt die Anzeige immer
+  synchron mit dem, was Shopify tatsächlich berechnet.
+
+  Aufruf:
+  {%- capture x -%}{%- render 'gw-addon-price', product: section.settings.addon_product, vid: block.settings.addon_variant_id, fallback: block.settings.surcharge_cents -%}{%- endcapture -%}
+  {%- assign x = x | plus: 0 -%}
+{%- endcomment -%}
+{%- liquid
+  assign gw_ap_price = fallback | default: 0 | plus: 0
+  if vid and vid > 0 and product != blank
+    for v in product.variants
+      if v.id == vid
+        assign gw_ap_price = v.price
+        break
+      endif
+    endfor
+  endif
+  echo gw_ap_price
+-%}

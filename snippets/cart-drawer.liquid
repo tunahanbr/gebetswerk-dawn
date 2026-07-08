@@ -389,20 +389,6 @@
             <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
           </div>
 
-          {%- comment -%} Versandkosten je Land — Zielland ist erst im Checkout bekannt {%- endcomment -%}
-          {%- if settings.shipping_countries_info != blank -%}
-            <details class="gw-drawer-shipinfo">
-              <summary>Versandkosten je Land</summary>
-              <ul>
-                {%- assign gw_ship_lines = settings.shipping_countries_info | newline_to_br | split: '<br />' -%}
-                {%- for line in gw_ship_lines -%}
-                  {%- assign gw_ship_line = line | strip_newlines | strip -%}
-                  {%- if gw_ship_line != blank -%}<li>{{ gw_ship_line }}</li>{%- endif -%}
-                {%- endfor -%}
-              </ul>
-            </details>
-          {%- endif -%}
-
           <small class="tax-note caption-large rte">
             {%- if cart.duties_included and cart.taxes_included -%}
               {%- if shop.shipping_policy.body == blank -%}

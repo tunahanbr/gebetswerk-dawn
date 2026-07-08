@@ -148,7 +148,7 @@
             "tooltip": "Deine Bestellung wird bevorzugt gefertigt und vor allen regulären Bestellungen bearbeitet. Dadurch verkürzt sich die Lieferzeit deutlich.",
             "field_key": "Expressanfertigung",
             "default_checked": false,
-            "surcharge_cents": 1000,
+            "surcharge_cents": 999,
             "addon_variant_id": 53197786054992
           }
         },
@@ -224,7 +224,7 @@
         "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
         "badge_text": "Personalisiertes Set",
         "inventory_threshold": 10,
-        "addon_product": "",
+        "addon_product": "aufpreise",
         "price_name1": 1000,
         "price_name2": 1500,
         "price_symbol": 400,

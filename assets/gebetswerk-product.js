@@ -194,7 +194,7 @@
 
     if (setLabel) {
       items.forEach((item, idx) => {
-        if (idx > 0) item.properties = Object.assign({}, item.properties, { 'Für': setLabel });
+        if (idx > 0) item.properties = Object.assign({}, item.properties, { '_Für': setLabel });
       });
     }
 
