@@ -271,7 +271,7 @@
 }
 .gw-symbol-btn.is-active { border-color: var(--gw-ink); }
 .gw-symbol-btn:hover:not(.is-active) { border-color: var(--gw-muted); }
-.gw-symbol-btn__icon { font-size: 20px; line-height: 1; color: var(--gw-gold); }
+.gw-symbol-btn__icon { font-size: 20px; line-height: 1; color: var(--gw-gold); font-variant-emoji: text; }
 /* Kontur für helle Schriftfarben (Weiß/Silber) — sonst unsichtbar auf Weiß */
 .gw-symbol-icon--outlined {
   text-shadow:
@@ -316,7 +316,7 @@
 .gw-sympos-preview[data-dir="col"] { flex-direction: column; }
 .gw-sympos-preview[data-dir="col-rev"] { flex-direction: column-reverse; }
 .gw-sympos-preview[data-dir="row-rev"] { flex-direction: row-reverse; }
-.gw-sympos-preview__symbol { color: var(--gw-gold); font-size: 13px; }
+.gw-sympos-preview__symbol { color: var(--gw-gold); font-size: 13px; font-variant-emoji: text; }
 .gw-sympos-preview__symbol--small { font-size: 11px; }
 .gw-sympos-preview__name { color: var(--gw-gold); font-size: 11px; }
 .gw-sympos-preview__name--small { font-size: 9px; }

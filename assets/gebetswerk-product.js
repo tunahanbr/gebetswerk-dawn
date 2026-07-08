@@ -18,6 +18,8 @@
     { id: 'heart', label: 'Herz', icon: '♥' },
     { id: 'infinity', label: 'Unendlich', icon: '∞' },
   ];
+  /* U+FE0E Variation Selector-15: erzwingt Text- statt Emoji-Darstellung (☾ ♥ ∞) auf Mobile */
+  const VS_TEXT    = String.fromCharCode(0xFE0E);
   const SYM_ICONS  = Object.fromEntries(SYMBOLS.map(s => [s.id, s.icon]));
   const SYM_LABELS = Object.fromEntries(SYMBOLS.map(s => [s.id, s.label]));
   const STRINGS = Object.assign({
@@ -539,7 +541,7 @@
       if (state.twoNames && state.name2) lines.push('Name 2: ' + state.name2);
       lines.push('Schrift: ' + state.threadLabel);
       if (state.symbol !== 'none') {
-        lines.push('Symbol: ' + (SYM_LABELS[state.symbol] || state.symbol) + ' ' + (SYM_ICONS[state.symbol] || ''));
+        lines.push('Symbol: ' + (SYM_LABELS[state.symbol] || state.symbol) + ' ' + (SYM_ICONS[state.symbol] ? SYM_ICONS[state.symbol] + VS_TEXT : ''));
         const posLabels = { above:'Über dem Namen', below:'Unter dem Namen', left:'Links', right:'Rechts', between:'Zwischen den Namen' };
         lines.push('Position: ' + (posLabels[state.symbolPos] || state.symbolPos));
       }
@@ -570,7 +572,7 @@
         a.value = input.value;
         a.surchargeCents = input.value.length > 0 ? base : 0;
         const counter = document.querySelector('[data-counter="' + input.dataset.block + '"]');
-        if (counter) counter.textContent = input.value.length + '/' + (input.maxLength > 0 ? input.maxLength : '∞');
+        if (counter) counter.textContent = input.value.length + '/' + (input.maxLength > 0 ? input.maxLength : '∞' + VS_TEXT);
         updatePrice();
       });
     });
