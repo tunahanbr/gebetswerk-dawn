@@ -45,7 +45,7 @@
         "card-1": {
           "type": "bento_card",
           "settings": {
-            "card_image": "shopify://shop_images/gebetswerk-footerbackground.png",
+            "card_image": "shopify://shop_images/white-gold.png",
             "card_eyebrow": "Handarbeit",
             "card_title": "Bestickt mit echtem Goldfaden",
             "card_style": "dark",
@@ -55,7 +55,7 @@
         "card-2": {
           "type": "bento_card",
           "settings": {
-            "card_image": "shopify://shop_images/hero-bg-new.png",
+            "card_image": "shopify://shop_images/box.png",
             "card_eyebrow": "Verpackung",
             "card_title": "Edler Geschenkkarton",
             "card_style": "dark",
@@ -65,7 +65,7 @@
         "card-3": {
           "type": "bento_card",
           "settings": {
-            "card_image": "shopify://shop_images/beschreibung_b750d6b6-1200-47f4-b636-e4a48970c7b0.jpg",
+            "card_image": "shopify://shop_images/personalisierter-gebetsteppich-von-unten.png",
             "card_eyebrow": "Detail",
             "card_title": "Jede Linie individuell gestickt",
             "card_style": "dark",
