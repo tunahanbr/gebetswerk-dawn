@@ -132,6 +132,7 @@
             "label": "Mit Geschenkschleife verpacken",
             "icon": "🎁",
             "description": "",
+            "tooltip": "",
             "field_key": "Geschenkverpackung",
             "default_checked": false,
             "surcharge_cents": 199,
@@ -148,7 +149,7 @@
             "field_key": "Expressanfertigung",
             "default_checked": false,
             "surcharge_cents": 1000,
-            "addon_variant_id": 0
+            "addon_variant_id": 53197786054992
           }
         },
         "addon-beads": {
@@ -201,10 +202,29 @@
         "acc-care"
       ],
       "settings": {
+        "label_color": "Farbe",
+        "label_name1": "Name 1",
+        "placeholder_name1": "z. B. Amina",
+        "toggle_two_names": "Zweiten Namen hinzufügen",
+        "label_name2": "Name 2",
+        "placeholder_name2": "z. B. Yusuf",
+        "name_max": 11,
+        "label_thread": "Schriftfarbe",
+        "label_symbol": "Symbol",
+        "label_sympos": "Position des Symbols",
+        "summary_label": "Deine Bestellung:",
+        "atc_label": "In den Warenkorb",
+        "added_label": "✓ Im Warenkorb",
+        "buy_now_label": "Jetzt kaufen",
+        "reset_label": "Weiteren Teppich personalisieren",
+        "soldout_label": "Ausverkauft",
+        "urgency_text": "Nur noch [Anzahl] Stück verfügbar",
+        "desc_accordion_title": "Beschreibung & Material",
         "personalize_title": "Gebetsteppich personalisieren?",
         "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
         "badge_text": "Personalisiertes Set",
         "inventory_threshold": 10,
+        "addon_product": "",
         "price_name1": 1000,
         "price_name2": 1500,
         "price_symbol": 400,
