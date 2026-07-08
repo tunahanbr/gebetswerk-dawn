@@ -263,6 +263,9 @@
       :root {
         --gw-ivory: {{ settings.gw_color_background | default: '#F9F6F0' }};
         --gw-ink: {{ settings.gw_color_text | default: '#1A1613' }};
+        --gw-ink-rgb: {{ settings.gw_color_text | default: '#1A1613' | color_extract: 'red' }}, {{ settings.gw_color_text | default: '#1A1613' | color_extract: 'green' }}, {{ settings.gw_color_text | default: '#1A1613' | color_extract: 'blue' }};
+        --gw-text-light: {{ settings.gw_color_text_light | default: '#F9F6F0' }};
+        --gw-text-light-rgb: {{ settings.gw_color_text_light | default: '#F9F6F0' | color_extract: 'red' }}, {{ settings.gw_color_text_light | default: '#F9F6F0' | color_extract: 'green' }}, {{ settings.gw_color_text_light | default: '#F9F6F0' | color_extract: 'blue' }};
         --gw-sand: {{ settings.gw_color_surface | default: '#EDE8DF' }};
         --gw-sand-light: {{ settings.gw_color_surface | default: '#EDE8DF' | color_lighten: 3 }};
         --gw-gold: {{ settings.gw_color_accent | default: '#C89B3C' }};

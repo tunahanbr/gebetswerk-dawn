@@ -206,7 +206,7 @@
 }
 .gw-form-input:focus { border-color: var(--gw-ink); }
 .gw-form-input.is-error { border-color: #c0392b; }
-.gw-form-input::placeholder { color: rgba(26,22,19,0.3); }
+.gw-form-input::placeholder { color: rgba(var(--gw-ink-rgb),0.3); }
 .gw-char-count { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--gw-muted); pointer-events: none; }
 .gw-form-error { color: #c0392b; font-size: 12px; margin: 6px 0 0; font-family: var(--gw-font-body); }
 

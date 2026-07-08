@@ -1,3 +1,15 @@
+{%- style -%}
+  {%- if section.settings.hero_text_color != blank -%}
+    #shopify-section-{{ section.id }} .gw-hero {
+      --gw-text-light: {{ section.settings.hero_text_color }};
+      --gw-text-light-rgb: {{ section.settings.hero_text_color | color_extract: 'red' }}, {{ section.settings.hero_text_color | color_extract: 'green' }}, {{ section.settings.hero_text_color | color_extract: 'blue' }};
+    }
+  {%- endif -%}
+  {%- if section.settings.hero_accent_color != blank -%}
+    #shopify-section-{{ section.id }} .gw-hero { --gw-gold: {{ section.settings.hero_accent_color }}; }
+  {%- endif -%}
+{%- endstyle -%}
+
 <section class="gw-hero">
   <div class="gw-hero__inner">
 
@@ -215,6 +227,22 @@
     {
       "type": "paragraph",
       "content": "Buttons und Vertrauens-Pills sind eigene Blöcke — links unter 'Blöcke' hinzufügen und sortieren."
+    },
+    {
+      "type": "header",
+      "content": "🎨 Farben"
+    },
+    {
+      "type": "color",
+      "id": "hero_text_color",
+      "label": "Textfarbe",
+      "info": "Überschrift, Untertitel, Beschreibung & Pills. Leer lassen = globale Einstellung 'Helle Textfarbe'."
+    },
+    {
+      "type": "color",
+      "id": "hero_accent_color",
+      "label": "Farbe der kursiven Wörter",
+      "info": "Die goldene Hervorhebung in der Überschrift. Leer lassen = globale Akzentfarbe."
     }
   ],
   "blocks": [

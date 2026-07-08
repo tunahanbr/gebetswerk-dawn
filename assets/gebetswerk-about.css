@@ -83,7 +83,7 @@
 .gw-about__stat-label {
   font-family: var(--gw-font-body);
   font-size: 12px;
-  color: rgba(249,246,240,0.55);
+  color: rgba(var(--gw-text-light-rgb),0.55);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -221,7 +221,7 @@
 .gw-about__cta-sub {
   font-family: var(--gw-font-body);
   font-size: 15px;
-  color: rgba(249,246,240,0.6);
+  color: rgba(var(--gw-text-light-rgb),0.6);
   margin: 0 0 36px;
   line-height: 1.6;
 }

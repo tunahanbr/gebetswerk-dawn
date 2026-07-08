@@ -136,6 +136,13 @@
       },
       {
         "type": "color",
+        "id": "gw_color_text_light",
+        "label": "Helle Textfarbe",
+        "default": "#F9F6F0",
+        "info": "Schrift auf dunklen Bereichen (Footer, dunkle Karten)"
+      },
+      {
+        "type": "color",
         "id": "gw_color_accent",
         "label": "Akzentfarbe (Gold)",
         "default": "#C89B3C",
