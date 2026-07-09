@@ -14,29 +14,128 @@
     "gebetswerk_footer": {
       "type": "gebetswerk-footer",
       "blocks": {
-        "col-shop": { "type": "column", "settings": { "heading": "Shop" } },
-        "shop-1": { "type": "link", "settings": { "label": "Alle Produkte", "url": "/collections/all" } },
-        "shop-2": { "type": "link", "settings": { "label": "Gebetsteppiche", "url": "/collections/all" } },
-        "shop-3": { "type": "link", "settings": { "label": "Gebetsketten", "url": "/collections/all" } },
-        "shop-4": { "type": "link", "settings": { "label": "Personalisierung", "url": "/products/gebetsteppich" } },
-        "col-hilfe": { "type": "column", "settings": { "heading": "Hilfe" } },
-        "hilfe-1": { "type": "link", "settings": { "label": "Kontakt", "url": "/pages/kontakt" } },
-        "hilfe-2": { "type": "link", "settings": { "label": "FAQ", "url": "/pages/faq" } },
-        "hilfe-3": { "type": "link", "settings": { "label": "Versand & Lieferung", "url": "/pages/versand-retouren" } },
-        "hilfe-4": { "type": "link", "settings": { "label": "Rückgabe & Widerruf", "url": "/policies/refund-policy" } },
-        "hilfe-5": { "type": "link", "settings": { "label": "Über uns", "url": "/pages/uber-uns" } },
-        "col-recht": { "type": "column", "settings": { "heading": "Rechtliches" } },
-        "recht-1": { "type": "link", "settings": { "label": "Impressum", "url": "/policies/legal-notice" } },
-        "recht-2": { "type": "link", "settings": { "label": "Datenschutzerklärung", "url": "/policies/privacy-policy" } },
-        "recht-3": { "type": "link", "settings": { "label": "AGB", "url": "/policies/terms-of-service" } },
-        "recht-4": { "type": "link", "settings": { "label": "Widerrufsrecht", "url": "/policies/refund-policy" } }
+        "col-shop": {
+          "type": "column",
+          "settings": {
+            "heading": "Shop"
+          }
+        },
+        "shop-1": {
+          "type": "link",
+          "settings": {
+            "label": "Alle Produkte",
+            "url": "/collections/all"
+          }
+        },
+        "shop-2": {
+          "type": "link",
+          "settings": {
+            "label": "Gebetsteppiche",
+            "url": "/collections/all"
+          }
+        },
+        "shop-4": {
+          "type": "link",
+          "settings": {
+            "label": "Personalisierung",
+            "url": "/products/gebetsteppich"
+          }
+        },
+        "col-hilfe": {
+          "type": "column",
+          "settings": {
+            "heading": "Hilfe"
+          }
+        },
+        "hilfe-1": {
+          "type": "link",
+          "settings": {
+            "label": "Kontakt",
+            "url": "/pages/kontakt"
+          }
+        },
+        "hilfe-2": {
+          "type": "link",
+          "settings": {
+            "label": "FAQ",
+            "url": "/pages/faq"
+          }
+        },
+        "hilfe-3": {
+          "type": "link",
+          "settings": {
+            "label": "Versand & Lieferung",
+            "url": "/pages/versand-retouren"
+          }
+        },
+        "hilfe-4": {
+          "type": "link",
+          "settings": {
+            "label": "Rückgabe & Widerruf",
+            "url": "/policies/refund-policy"
+          }
+        },
+        "hilfe-5": {
+          "type": "link",
+          "settings": {
+            "label": "Über uns",
+            "url": "/pages/uber-uns"
+          }
+        },
+        "col-recht": {
+          "type": "column",
+          "settings": {
+            "heading": "Rechtliches"
+          }
+        },
+        "recht-1": {
+          "type": "link",
+          "settings": {
+            "label": "Impressum",
+            "url": "/policies/legal-notice"
+          }
+        },
+        "recht-2": {
+          "type": "link",
+          "settings": {
+            "label": "Datenschutzerklärung",
+            "url": "/policies/privacy-policy"
+          }
+        },
+        "recht-3": {
+          "type": "link",
+          "settings": {
+            "label": "AGB",
+            "url": "/policies/terms-of-service"
+          }
+        },
+        "recht-4": {
+          "type": "link",
+          "settings": {
+            "label": "Widerrufsrecht",
+            "url": "/policies/refund-policy"
+          }
+        }
       },
       "block_order": [
-        "col-shop", "shop-1", "shop-2", "shop-3", "shop-4",
-        "col-hilfe", "hilfe-1", "hilfe-2", "hilfe-3", "hilfe-4", "hilfe-5",
-        "col-recht", "recht-1", "recht-2", "recht-3", "recht-4"
+        "col-shop",
+        "shop-1",
+        "shop-2",
+        "shop-4",
+        "col-hilfe",
+        "hilfe-1",
+        "hilfe-2",
+        "hilfe-3",
+        "hilfe-4",
+        "hilfe-5",
+        "col-recht",
+        "recht-1",
+        "recht-2",
+        "recht-3",
+        "recht-4"
       ],
       "settings": {
+        "logo_width": 160,
         "logo_initials": "GW",
         "brand_name": "Gebetswerk",
         "tagline": "Personalisierte Gebetsteppiche mit dem Namen deiner Wahl – ein Geschenk, das Generationen bleibt.",
