@@ -17,10 +17,12 @@
               style="width:{{ logo_w }}px"
               loading="lazy"
             >
-          {%- else -%}
+          {%- elsif section.settings.logo_initials != blank -%}
             <span class="gw-footer__logo-mark">{{ section.settings.logo_initials }}</span>
-            <span class="gw-footer__logo-name">{{ section.settings.brand_name }}</span>          
-        {%- endif -%}
+          {%- endif -%}
+          {%- if section.settings.brand_name != blank -%}
+            <span class="gw-footer__logo-name" style="color:#fff;">{{ section.settings.brand_name }}</span>
+          {%- endif -%}
         </a>
         <p class="gw-footer__tagline">{{ section.settings.tagline }}</p>
 
