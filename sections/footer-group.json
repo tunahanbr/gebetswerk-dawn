@@ -29,13 +29,12 @@
         "recht-1": { "type": "link", "settings": { "label": "Impressum", "url": "/policies/legal-notice" } },
         "recht-2": { "type": "link", "settings": { "label": "Datenschutzerklärung", "url": "/policies/privacy-policy" } },
         "recht-3": { "type": "link", "settings": { "label": "AGB", "url": "/policies/terms-of-service" } },
-        "recht-4": { "type": "link", "settings": { "label": "Widerrufsrecht", "url": "/policies/refund-policy" } },
-        "recht-5": { "type": "link", "settings": { "label": "Cookie-Einstellungen", "url": "#shopifyReshowConsentBanner" } }
+        "recht-4": { "type": "link", "settings": { "label": "Widerrufsrecht", "url": "/policies/refund-policy" } }
       },
       "block_order": [
         "col-shop", "shop-1", "shop-2", "shop-3", "shop-4",
         "col-hilfe", "hilfe-1", "hilfe-2", "hilfe-3", "hilfe-4", "hilfe-5",
-        "col-recht", "recht-1", "recht-2", "recht-3", "recht-4", "recht-5"
+        "col-recht", "recht-1", "recht-2", "recht-3", "recht-4"
       ],
       "settings": {
         "logo_initials": "GW",
