@@ -5,11 +5,39 @@
 
       {%- comment -%} Brand + newsletter {%- endcomment -%}
       <div>
-        <a href="{{ routes.root_url }}" class="gw-footer__logo">
-          <span class="gw-footer__logo-mark">{{ section.settings.logo_initials }}</span>
-          <span class="gw-footer__logo-name">{{ section.settings.brand_name }}</span>
+        <a href="{{ routes.root_url }}" class="gw-footer__logo" aria-label="{{ section.settings.brand_name | escape }}">
+          {%- if section.settings.logo_image != blank -%}
+            {%- assign logo_w = section.settings.logo_width | default: 160 -%}
+            <img
+              src="{{ section.settings.logo_image | image_url: width: 400 }}"
+              alt="{{ section.settings.brand_name | escape }}"
+              class="gw-footer__logo-img"
+              width="{{ logo_w }}"
+              height="{{ logo_w | divided_by: section.settings.logo_image.aspect_ratio | round }}"
+              style="width:{{ logo_w }}px"
+              loading="lazy"
+            >
+          {%- else -%}
+            <span class="gw-footer__logo-mark">{{ section.settings.logo_initials }}</span>
+            <span class="gw-footer__logo-name">{{ section.settings.brand_name }}</span>
+          {%- endif -%}
         </a>
         <p class="gw-footer__tagline">{{ section.settings.tagline }}</p>
+
+        {%- comment -%} App-Blöcke (z. B. Shopify-Forms Inline-Formular für Willkommensrabatt) {%- endcomment -%}
+        {%- assign has_app_block = false -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}{%- assign has_app_block = true -%}{%- endif -%}
+        {%- endfor -%}
+        {%- if has_app_block -%}
+          <div class="gw-footer__apps">
+            {%- for block in section.blocks -%}
+              {%- if block.type == '@app' -%}
+                <div class="gw-footer__app-block" {{ block.shopify_attributes }}>{%- render block -%}</div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
 
         {%- if section.settings.show_newsletter -%}
           {%- assign welcome_code = section.settings.welcome_code | default: 'WILLKOMMEN10' -%}
@@ -121,9 +149,25 @@
       "content": "Marke"
     },
     {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo-Bild",
+      "info": "Optional. Wird statt der Initialen angezeigt. Empfohlen: PNG/SVG mit transparentem Hintergrund (heller/weißer Logo, da der Footer dunkel ist)."
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo-Breite",
+      "default": 160
+    },
+    {
       "type": "text",
       "id": "logo_initials",
-      "label": "Logo-Initialen",
+      "label": "Logo-Initialen (Fallback ohne Bild)",
       "default": "GW"
     },
     {
@@ -136,7 +180,7 @@
       "type": "textarea",
       "id": "tagline",
       "label": "Tagline",
-      "default": "Handgefertigte, personalisierte Gebetsteppiche – ein Geschenk, das Generationen bleibt."
+      "default": "Personalisierte Gebetsteppiche mit dem Namen deiner Wahl – ein Geschenk, das Generationen bleibt."
     },
     {
       "type": "text",
@@ -206,6 +250,7 @@
     }
   ],
   "blocks": [
+    { "type": "@app" },
     {
       "type": "column",
       "name": "📁 Spalte",

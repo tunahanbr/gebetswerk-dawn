@@ -4,6 +4,9 @@
     <div class="gw-feature__intro">
       <p class="gw-eyebrow">{{ section.settings.eyebrow }}</p>
       <h2 class="gw-feature__heading">{{ section.settings.heading | remove: '<p>' | remove: '</p>' }}</h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="gw-feature__sub">{{ section.settings.subheading }}</p>
+      {%- endif -%}
     </div>
 
     <div class="gw-feature__grid">
@@ -65,6 +68,19 @@
       </div>
 
     </div>
+
+    {%- if section.settings.cta_label != blank -%}
+      <div class="gw-feature__cta-wrap">
+        <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="gw-btn-primary gw-feature__cta">
+          {{ section.settings.cta_label }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        {%- if section.settings.cta_note != blank -%}
+          <p class="gw-feature__cta-note">{{ section.settings.cta_note }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
   </div>
 </section>
 
@@ -86,9 +102,37 @@
       "default": "<p>Ein Geschenk, das <em>Bedeutung</em> trägt.</p>"
     },
     {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Stützzeile unter der Überschrift",
+      "default": "Wunschname, Farbe und Symbol – in wenigen Klicks zu deinem persönlichen Unikat."
+    },
+    {
       "type": "image_picker",
       "id": "image",
       "label": "Produktbild (Mitte)"
+    },
+    {
+      "type": "header",
+      "content": "🔘 Call-to-Action"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button-Text",
+      "default": "Jetzt personalisieren"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button-Link",
+      "info": "Leer = zur Kollektion. Empfohlen: dein Haupt-Gebetsteppich-Produkt."
+    },
+    {
+      "type": "text",
+      "id": "cta_note",
+      "label": "Hinweis unter dem Button",
+      "default": "Versandfertig in 2–4 Werktagen · Geschenkfertig verpackt"
     },
     {
       "type": "text",
@@ -156,8 +200,8 @@
           "type": "feature",
           "settings": {
             "icon": "sparkles",
-            "title": "Echte Goldstickerei",
-            "text": "Feiner Metallfaden, von erfahrenen Stickern Stich für Stich gesetzt."
+            "title": "Name in deiner Wunschfarbe",
+            "text": "Dein Wunschname in arabischer oder lateinischer Schrift – in der Stickfarbe deiner Wahl."
           }
         },
         {
@@ -181,7 +225,7 @@
           "settings": {
             "icon": "gift",
             "title": "Geschenkfertig verpackt",
-            "text": "Edler Karton mit Goldschleife – ideal für besondere Momente."
+            "text": "Edle Verpackung mit Satinschleife – ideal für besondere Momente."
           }
         }
       ]

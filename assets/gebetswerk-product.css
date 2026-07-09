@@ -104,6 +104,14 @@
   margin: 0 0 12px;
 }
 
+.gw-product__subtitle {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--gw-muted);
+  margin: -4px 0 16px;
+  max-width: 46ch;
+}
+
 .gw-product__rating { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gw-muted); margin-bottom: 16px; }
 .gw-product__rating-fallback { display: flex; align-items: center; gap: 8px; }
 .gw-product__rating-count { color: var(--gw-muted); }

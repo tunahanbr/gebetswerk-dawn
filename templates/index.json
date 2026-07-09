@@ -46,8 +46,8 @@
           "type": "bento_card",
           "settings": {
             "card_image": "shopify://shop_images/white-gold.png",
-            "card_eyebrow": "Handarbeit",
-            "card_title": "Bestickt mit echtem Goldfaden",
+            "card_eyebrow": "Personalisierung",
+            "card_title": "Dein Name in deiner Wunschfarbe",
             "card_style": "dark",
             "card_url": ""
           }
@@ -93,7 +93,7 @@
           "settings": {
             "step_number": "",
             "step_title": "Lieferung",
-            "step_desc": "Versandfertig in 3–5 Tagen"
+            "step_desc": "Versandfertig in 2–4 Werktagen"
           }
         }
       },
@@ -113,7 +113,7 @@
         "hero_video": "shopify://files/videos/hero vid.mp4",
         "hero_sub": "Personalisierte Gebetsteppiche",
         "hero_heading": "<p>Ein Name.<em> Ein Gebet</em>. Ein Geschenk fürs Leben.</p>",
-        "hero_desc": "Personalisiere deinen Gebetsteppich mit Wunschnamen, Farbe und feinster Goldstickerei – sorgfältig in unserer Manufaktur gefertigt.",
+        "hero_desc": "Wähle Wunschnamen, Schriftfarbe und ein Symbol – wir sticken es sauber und langlebig auf deinen Gebetsteppich. Ein persönliches Geschenk, das bleibt.",
         "hero_text_color": "#ffffff",
         "hero_accent_color": "#dcb724"
       }
@@ -136,8 +136,8 @@
           "type": "feature",
           "settings": {
             "icon": "sparkles",
-            "title": "Echte Goldstickerei",
-            "text": "Feiner Metallfaden, von erfahrenen Stickern Stich für Stich gesetzt."
+            "title": "Name in deiner Wunschfarbe",
+            "text": "Dein Wunschname in arabischer oder lateinischer Schrift – in der Stickfarbe deiner Wahl."
           }
         },
         "feat-2": {
@@ -161,7 +161,7 @@
           "settings": {
             "icon": "gift",
             "title": "Geschenkfertig verpackt",
-            "text": "Edler Karton mit Goldschleife – ideal für besondere Momente."
+            "text": "Edle Verpackung mit Satinschleife – ideal für besondere Momente."
           }
         }
       },
@@ -208,28 +208,28 @@
           "type": "item",
           "settings": {
             "question": "Wie lange dauert die Produktion?",
-            "answer": "Personalisierte Gebetsteppiche werden innerhalb von 2–3 Werktagen gefertigt und anschließend verschickt. Insgesamt erhältst du dein Paket meist innerhalb von 3–5 Werktagen."
+            "answer": "Personalisierte Gebetsteppiche werden in der Regel innerhalb von 2–4 Werktagen gefertigt und anschließend verschickt. Auf der Produktseite siehst du ein voraussichtliches Lieferdatum – mit der Expressanfertigung geht es schneller."
           }
         },
         "faq-2": {
           "type": "item",
           "settings": {
-            "question": "Welche Namen und Schriften kann ich wählen?",
-            "answer": "Du kannst lateinische sowie arabische Namen mit bis zu 11 Zeichen bestellen. Wähle zwischen vier eleganten Schriftarten und drei Goldtönen."
+            "question": "Welche Namen, Schriften und Farben kann ich wählen?",
+            "answer": "Du kannst lateinische sowie arabische Namen mit bis zu 11 Zeichen bestellen und die Schriftfarbe frei wählen – von Gold über Silber bis zu weiteren dezenten Tönen."
           }
         },
         "faq-3": {
           "type": "item",
           "settings": {
             "question": "Kann ich den Teppich waschen?",
-            "answer": "Ja – schonend bei 30 °C im Wäschesack. Die Goldstickerei bleibt dauerhaft erhalten."
+            "answer": "Ja – wir empfehlen eine schonende Handwäsche. So bleiben Stickerei und Material lange schön."
           }
         },
         "faq-4": {
           "type": "item",
           "settings": {
             "question": "Welche Bezahlmöglichkeiten gibt es?",
-            "answer": "Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna (3 zinsfreie Raten)."
+            "answer": "Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna."
           }
         },
         "faq-5": {

@@ -172,6 +172,13 @@
           </div>
           <p class="gw-cart-summary__tax">{{ section.settings.tax_note | default: 'inkl. MwSt.' }}</p>
 
+          {%- comment -%} Dynamische Lieferzeit — Express wenn ein Artikel Expressanfertigung hat {%- endcomment -%}
+          {%- assign cart_has_express = false -%}
+          {%- for item in cart.items -%}
+            {%- if item.properties['Expressanfertigung'] != blank -%}{%- assign cart_has_express = true -%}{%- endif -%}
+          {%- endfor -%}
+          {%- render 'gw-delivery-estimate', express: cart_has_express, compact: true -%}
+
           <a href="/checkout" class="gw-cart-checkout-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             {{ section.settings.checkout_label | default: 'Sicher zur Kasse' }}
@@ -328,9 +335,9 @@
     {
       "name": "Warenkorb – Gebetswerk",
       "blocks": [
-        { "type": "trust_item", "settings": { "icon": "lock",   "label": "SSL-gesichert" } },
-        { "type": "trust_item", "settings": { "icon": "shield", "label": "14 Tage Rückgabe" } },
-        { "type": "trust_item", "settings": { "icon": "truck",  "label": "3–5 Tage Lieferzeit" } }
+        { "type": "trust_item", "settings": { "icon": "lock",  "label": "Sichere Zahlung" } },
+        { "type": "trust_item", "settings": { "icon": "heart", "label": "Gefertigt in Österreich" } },
+        { "type": "trust_item", "settings": { "icon": "gift",  "label": "Geschenkfertig verpackt" } }
       ]
     }
   ]

@@ -15,11 +15,11 @@
         "stat-1": { "type": "stat", "settings": { "num": "2.400+",     "label": "zufriedene Familien" } },
         "stat-2": { "type": "stat", "settings": { "num": "4,9 / 5",    "label": "Kundenbewertung" } },
         "stat-3": { "type": "stat", "settings": { "num": "Made in EU", "label": "Manufaktur-Qualität" } },
-        "stat-4": { "type": "stat", "settings": { "num": "3–5 Tage",   "label": "bis zur Lieferung" } },
-        "val-1": { "type": "value", "settings": { "icon": "sparkles", "title": "Echte Goldstickerei", "text": "Feiner Metallfaden, von erfahrenen Stickern Stich für Stich gesetzt." } },
-        "val-2": { "type": "value", "settings": { "icon": "shield",   "title": "Lebenslange Qualität", "text": "Farbecht, formstabil und waschbar bei 30 °C – für Generationen." } },
+        "stat-4": { "type": "stat", "settings": { "num": "2–4 Tage",   "label": "bis zur Lieferung" } },
+        "val-1": { "type": "value", "settings": { "icon": "sparkles", "title": "Name in deiner Wunschfarbe", "text": "Dein Wunschname in arabischer oder lateinischer Schrift – sauber und langlebig bestickt." } },
+        "val-2": { "type": "value", "settings": { "icon": "shield",   "title": "Lebenslange Qualität", "text": "Farbecht, formstabil und schonend waschbar – für Generationen." } },
         "val-3": { "type": "value", "settings": { "icon": "heart",    "title": "Mit Liebe gemacht",    "text": "Jedes Stück entsteht mit dem Bewusstsein, dass es ein besonderes Geschenk sein wird." } },
-        "val-4": { "type": "value", "settings": { "icon": "gift",     "title": "Geschenkfertig",       "text": "Edler Karton mit Goldschleife – bereit zum Verschenken." } }
+        "val-4": { "type": "value", "settings": { "icon": "gift",     "title": "Geschenkfertig",       "text": "Edle Verpackung mit Satinschleife – bereit zum Verschenken." } }
       },
       "block_order": ["stat-1", "stat-2", "stat-3", "stat-4", "val-1", "val-2", "val-3", "val-4"],
       "settings": {}

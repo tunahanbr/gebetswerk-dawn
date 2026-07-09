@@ -1,0 +1,71 @@
+{%- comment -%}
+  Dynamische Lieferzeit-Anzeige (Standard / Express).
+
+  Parameter (alle optional):
+    express       - true/false  initialer Zustand (Standard: false)
+    auto_express  - true        beobachtet die Express-Checkbox der Produktseite
+                                 und schaltet automatisch um
+    compact       - true        kompaktere Darstellung (z. B. Cart-Drawer)
+    prod_min/max  - Produktions-Werktage (Standard 2 / 4)
+    ship_min/max  - Versand-Werktage (Standard 1 / 4)
+    exp_min/max   - Gesamt-Werktage Express (Standard 1 / 3)
+    cutoff_hour   - Bestell-Redaktionsschluss, Stunde 0–23 (Standard 14)
+    label         - Eyebrow über dem Datum (Standard: "Voraussichtliche Lieferung")
+    standard_note - Erklärzeile Standard (unter dem Datum)
+    express_note  - Erklärzeile Express
+    express_hint  - Kleingedruckter Hinweis unter dem Express-Text
+
+  Verwendung:
+    {%- render 'gw-delivery-estimate', auto_express: true -%}
+    {%- render 'gw-delivery-estimate', express: has_express, compact: true -%}
+{%- endcomment -%}
+
+{{ 'gebetswerk-delivery.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign gw_label = label | default: 'Voraussichtliche Lieferung'
+  assign gw_std_note = standard_note | default: 'Standard-Anfertigung: 2–4 Werktage + Versand (AT 1–2, DE 2–4 Tage).'
+  assign gw_exp_note = express_note | default: 'Wir starten sofort mit deiner Bestellung – bevorzugt vor allen anderen.'
+  assign gw_hint = express_hint | default: 'Das genaue Zustelldatum hängt zusätzlich vom Versanddienstleister ab.'
+-%}
+
+<div
+  class="gw-delivery{% if compact %} gw-delivery--compact{% endif %}"
+  data-express="{% if express %}true{% else %}false{% endif %}"
+  data-auto-express="{% if auto_express %}true{% else %}false{% endif %}"
+  data-prod-min="{{ prod_min | default: 2 }}"
+  data-prod-max="{{ prod_max | default: 4 }}"
+  data-ship-min="{{ ship_min | default: 1 }}"
+  data-ship-max="{{ ship_max | default: 4 }}"
+  data-exp-min="{{ exp_min | default: 1 }}"
+  data-exp-max="{{ exp_max | default: 3 }}"
+  data-cutoff-hour="{{ cutoff_hour | default: 14 }}"
+  aria-live="polite"
+>
+  {%- comment -%} Standard {%- endcomment -%}
+  <div class="gw-delivery__state" data-state="standard"{% if express %} hidden{% endif %}>
+    <span class="gw-delivery__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    </span>
+    <div class="gw-delivery__body">
+      <p class="gw-delivery__label">{{ gw_label }}</p>
+      <p class="gw-delivery__date" data-date>…</p>
+      <p class="gw-delivery__note">{{ gw_std_note }}</p>
+    </div>
+  </div>
+
+  {%- comment -%} Express {%- endcomment -%}
+  <div class="gw-delivery__state gw-delivery__state--express" data-state="express"{% unless express %} hidden{% endunless %}>
+    <span class="gw-delivery__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg>
+    </span>
+    <div class="gw-delivery__body">
+      <p class="gw-delivery__label">{{ gw_label }} <span class="gw-delivery__tag">Express</span></p>
+      <p class="gw-delivery__date" data-date>…</p>
+      <p class="gw-delivery__note">{{ gw_exp_note }}</p>
+      {%- if gw_hint != blank -%}<p class="gw-delivery__hint">{{ gw_hint }}</p>{%- endif -%}
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'gebetswerk-delivery.js' | asset_url }}" defer></script>

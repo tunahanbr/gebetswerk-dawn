@@ -6,7 +6,7 @@
     <div class="gw-about__hero-inner">
       <p class="gw-eyebrow">{{ section.settings.eyebrow | default: 'Unsere Geschichte' }}</p>
       <h1 class="gw-about__heading">{{ section.settings.heading | default: 'Wir glauben, dass jedes Gebet mit Würde beginnt.' }}</h1>
-      <p class="gw-about__lead">{{ section.settings.lead | default: 'Gebetswerk ist ein europäisches Manufaktur-Label für personalisierte Gebetsteppiche — gefertigt mit echter Goldstickerei, mit Liebe zum Detail und dem Wunsch, Familien ein bleibendes Geschenk zu schenken.' }}</p>
+      <p class="gw-about__lead">{{ section.settings.lead | default: 'Gebetswerk ist ein europäisches Manufaktur-Label für personalisierte Gebetsteppiche — bestickt mit dem Namen deiner Wahl, mit Liebe zum Detail und dem Wunsch, Familien ein bleibendes Geschenk zu schenken.' }}</p>
     </div>
     {%- if section.settings.hero_image != blank -%}
       <div class="gw-about__hero-img">
@@ -38,7 +38,7 @@
         <p class="gw-eyebrow">{{ section.settings.story_eyebrow | default: 'Warum Gebetswerk' }}</p>
         <h2 class="gw-about__section-heading">{{ section.settings.story_heading | default: 'Ein Geschenk, das bleibt.' }}</h2>
         <div class="gw-about__story-body">
-          {{ section.settings.story_body | default: '<p>Gebetswerk entstand aus einem persönlichen Moment — dem Wunsch, unseren Eltern etwas zu schenken, das wirklich zählt. Nicht irgendein Teppich, sondern ein Teppich mit ihrem Namen, in ihrer Lieblingsfarbe, mit einem Symbol, das ihnen bedeutet.</p><p>Heute fertigen wir jeden Gebetsteppich in unserer Manufaktur in Europa — Stich für Stich, von Hand. Aus hochwertigem Mikrofaser-Velours, bestickt mit echtem Goldfaden. Verpackt in einem edlen Karton mit Goldschleife.</p><p>Jedes Stück ist ein Original.</p>' }}</div>
+          {{ section.settings.story_body | default: '<p>Gebetswerk entstand aus einem persönlichen Moment — dem Wunsch, unseren Eltern etwas zu schenken, das wirklich zählt. Nicht irgendein Teppich, sondern ein Teppich mit ihrem Namen, in ihrer Lieblingsfarbe, mit einem Symbol, das ihnen bedeutet.</p><p>Heute fertigen wir jeden Gebetsteppich in unserer Manufaktur in Europa — sorgfältig für dich bestickt und einzeln geprüft. Aus hochwertigem Mikrofaser-Velours, in der Stickfarbe deiner Wahl. Auf Wunsch geschenkfertig mit Satinschleife.</p><p>Jedes Stück ist ein Original.</p>' }}</div>
       </div>
       {%- if section.settings.story_image != blank -%}
         <div class="gw-about__story-img">
@@ -92,7 +92,7 @@
     { "type": "header", "content": "Hero" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Unsere Geschichte" },
     { "type": "text", "id": "heading", "label": "Überschrift", "default": "Wir glauben, dass jedes Gebet mit Würde beginnt." },
-    { "type": "textarea", "id": "lead", "label": "Einleitungstext", "default": "Gebetswerk ist ein europäisches Manufaktur-Label für personalisierte Gebetsteppiche — gefertigt mit echter Goldstickerei, mit Liebe zum Detail." },
+    { "type": "textarea", "id": "lead", "label": "Einleitungstext", "default": "Gebetswerk ist ein europäisches Manufaktur-Label für personalisierte Gebetsteppiche — bestickt mit dem Namen deiner Wahl, mit Liebe zum Detail." },
     { "type": "image_picker", "id": "hero_image", "label": "Hero-Bild" },
     { "type": "header", "content": "Story" },
     { "type": "text", "id": "story_eyebrow", "label": "Eyebrow", "default": "Warum Gebetswerk" },
@@ -142,11 +142,11 @@
         { "type": "stat", "settings": { "num": "2.400+",    "label": "zufriedene Familien" } },
         { "type": "stat", "settings": { "num": "4,9 / 5",   "label": "Kundenbewertung" } },
         { "type": "stat", "settings": { "num": "Made in EU","label": "Manufaktur-Qualität" } },
-        { "type": "stat", "settings": { "num": "3–5 Tage",  "label": "bis zur Lieferung" } },
-        { "type": "value", "settings": { "icon": "sparkles", "title": "Echte Goldstickerei", "text": "Feiner Metallfaden, von erfahrenen Stickern Stich für Stich gesetzt." } },
+        { "type": "stat", "settings": { "num": "2–4 Tage",  "label": "bis zur Lieferung" } },
+        { "type": "value", "settings": { "icon": "sparkles", "title": "Name in deiner Wunschfarbe", "text": "Dein Wunschname in arabischer oder lateinischer Schrift – sauber und langlebig bestickt." } },
         { "type": "value", "settings": { "icon": "shield",   "title": "Lebenslange Qualität", "text": "Farbecht, formstabil und waschbar bei 30 °C – für Generationen." } },
         { "type": "value", "settings": { "icon": "heart",    "title": "Mit Liebe gemacht",    "text": "Jedes Stück entsteht mit dem Bewusstsein, dass es ein besonderes Geschenk sein wird." } },
-        { "type": "value", "settings": { "icon": "gift",     "title": "Geschenkfertig",       "text": "Edler Karton mit Goldschleife – bereit zum Verschenken." } }
+        { "type": "value", "settings": { "icon": "gift",     "title": "Geschenkfertig",       "text": "Edle Verpackung mit Satinschleife – bereit zum Verschenken." } }
       ]
     }
   ]

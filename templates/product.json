@@ -15,15 +15,15 @@
         "ship-1": {
           "type": "shipping_row",
           "settings": {
-            "icon": "truck",
-            "text": "Österreich kostenlos · Deutschland kostenlos ab 100 €"
+            "icon": "check",
+            "text": "Mit Sorgfalt für dich bestickt & geprüft"
           }
         },
         "ship-2": {
           "type": "shipping_row",
           "settings": {
-            "icon": "package",
-            "text": "3–5 Werktage Lieferzeit · Geschenkverpackung optional"
+            "icon": "gift",
+            "text": "Sorgfältig geprüft & geschenkfertig verpackt"
           }
         },
         "thread-gold": {
@@ -78,28 +78,21 @@
           "type": "trust_badge",
           "settings": {
             "icon": "lock",
-            "label": "SSL-gesichert"
-          }
-        },
-        "badge-shield": {
-          "type": "trust_badge",
-          "settings": {
-            "icon": "shield",
-            "label": "14 Tage Rückgabe"
+            "label": "Sichere Zahlung"
           }
         },
         "badge-heart": {
           "type": "trust_badge",
           "settings": {
             "icon": "heart",
-            "label": "Handgefertigt"
+            "label": "Mit Liebe gefertigt"
           }
         },
         "badge-clock": {
           "type": "trust_badge",
           "settings": {
             "icon": "clock",
-            "label": "3–5 Tage"
+            "label": "Schnelle Lieferung"
           }
         },
         "sym-none": {
@@ -139,8 +132,8 @@
           "settings": {
             "label": "Mit Geschenkschleife verpacken",
             "icon": "🎁",
-            "description": "",
-            "tooltip": "",
+            "description": "Edle Satinschleife ums Paket – ausgepackt wird’s zum Moment.",
+            "tooltip": "Wir verschließen deinen Gebetsteppich mit einer hochwertigen Satinschleife, sodass er geschenkfertig bei dir oder direkt beim Beschenkten ankommt.",
             "field_key": "Geschenkverpackung",
             "default_checked": false,
             "surcharge_cents": 199,
@@ -152,8 +145,8 @@
           "settings": {
             "label": "Expressanfertigung",
             "icon": "⚡",
-            "description": "Bevorzugte Fertigung & schnellerer Versand",
-            "tooltip": "Deine Bestellung wird bevorzugt gefertigt und vor allen regulären Bestellungen bearbeitet. Dadurch verkürzt sich die Lieferzeit deutlich.",
+            "description": "Wird sofort & bevorzugt gefertigt – für Geschenke, die nicht warten können.",
+            "tooltip": "Deine Bestellung wird sofort und vor allen regulären Bestellungen bearbeitet. Dadurch verkürzt sich die Lieferzeit deutlich. Das genaue Zustelldatum hängt zusätzlich vom Versanddienstleister ab.",
             "field_key": "Expressanfertigung",
             "default_checked": false,
             "surcharge_cents": 999,
@@ -163,7 +156,7 @@
         "addon-beads": {
           "type": "opt_product",
           "settings": {
-            "label": "Gebetskette dazu?",
+            "label": "Passende Gebetskette dazulegen?",
             "field_key": "Gebetskette",
             "product": "gebetskette",
             "display_type": "image_grid",
@@ -173,18 +166,32 @@
             "separate_line_item": true
           }
         },
-        "acc-shipping": {
+        "acc-perso": {
           "type": "accordion",
           "settings": {
-            "title": "Versand & Rückgabe",
-            "content": "<p>Versand in 3–5 Werktagen. Österreich ist kostenlos, Deutschland ab 100 € Bestellwert kostenlos. 14 Tage Rückgaberecht (personalisierte Artikel ausgeschlossen).</p>"
+            "title": "Personalisierung & Bestickung",
+            "content": "<p>Jeder Teppich wird persönlich für dich angefertigt – mit deinem Wunschnamen und in deiner Schriftfarbe.</p><p><strong>Platzierung:</strong> Damit dich nichts vom Gebet ablenkt, sticken wir den Namen dezent unten seitlich (rechts oder links). Bei schmalem Rand kann der Name auf dem Muster liegen.</p><p><strong>Schrift:</strong> Möglich sind arabische und lateinische Buchstaben. Russische oder andere nicht-arabische Schriften sowie Sonderzeichen (? ! ' \" …) können wir nicht sticken. Für arabische Namen gib die Zeichen direkt ein oder hinterlasse uns einen kurzen Hinweis im Warenkorb.</p><p><strong>Bitte prüfe deine Angaben sorgfältig</strong> (Schreibweise, Reihenfolge) – jedes Stück ist ein individuell gefertigtes Unikat.</p>"
           }
         },
-        "acc-care": {
+        "acc-material": {
           "type": "accordion",
           "settings": {
-            "title": "Pflege",
-            "content": "<p>Maschinenwäsche bei 30 °C im Wäschesack. Nicht direkt auf der Stickerei bügeln.</p>"
+            "title": "Maße, Material & Pflege",
+            "content": "<ul><li><strong>Maße:</strong> ca. 70 × 110 cm, ca. 1 cm gepolstert (gelenkschonend)</li><li><strong>Unterseite:</strong> rutschfest für sicheren Halt</li><li><strong>Material:</strong> 100 % Polyester</li></ul><p><strong>Pflege:</strong> schonende Handwäsche, nicht direkt auf der Stickerei bügeln. So bleiben Stickerei und Material lange schön.</p>"
+          }
+        },
+        "acc-shipret": {
+          "type": "accordion",
+          "settings": {
+            "title": "Lieferung & Rückgabe",
+            "content": "<p><strong>Versandkosten:</strong> Österreich kostenlos, Deutschland ab 100 € Bestellwert kostenlos. Das voraussichtliche Lieferdatum siehst du oben.</p><p>Zu Stoßzeiten wie Ramadan oder Eid kann es vereinzelt zu längeren Bearbeitungszeiten kommen – mit der <strong>Expressanfertigung</strong> starten wir sofort.</p><p><strong>Rückgabe:</strong> Standardartikel innerhalb von 14 Tagen. Personalisierte Produkte werden eigens für dich angefertigt – ein Widerruf ist hier ausgeschlossen. Bitte prüfe deine Angaben vor dem Kauf sorgfältig.</p>"
+          }
+        },
+        "acc-hint": {
+          "type": "accordion",
+          "settings": {
+            "title": "Design, Muster & Farbe",
+            "content": "<p>Das Muster kann von der Produktabbildung abweichen; eine Auswahl bestimmter Muster ist nicht möglich. Das schlichte, einfarbige Design sorgt bewusst für eine ruhige, ablenkungsfreie Atmosphäre.</p><p>Je nach Bildschirm und Geräteeinstellung kann es zu leichten Farbabweichungen kommen.</p>"
           }
         }
       },
@@ -198,7 +205,6 @@
         "thread-brown",
         "thread_color_FDfRGA",
         "badge-lock",
-        "badge-shield",
         "badge-heart",
         "badge-clock",
         "sym-none",
@@ -208,10 +214,13 @@
         "addon-giftwrap",
         "addon-express",
         "addon-beads",
-        "acc-shipping",
-        "acc-care"
+        "acc-perso",
+        "acc-material",
+        "acc-shipret",
+        "acc-hint"
       ],
       "settings": {
+        "subtitle": "Mit dem Namen deiner Wahl bestickt – ein Geschenk, das bleibt.",
         "label_color": "Farbe",
         "label_name1": "Name 1",
         "placeholder_name1": "z. B. Amina",
@@ -230,9 +239,9 @@
         "soldout_label": "Ausverkauft",
         "urgency_text": "Nur noch [Anzahl] Stück verfügbar",
         "desc_accordion_title": "Beschreibung & Material",
-        "personalize_title": "Gebetsteppich personalisieren?",
-        "personalize_desc": "Mit gestickten Namen wird dein Geschenk einzigartig.",
-        "badge_text": "Personalisiertes Set",
+        "personalize_title": "Mit Namen personalisieren?",
+        "personalize_desc": "Ein gestickter Name macht aus dem Teppich ein unvergessliches Unikat.",
+        "badge_text": "Personalisiertes Geschenk",
         "inventory_threshold": 10,
         "addon_product": "aufpreise",
         "price_name1": 1000,
@@ -270,29 +279,57 @@
         "f1": {
           "type": "item",
           "settings": {
-            "question": "Wie lange dauert die Produktion?",
-            "answer": "Personalisierte Gebetsteppiche werden innerhalb von 2–3 Werktagen gefertigt und anschließend verschickt."
+            "question": "Wie lange dauert die Anfertigung eines personalisierten Gebetsteppichs?",
+            "answer": "Jeder Gebetsteppich wird individuell für dich bestickt. Die Anfertigung dauert in der Regel 2–4 Werktage, danach folgt der Versand (Österreich 1–2 Werktage, Deutschland 2–4 Werktage). Auf der Produktseite siehst du ein voraussichtliches Lieferdatum. Mit der Expressanfertigung starten wir sofort und bevorzugt."
           }
         },
         "f2": {
           "type": "item",
           "settings": {
-            "question": "Welche Namen und Schriften kann ich wählen?",
-            "answer": "Du kannst lateinische sowie arabische Namen mit bis zu 11 Zeichen bestellen. Wähle zwischen vier Schriftarten und drei Goldtönen."
+            "question": "In welcher Schrift kann der Name gestickt werden – auch auf Arabisch?",
+            "answer": "Ja. Wir sticken Namen in arabischer und lateinischer Schrift (bis zu 11 Zeichen). Für einen arabischen Namen gib die Zeichen direkt ein oder hinterlasse uns einen kurzen Hinweis im Warenkorb. Nicht-arabische Fremdschriften und Sonderzeichen (? ! ' \" …) sind von der Bestickung ausgeschlossen."
           }
         },
         "f3": {
           "type": "item",
           "settings": {
-            "question": "Kann ich den Teppich waschen?",
-            "answer": "Ja – schonend bei 30 °C im Wäschesack. Die Goldstickerei bleibt dauerhaft erhalten."
+            "question": "Wo wird der Name platziert und kann ich die Farbe wählen?",
+            "answer": "Damit dich nichts vom Gebet ablenkt, sticken wir den Namen dezent unten seitlich (rechts oder links). Die Schriftfarbe wählst du frei aus – von Gold über Silber bis zu dezenten Tönen. Bei schmalem Rand kann der Name auf dem Muster liegen."
           }
         },
         "f4": {
           "type": "item",
           "settings": {
-            "question": "Welche Bezahlmöglichkeiten gibt es?",
-            "answer": "Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna (3 zinsfreie Raten)."
+            "question": "Eignet sich der Teppich als Geschenk (Ramadan, Bayram, Hochzeit, Umrah)?",
+            "answer": "Genau dafür ist er gemacht. Ein personalisierter Gebetsteppich ist ein bedeutungsvolles Geschenk zu Ramadan, Eid/Bayram, zur Hochzeit, Geburt oder Umrah/Hajj – für Mama, Papa, Partner:in oder Geschwister. Auf Wunsch verpacken wir ihn geschenkfertig mit Satinschleife."
+          }
+        },
+        "f5": {
+          "type": "item",
+          "settings": {
+            "question": "Wie pflege ich den Gebetsteppich?",
+            "answer": "Wir empfehlen eine schonende Handwäsche, damit Stickerei und Material lange schön bleiben. Bitte nicht direkt auf der Stickerei bügeln."
+          }
+        },
+        "f6": {
+          "type": "item",
+          "settings": {
+            "question": "Welche Maße und welches Material hat der Teppich?",
+            "answer": "Der Gebetsteppich misst ca. 70 × 110 cm, ist rund 1 cm dick (gepolstert, gelenkschonend) und besteht aus 100 % Polyester. Die rutschfeste Unterseite sorgt für sicheren Halt."
+          }
+        },
+        "f7": {
+          "type": "item",
+          "settings": {
+            "question": "Kann ich personalisierte Artikel zurückgeben?",
+            "answer": "Für Standardartikel gilt das 14-tägige Rückgaberecht. Personalisierte Produkte werden eigens für dich angefertigt – hier ist ein Widerruf ausgeschlossen. Bitte prüfe deine Angaben (Schreibweise, Reihenfolge) vor dem Kauf sorgfältig."
+          }
+        },
+        "f8": {
+          "type": "item",
+          "settings": {
+            "question": "Welche Bezahlmöglichkeiten gibt es und liefert ihr nach Deutschland & Österreich?",
+            "answer": "Wir liefern nach Österreich und Deutschland. Bezahlen kannst du bequem mit Visa, Mastercard, AMEX, PayPal, Apple Pay und Klarna."
           }
         }
       },
@@ -300,7 +337,11 @@
         "f1",
         "f2",
         "f3",
-        "f4"
+        "f4",
+        "f5",
+        "f6",
+        "f7",
+        "f8"
       ],
       "settings": {
         "eyebrow": "Häufige Fragen",

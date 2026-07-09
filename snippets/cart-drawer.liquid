@@ -430,6 +430,15 @@
           </small>
         </div>
 
+        {%- comment -%} Dynamische Lieferzeit — Express wenn ein Artikel Expressanfertigung hat {%- endcomment -%}
+        {%- if cart != empty -%}
+          {%- assign gw_drawer_express = false -%}
+          {%- for item in cart.items -%}
+            {%- if item.properties['Expressanfertigung'] != blank -%}{%- assign gw_drawer_express = true -%}{%- endif -%}
+          {%- endfor -%}
+          {%- render 'gw-delivery-estimate', express: gw_drawer_express, compact: true -%}
+        {%- endif -%}
+
         <!-- CTAs -->
 
         <div class="cart__ctas" {{ block.shopify_attributes }}>
