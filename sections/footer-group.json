@@ -14,6 +14,23 @@
     "gebetswerk_footer": {
       "type": "gebetswerk-footer",
       "blocks": {
+        "forms_inline_kqgFUn": {
+          "type": "shopify://apps/forms/blocks/inline/8744a304-fcb1-4347-b211-bb6b4759a76a",
+          "settings": {
+            "form_id": "1060865",
+            "text_color": "#FFFFFF",
+            "button_background_color": "#C89B3C",
+            "button_label_color": "#FFFFFF",
+            "links_color": "#1878B9",
+            "errors_color": "#E02229",
+            "text_alignment": "center",
+            "form_alignment": "center",
+            "padding_top": 0,
+            "padding_bottom": 24,
+            "padding_right": 0,
+            "padding_left": 0
+          }
+        },
         "col-shop": {
           "type": "column",
           "settings": {
@@ -118,6 +135,7 @@
         }
       },
       "block_order": [
+        "forms_inline_kqgFUn",
         "col-shop",
         "shop-1",
         "shop-2",
@@ -135,7 +153,8 @@
         "recht-4"
       ],
       "settings": {
-        "logo_width": 160,
+        "logo_image": "shopify://shop_images/gebetswerk-logo-white.png",
+        "logo_width": 80,
         "logo_initials": "GW",
         "brand_name": "Gebetswerk",
         "tagline": "Personalisierte Gebetsteppiche mit dem Namen deiner Wahl – ein Geschenk, das Generationen bleibt.",
