@@ -152,10 +152,13 @@
         "recht-3",
         "recht-4"
       ],
+      "custom_css": [
+        ".gw-footer__logo-name {color: white;}"
+      ],
       "settings": {
         "logo_image": "shopify://shop_images/gebetswerk-logo-white.png",
         "logo_width": 80,
-        "logo_initials": "GW",
+        "logo_initials": "",
         "brand_name": "Gebetswerk",
         "tagline": "Personalisierte Gebetsteppiche mit dem Namen deiner Wahl – ein Geschenk, das Generationen bleibt.",
         "copyright_suffix": "Mit Liebe gefertigt.",
