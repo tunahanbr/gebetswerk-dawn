@@ -1,45 +1,85 @@
 {%- comment -%}
   Dynamische Lieferzeit-Anzeige (Standard / Express).
 
+  Rechenmodell (siehe assets/gebetswerk-delivery.js):
+    1. Bearbeitung: zählt nur an den gewählten Bearbeitungstagen (auch Wochenende
+       möglich). Bestellungen nach Redaktionsschluss starten einen Tag später.
+    2. Versandübergabe: das fertige Paket geht am selben Tag raus, wenn er ein
+       Versandtag ist, sonst am nächsten Versandtag (typisch Mo–Fr).
+    3. Versanddauer: zählt Mo–Fr, bei aktivierter Samstagszustellung auch Sa.
+
   Parameter (alle optional):
+    s             - section.settings des Aufrufers; liefert alle delivery_*-Werte
+                    aus dem Theme-Editor (Tage, Uhrzeit, Texte)
     express       - true/false  initialer Zustand (Standard: false)
     auto_express  - true        beobachtet die Express-Checkbox der Produktseite
                                  und schaltet automatisch um
     compact       - true        kompaktere Darstellung (z. B. Cart-Drawer)
-    prod_min/max  - Produktions-Werktage (Standard 2 / 4)
-    ship_min/max  - Versand-Werktage (Standard 1 / 4)
-    exp_min/max   - Gesamt-Werktage Express (Standard 1 / 3)
-    cutoff_hour   - Bestell-Redaktionsschluss, Stunde 0–23 (Standard 14)
-    label         - Eyebrow über dem Datum (Standard: "Voraussichtliche Lieferung")
-    standard_note - Erklärzeile Standard (unter dem Datum)
-    express_note  - Erklärzeile Express
-    express_hint  - Kleingedruckter Hinweis unter dem Express-Text
+    label / standard_note / express_note / express_hint
+                  - Text-Overrides; gewinnen gegenüber s
 
   Verwendung:
-    {%- render 'gw-delivery-estimate', auto_express: true -%}
+    {%- render 'gw-delivery-estimate', auto_express: true, s: section.settings -%}
     {%- render 'gw-delivery-estimate', express: has_express, compact: true -%}
 {%- endcomment -%}
 
 {{ 'gebetswerk-delivery.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign gw_label = label | default: 'Voraussichtliche Lieferung'
-  assign gw_std_note = standard_note | default: 'Standard-Anfertigung: 2–4 Werktage + Versand (AT 1–2, DE 2–4 Tage).'
-  assign gw_exp_note = express_note | default: 'Wir starten sofort mit deiner Bestellung – bevorzugt vor allen anderen.'
-  assign gw_hint = express_hint | default: 'Das genaue Zustelldatum hängt zusätzlich vom Versanddienstleister ab.'
+  assign gw_label = label | default: s.delivery_label | default: 'Voraussichtliche Lieferung'
+  assign gw_std_note = standard_note | default: s.delivery_standard_text | default: 'Standard-Anfertigung: 2–4 Werktage + Versand (AT 1–2, DE 2–4 Tage).'
+  assign gw_exp_note = express_note | default: s.delivery_express_text | default: 'Wir starten sofort mit deiner Bestellung – bevorzugt vor allen anderen.'
+  assign gw_hint = express_hint | default: s.delivery_express_hint | default: 'Das genaue Zustelldatum hängt zusätzlich vom Versanddienstleister ab.'
+  assign gw_cutoff = s.delivery_cutoff | default: '14:00'
+
+  comment
+    Tages-Masken als 7-stellige Bitstrings, Index = JS getDay() (0 = Sonntag).
+  endcomment
+  assign gw_day_keys = 'so,mo,di,mi,do,fr,sa' | split: ','
+  if s
+    assign gw_work_days = ''
+    assign gw_ship_days = ''
+    for k in gw_day_keys
+      assign gw_wid = 'delivery_work_' | append: k
+      assign gw_sid = 'delivery_ship_' | append: k
+      if s[gw_wid]
+        assign gw_work_days = gw_work_days | append: '1'
+      else
+        assign gw_work_days = gw_work_days | append: '0'
+      endif
+      if s[gw_sid]
+        assign gw_ship_days = gw_ship_days | append: '1'
+      else
+        assign gw_ship_days = gw_ship_days | append: '0'
+      endif
+    endfor
+  else
+    assign gw_work_days = '1111111'
+    assign gw_ship_days = '0111110'
+  endif
+
+  assign gw_sat_delivery = true
+  if s and s.delivery_sat_delivery == false
+    assign gw_sat_delivery = false
+  endif
 -%}
 
 <div
   class="gw-delivery{% if compact %} gw-delivery--compact{% endif %}"
   data-express="{% if express %}true{% else %}false{% endif %}"
   data-auto-express="{% if auto_express %}true{% else %}false{% endif %}"
-  data-prod-min="{{ prod_min | default: 2 }}"
-  data-prod-max="{{ prod_max | default: 4 }}"
-  data-ship-min="{{ ship_min | default: 1 }}"
-  data-ship-max="{{ ship_max | default: 4 }}"
-  data-exp-min="{{ exp_min | default: 1 }}"
-  data-exp-max="{{ exp_max | default: 3 }}"
-  data-cutoff-hour="{{ cutoff_hour | default: 14 }}"
+  data-work-days="{{ gw_work_days }}"
+  data-ship-days="{{ gw_ship_days }}"
+  data-sat-delivery="{{ gw_sat_delivery }}"
+  data-cutoff="{{ gw_cutoff }}"
+  data-prod-min="{{ s.delivery_prod_min | default: 2 }}"
+  data-prod-max="{{ s.delivery_prod_max | default: 4 }}"
+  data-ship-min="{{ s.delivery_ship_min | default: 1 }}"
+  data-ship-max="{{ s.delivery_ship_max | default: 4 }}"
+  data-exp-prod-min="{{ s.delivery_exp_prod_min | default: 1 }}"
+  data-exp-prod-max="{{ s.delivery_exp_prod_max | default: 1 }}"
+  data-exp-ship-min="{{ s.delivery_exp_ship_min | default: 1 }}"
+  data-exp-ship-max="{{ s.delivery_exp_ship_max | default: 2 }}"
   aria-live="polite"
 >
   {%- comment -%} Standard {%- endcomment -%}

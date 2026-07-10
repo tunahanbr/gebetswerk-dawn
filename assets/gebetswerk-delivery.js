@@ -1,6 +1,20 @@
 /* Gebetswerk — dynamische Lieferzeit (Standard / Express)
    Rendert in jedes .gw-delivery-Element ein voraussichtliches Lieferdatum.
-   - Werktags-Logik: Wochenenden werden übersprungen.
+
+   Rechenmodell in drei Schritten, jeweils mit eigenem Tages-Kalender:
+     1. Bearbeitung   — zählt nur an den gewählten Bearbeitungstagen
+                        (data-work-days, auch Wochenende möglich). Bestellungen
+                        nach Redaktionsschluss (data-cutoff "HH:MM") an einem
+                        Bearbeitungstag starten einen Tag später.
+     2. Versandübergabe — das fertige Paket geht am selben Tag raus, wenn er
+                        ein Versandtag ist (data-ship-days), sonst am nächsten
+                        Versandtag.
+     3. Versanddauer  — zählt Mo–Fr; bei data-sat-delivery="true" zählt auch
+                        der Samstag als Zustelltag.
+
+   Tages-Masken sind 7-stellige Bitstrings, Index = Date.getDay() (0 = Sonntag),
+   z. B. "0111110" = Mo–Fr.
+
    - Auf der Produktseite beobachtet es (data-auto-express) die Express-Checkbox
      und schaltet automatisch zwischen Standard- und Express-Zustand um.
    - Im Warenkorb kommt der Zustand statisch aus Liquid (data-express).
@@ -11,27 +25,42 @@
   var WEEKDAYS = ['So.', 'Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.'];
   var MONTHS = ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
 
-  /* Fügt n Werktage (Mo–Fr) zu einem Datum hinzu. */
-  function addBusinessDays(start, n) {
-    var d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  /* Eine Maske ohne einzigen aktiven Tag würde endlos iterieren. */
+  function validMask(mask, fallback) {
+    return typeof mask === 'string' && mask.length === 7 && mask.indexOf('1') !== -1 ? mask : fallback;
+  }
+
+  function isDay(mask, d) {
+    return mask.charAt(d.getDay()) === '1';
+  }
+
+  /* Fügt n Tage hinzu, gezählt werden nur Tage der Maske. */
+  function addDays(start, n, mask) {
+    var d = new Date(start.getTime());
     var added = 0;
     while (added < n) {
       d.setDate(d.getDate() + 1);
-      var wd = d.getDay();
-      if (wd !== 0 && wd !== 6) added++;
+      if (isDay(mask, d)) added++;
     }
     return d;
   }
 
-  function fmtDate(d) {
-    return WEEKDAYS[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()];
+  /* Erster Masken-Tag am oder nach dem Startdatum. */
+  function nextOnOrAfter(start, mask) {
+    var d = new Date(start.getTime());
+    while (!isDay(mask, d)) d.setDate(d.getDate() + 1);
+    return d;
   }
 
-  /* Bestellungen nach Redaktionsschluss (Standard 14 Uhr) starten am nächsten Tag. */
-  function startDate(cutoffHour) {
-    var now = new Date();
-    if (now.getHours() >= cutoffHour) now.setDate(now.getDate() + 1);
-    return now;
+  /* "14:00", "14" → {h, m}; Unlesbares fällt auf 14:00 zurück. */
+  function parseCutoff(value) {
+    var m = /^\s*(\d{1,2})(?::(\d{1,2}))?\s*$/.exec(value || '');
+    if (!m) return { h: 14, m: 0 };
+    return { h: Math.min(23, parseInt(m[1], 10)), m: m[2] ? Math.min(59, parseInt(m[2], 10)) : 0 };
+  }
+
+  function fmtDate(d) {
+    return WEEKDAYS[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()];
   }
 
   function num(v, fallback) {
@@ -39,22 +68,43 @@
     return isNaN(n) ? fallback : n;
   }
 
-  function render(el) {
-    var express = el.dataset.express === 'true';
-    var cutoff = num(el.dataset.cutoffHour, 14);
-    var start = startDate(cutoff);
+  function computeDate(el, prodDays, transitDays) {
+    var work = validMask(el.dataset.workDays, '1111111');
+    var ship = validMask(el.dataset.shipDays, '0111110');
+    var transit = el.dataset.satDelivery === 'true' ? '0111111' : '0111110';
+    var cutoff = parseCutoff(el.dataset.cutoff);
 
-    var min, max;
-    if (express) {
-      min = num(el.dataset.expMin, 1);
-      max = num(el.dataset.expMax, 3);
-    } else {
-      min = num(el.dataset.prodMin, 2) + num(el.dataset.shipMin, 1);
-      max = num(el.dataset.prodMax, 4) + num(el.dataset.shipMax, 4);
+    /* Redaktionsschluss greift nur an Bearbeitungstagen: an einem freien Tag
+       beginnt die Zählung ohnehin erst am nächsten Bearbeitungstag. */
+    var now = new Date();
+    var start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (isDay(work, start) && (now.getHours() > cutoff.h || (now.getHours() === cutoff.h && now.getMinutes() >= cutoff.m))) {
+      start.setDate(start.getDate() + 1);
     }
 
-    var earliest = addBusinessDays(start, min);
-    var latest = addBusinessDays(start, max);
+    var prodDone = addDays(start, prodDays, work);
+    var handoff = nextOnOrAfter(prodDone, ship);
+    return addDays(handoff, transitDays, transit);
+  }
+
+  function render(el) {
+    var express = el.dataset.express === 'true';
+
+    var prodMin, prodMax, shipMin, shipMax;
+    if (express) {
+      prodMin = num(el.dataset.expProdMin, 1);
+      prodMax = num(el.dataset.expProdMax, 1);
+      shipMin = num(el.dataset.expShipMin, 1);
+      shipMax = num(el.dataset.expShipMax, 2);
+    } else {
+      prodMin = num(el.dataset.prodMin, 2);
+      prodMax = num(el.dataset.prodMax, 4);
+      shipMin = num(el.dataset.shipMin, 1);
+      shipMax = num(el.dataset.shipMax, 4);
+    }
+
+    var earliest = computeDate(el, prodMin, shipMin);
+    var latest = computeDate(el, prodMax, shipMax);
     var text = earliest.getTime() === latest.getTime()
       ? fmtDate(earliest)
       : fmtDate(earliest) + ' – ' + fmtDate(latest);

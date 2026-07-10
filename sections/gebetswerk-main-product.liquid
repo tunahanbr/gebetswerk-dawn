@@ -451,20 +451,7 @@
 
           {%- comment -%} ─ Dynamische Lieferzeit (Standard / Express) ─ {%- endcomment -%}
           {%- if section.settings.delivery_show -%}
-            {%- render 'gw-delivery-estimate',
-              auto_express: true,
-              prod_min: section.settings.delivery_prod_min,
-              prod_max: section.settings.delivery_prod_max,
-              ship_min: section.settings.delivery_ship_min,
-              ship_max: section.settings.delivery_ship_max,
-              exp_min: section.settings.delivery_exp_min,
-              exp_max: section.settings.delivery_exp_max,
-              cutoff_hour: section.settings.delivery_cutoff_hour,
-              label: section.settings.delivery_label,
-              standard_note: section.settings.delivery_standard_text,
-              express_note: section.settings.delivery_express_text,
-              express_hint: section.settings.delivery_express_hint
-            -%}
+            {%- render 'gw-delivery-estimate', auto_express: true, s: section.settings -%}
           {%- endif -%}
 
           {%- comment -%} ─ Qty + ATC ─ {%- endcomment -%}
@@ -688,15 +675,56 @@
     },
     {
       "type": "paragraph",
-      "content": "Lieferdatum = Bearbeitungstage + Versandtage (nur Werktage Mo–Fr). Standard-Lieferung wird als Spanne vom frühesten bis spätesten Werktag angezeigt."
+      "content": "Lieferdatum = Bearbeitung (zählt nur an den gewählten Bearbeitungstagen) → Übergabe an den Versand (am nächsten Versandtag) → Versanddauer (Mo–Fr, optional auch Sa als Zustelltag). Angezeigt wird die Spanne vom frühesten bis spätesten Datum."
     },
-    { "type": "number", "id": "delivery_prod_min", "label": "Bearbeitung Standard: min. Werktage", "default": 2 },
-    { "type": "number", "id": "delivery_prod_max", "label": "Bearbeitung Standard: max. Werktage", "default": 4 },
-    { "type": "number", "id": "delivery_ship_min", "label": "Versand: min. Werktage", "default": 1 },
-    { "type": "number", "id": "delivery_ship_max", "label": "Versand: max. Werktage", "default": 4 },
-    { "type": "number", "id": "delivery_exp_min", "label": "Express gesamt: min. Werktage", "default": 1 },
-    { "type": "number", "id": "delivery_exp_max", "label": "Express gesamt: max. Werktage", "default": 3 },
-    { "type": "number", "id": "delivery_cutoff_hour", "label": "Redaktionsschluss (Stunde 0–23)", "default": 14, "info": "Bestellungen nach dieser Uhrzeit starten am nächsten Tag." },
+    {
+      "type": "header",
+      "content": "Bearbeitung (Personalisierung)"
+    },
+    {
+      "type": "text",
+      "id": "delivery_cutoff",
+      "label": "Redaktionsschluss (HH:MM)",
+      "default": "14:00",
+      "info": "Bestellungen nach dieser Uhrzeit an einem Bearbeitungstag zählen erst ab dem nächsten Tag."
+    },
+    { "type": "checkbox", "id": "delivery_work_mo", "label": "Bearbeitung: Montag", "default": true },
+    { "type": "checkbox", "id": "delivery_work_di", "label": "Bearbeitung: Dienstag", "default": true },
+    { "type": "checkbox", "id": "delivery_work_mi", "label": "Bearbeitung: Mittwoch", "default": true },
+    { "type": "checkbox", "id": "delivery_work_do", "label": "Bearbeitung: Donnerstag", "default": true },
+    { "type": "checkbox", "id": "delivery_work_fr", "label": "Bearbeitung: Freitag", "default": true },
+    { "type": "checkbox", "id": "delivery_work_sa", "label": "Bearbeitung: Samstag", "default": true },
+    { "type": "checkbox", "id": "delivery_work_so", "label": "Bearbeitung: Sonntag", "default": true },
+    { "type": "number", "id": "delivery_prod_min", "label": "Bearbeitung Standard: min. Tage", "default": 2 },
+    { "type": "number", "id": "delivery_prod_max", "label": "Bearbeitung Standard: max. Tage", "default": 4 },
+    { "type": "number", "id": "delivery_exp_prod_min", "label": "Bearbeitung Express: min. Tage", "default": 1 },
+    { "type": "number", "id": "delivery_exp_prod_max", "label": "Bearbeitung Express: max. Tage", "default": 1 },
+    {
+      "type": "header",
+      "content": "Versand & Zustellung"
+    },
+    {
+      "type": "paragraph",
+      "content": "Versandtage = Tage, an denen Pakete an den Versanddienst übergeben werden. Ist die Bearbeitung an einem anderen Tag fertig, wartet das Paket bis zum nächsten Versandtag."
+    },
+    { "type": "checkbox", "id": "delivery_ship_mo", "label": "Versand: Montag", "default": true },
+    { "type": "checkbox", "id": "delivery_ship_di", "label": "Versand: Dienstag", "default": true },
+    { "type": "checkbox", "id": "delivery_ship_mi", "label": "Versand: Mittwoch", "default": true },
+    { "type": "checkbox", "id": "delivery_ship_do", "label": "Versand: Donnerstag", "default": true },
+    { "type": "checkbox", "id": "delivery_ship_fr", "label": "Versand: Freitag", "default": true },
+    { "type": "checkbox", "id": "delivery_ship_sa", "label": "Versand: Samstag", "default": false },
+    { "type": "checkbox", "id": "delivery_ship_so", "label": "Versand: Sonntag", "default": false },
+    { "type": "number", "id": "delivery_ship_min", "label": "Versanddauer Standard: min. Tage", "default": 1 },
+    { "type": "number", "id": "delivery_ship_max", "label": "Versanddauer Standard: max. Tage", "default": 4 },
+    { "type": "number", "id": "delivery_exp_ship_min", "label": "Versanddauer Express: min. Tage", "default": 1 },
+    { "type": "number", "id": "delivery_exp_ship_max", "label": "Versanddauer Express: max. Tage", "default": 2 },
+    {
+      "type": "checkbox",
+      "id": "delivery_sat_delivery",
+      "label": "Zustellung auch samstags",
+      "default": true,
+      "info": "Samstage zählen dann als Zustelltage (z. B. Post/DHL-Samstagszustellung)."
+    },
     {
       "type": "header",
       "content": "💰 Aufpreise für Personalisierung"
