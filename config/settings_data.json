@@ -135,22 +135,19 @@
         "disabled": false,
         "settings": {}
       },
-      "3477441169306989575": {
-        "type": "shopify://apps/eu-withdrawal-form/blocks/euWithdrawalFormEmbed/0199511b-9a6a-70b7-9036-616a6d03b570",
+      "339036956232728707": {
+        "type": "shopify://apps/eu-widerrufsbutton/blocks/withdrawal-link/019e3842-e8eb-772d-9292-20f5ccbc0337",
         "disabled": false,
         "settings": {
-          "display_mode": "floating_button",
-          "button_position": "bottom_right",
-          "embed_privacy_policy_url": "/policies/privacy-policy",
-          "form_bg_color": "#ffffff",
-          "form_text_color": "#000000",
-          "border_radius": 8,
-          "btn_bg_color": "#000000",
-          "btn_text_color": "#ffffff",
-          "btn_bg_hover_color": "#000000",
-          "btn_text_hover_color": "#ffffff",
-          "btn_border_radius": 8,
-          "embed_custom_css": "/* Add custom CSS here */"
+          "style": "button",
+          "bold": true,
+          "underline": true,
+          "underline_thickness": 1,
+          "link_color": "",
+          "size": "middle",
+          "border_radius": 4,
+          "text_color": "#ffffff",
+          "background_color": "#000000"
         }
       }
     },

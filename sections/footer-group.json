@@ -105,6 +105,13 @@
             "heading": "Rechtliches"
           }
         },
+        "link_jFbXbH": {
+          "type": "link",
+          "settings": {
+            "label": "Vertrag widerrufen",
+            "url": "/a/withdrawal"
+          }
+        },
         "recht-1": {
           "type": "link",
           "settings": {
@@ -147,6 +154,7 @@
         "hilfe-4",
         "hilfe-5",
         "col-recht",
+        "link_jFbXbH",
         "recht-1",
         "recht-2",
         "recht-3",
