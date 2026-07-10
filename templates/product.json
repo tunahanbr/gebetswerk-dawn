@@ -253,7 +253,7 @@
         "delivery_ship_min": 1,
         "delivery_ship_max": 3,
         "delivery_exp_min": 1,
-        "delivery_exp_max": 2,
+        "delivery_exp_max": 3,
         "delivery_cutoff_hour": 17,
         "addon_product": "aufpreise",
         "price_name1": 1000,
