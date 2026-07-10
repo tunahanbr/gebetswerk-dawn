@@ -166,38 +166,33 @@
             </div>
           {%- endif -%}
 
-          <div class="gw-cart-discount">
-            <p class="gw-cart-discount__label">Gutscheincode</p>
-            <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js">
-              <label class="visually-hidden" for="gw-cart-discount-code">Gutscheincode eingeben</label>
-              <input id="gw-cart-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
-              <button class="gw-discount-form__button" type="submit">Einlösen</button>
-            </form>
-            {%- if cart.cart_level_discount_applications.size > 0 -%}
-              <ul class="gw-cart-discount__applied" role="list" aria-label="Angewendete Gutscheine">
-                {%- for discount in cart.cart_level_discount_applications -%}
-                  <li>
-                    <span>{{ discount.title | escape }} <span>−{{ discount.total_allocated_amount | money }}</span></span>
-                    <button type="button" class="gw-discount-remove" data-gw-remove-discount data-discount-update-url="{{ routes.cart_update_url }}.js">Entfernen</button>
-                  </li>
-                {%- endfor -%}
-              </ul>
-            {%- endif -%}
-            <p class="gw-discount-form__status" data-discount-status hidden role="status"></p>
-          </div>
+          <details class="gw-cart-discount">
+            <summary class="gw-cart-discount__label">Gutscheincode</summary>
+            <div class="gw-cart-discount__content">
+              <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js">
+                <label class="visually-hidden" for="gw-cart-discount-code">Gutscheincode eingeben</label>
+                <input id="gw-cart-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
+                <button class="gw-discount-form__button" type="submit">Einlösen</button>
+                <p class="gw-discount-form__status" data-discount-status hidden role="status"></p>
+              </form>
+              {%- if cart.cart_level_discount_applications.size > 0 -%}
+                <ul class="gw-cart-discount__applied" role="list" aria-label="Angewendete Gutscheine">
+                  {%- for discount in cart.cart_level_discount_applications -%}
+                    <li>
+                      <span>{{ discount.title | escape }} <span>−{{ discount.total_allocated_amount | money }}</span></span>
+                      <button type="button" class="gw-discount-remove" data-gw-remove-discount data-discount-update-url="{{ routes.cart_update_url }}.js">Entfernen</button>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+          </details>
 
           <div class="gw-cart-summary__total">
             <span>{{ section.settings.total_label | default: 'Gesamt' }}</span>
             <span id="gw-cart-total">{{ cart.total_price | money }}</span>
           </div>
           <p class="gw-cart-summary__tax">{{ section.settings.tax_note | default: 'inkl. MwSt.' }}</p>
-
-          {%- comment -%} Dynamische Lieferzeit — Express wenn ein Artikel Expressanfertigung hat {%- endcomment -%}
-          {%- assign cart_has_express = false -%}
-          {%- for item in cart.items -%}
-            {%- if item.properties['Expressanfertigung'] != blank -%}{%- assign cart_has_express = true -%}{%- endif -%}
-          {%- endfor -%}
-          {%- render 'gw-delivery-estimate', express: cart_has_express, compact: true -%}
 
           <a href="/checkout" class="gw-cart-checkout-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>

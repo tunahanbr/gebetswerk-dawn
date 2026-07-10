@@ -281,8 +281,12 @@
 
 /* Discount code */
 .gw-cart-discount { margin: 0 0 18px; padding: 16px 0 4px; border-top: 1px solid var(--gw-border, #e5e0d8); }
-.gw-cart-discount__label { margin: 0 0 8px; color: var(--gw-ink, #1a1613); font-size: 13px; font-weight: 600; }
-.gw-discount-form { display: flex; gap: 8px; }
+.gw-cart-discount__label { display: flex; align-items: center; justify-content: space-between; margin: 0; color: var(--gw-ink, #1a1613); font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; }
+.gw-cart-discount__label::-webkit-details-marker { display: none; }
+.gw-cart-discount__label::after { content: '+'; color: var(--gw-muted, #6b6560); font-size: 18px; font-weight: 400; line-height: 1; }
+.gw-cart-discount[open] .gw-cart-discount__label::after { content: '−'; }
+.gw-cart-discount__content { padding-top: 10px; }
+.gw-discount-form { display: flex; flex-wrap: wrap; gap: 8px; }
 .gw-discount-form__input { min-width: 0; flex: 1; width: 100%; padding: 11px 12px; border: 1px solid var(--gw-border, #d9d2c6); border-radius: 8px; background: var(--gw-ivory, #faf8f3); color: var(--gw-ink, #1a1613); font: inherit; font-size: 13px; }
 .gw-discount-form__input:focus { outline: 2px solid var(--gw-gold, #c9a24a); outline-offset: 1px; }
 .gw-discount-form__button { flex: none; padding: 0 14px; border: 1px solid var(--gw-ink, #1a1613); border-radius: 8px; background: var(--gw-ink, #1a1613); color: var(--gw-ivory, #f9f6f0); cursor: pointer; font: inherit; font-size: 12px; font-weight: 600; }
@@ -292,7 +296,7 @@
 .gw-cart-discount__applied li > span:first-child { min-width: 0; }
 .gw-discount-remove { flex: none; padding: 0; border: 0; background: none; color: var(--gw-muted, #6b6560); cursor: pointer; font: inherit; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
 .gw-discount-remove:hover { color: var(--gw-ink, #1a1613); }
-.gw-discount-form__status { margin: 8px 0 0; font-size: 12px; color: #8a2f22; }
+.gw-discount-form__status { flex: 0 0 100%; margin: 0; font-size: 12px; color: #8a2f22; }
 .gw-discount-form__status[data-state="success"] { color: #24733d; }
 
 .gw-cart-summary__total {

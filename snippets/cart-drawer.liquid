@@ -370,15 +370,17 @@
               </div>
             {%- endif -%}
           {%- endif -%}
-          <div class="gw-drawer-discount">
-            <p class="gw-drawer-discount__label">Gutscheincode</p>
-            <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js">
-              <label class="visually-hidden" for="gw-drawer-discount-code">Gutscheincode eingeben</label>
-              <input id="gw-drawer-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
-              <button class="gw-discount-form__button" type="submit">Einlösen</button>
-            </form>
-            <p class="gw-discount-form__status" data-discount-status hidden role="status"></p>
-          </div>
+          <details class="gw-drawer-discount">
+            <summary class="gw-drawer-discount__label">Gutscheincode</summary>
+            <div class="gw-drawer-discount__content">
+              <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js">
+                <label class="visually-hidden" for="gw-drawer-discount-code">Gutscheincode eingeben</label>
+                <input id="gw-drawer-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
+                <button class="gw-discount-form__button" type="submit">Einlösen</button>
+                <p class="gw-discount-form__status" data-discount-status hidden role="status"></p>
+              </form>
+            </div>
+          </details>
           <div>
             {%- if cart.cart_level_discount_applications.size > 0 -%}
               <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
@@ -438,15 +440,6 @@
             {%- endif -%}
           </small>
         </div>
-
-        {%- comment -%} Dynamische Lieferzeit — Express wenn ein Artikel Expressanfertigung hat {%- endcomment -%}
-        {%- if cart != empty -%}
-          {%- assign gw_drawer_express = false -%}
-          {%- for item in cart.items -%}
-            {%- if item.properties['Expressanfertigung'] != blank -%}{%- assign gw_drawer_express = true -%}{%- endif -%}
-          {%- endfor -%}
-          {%- render 'gw-delivery-estimate', express: gw_drawer_express, compact: true -%}
-        {%- endif -%}
 
         <!-- CTAs -->
 
