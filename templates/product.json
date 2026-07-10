@@ -256,7 +256,7 @@
         "delivery_work_fr": true,
         "delivery_work_sa": true,
         "delivery_work_so": true,
-        "delivery_prod_min": 3,
+        "delivery_prod_min": 2,
         "delivery_prod_max": 3,
         "delivery_exp_prod_min": 1,
         "delivery_exp_prod_max": 1,
