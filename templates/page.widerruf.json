@@ -24,7 +24,35 @@
         "address": "[Straße Nr.]\n[PLZ Ort], Österreich",
         "email": "gebetswerk@gmail.com"
       }
+    },
+    "17837001868cdbfda4": {
+      "type": "apps",
+      "blocks": {
+        "eu_withdrawal_form_withdrawal_exclusion_notice_Naq8dB": {
+          "type": "shopify://apps/eu-withdrawal-form/blocks/withdrawalExclusionNotice/0199511b-9a6a-70b7-9036-616a6d03b570",
+          "settings": {
+            "show_title": true,
+            "title": "Right of withdrawal",
+            "message": "This product is excluded from the right of withdrawal.",
+            "background_color": "#f5f5f5",
+            "text_color": "#333333",
+            "font_size": 14,
+            "border_radius": 4,
+            "custom_css": "/* Add custom CSS here */"
+          }
+        }
+      },
+      "block_order": [
+        "eu_withdrawal_form_withdrawal_exclusion_notice_Naq8dB"
+      ],
+      "settings": {
+        "include_margins": true
+      }
     }
   },
-  "order": ["main", "widerruf_form"]
+  "order": [
+    "main",
+    "widerruf_form",
+    "17837001868cdbfda4"
+  ]
 }
