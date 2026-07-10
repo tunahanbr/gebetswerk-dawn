@@ -139,15 +139,15 @@
         "type": "shopify://apps/eu-widerrufsbutton/blocks/withdrawal-link/019e3842-e8eb-772d-9292-20f5ccbc0337",
         "disabled": false,
         "settings": {
-          "style": "button",
+          "style": "link",
           "bold": true,
           "underline": true,
           "underline_thickness": 1,
           "link_color": "",
-          "size": "middle",
+          "size": "small",
           "border_radius": 4,
           "text_color": "#ffffff",
-          "background_color": "#C89B3C"
+          "background_color": "#c89b3c"
         }
       }
     },
