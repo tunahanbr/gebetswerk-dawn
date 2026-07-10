@@ -645,7 +645,12 @@
       const key = 'prod-' + sel.dataset.block;
       const sep = sel.dataset.separate === 'true';
       const update = () => {
-        const opt = sel.options[sel.selectedIndex];
+        let opt = sel.options[sel.selectedIndex];
+        /* Ausverkaufte (disabled) Option nie übernehmen — auf erste verfügbare ausweichen */
+        if (opt?.disabled) {
+          opt = Array.from(sel.options).find(o => !o.disabled) || null;
+          if (opt) sel.value = opt.value;
+        }
         addonMap.set(key, { fieldKey: sel.dataset.fkey, value: opt?.value || '', surchargeCents: parseInt(opt?.dataset.price) || 0, variantId: parseInt(opt?.dataset.variant) || 0, separateLineItem: sep });
         updatePrice();
       };

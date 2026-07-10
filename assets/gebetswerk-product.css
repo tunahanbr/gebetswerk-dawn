@@ -374,6 +374,11 @@
 }
 .gw-bead-btn.is-active { border-color: var(--gw-ink); }
 .gw-bead-btn:hover:not(.is-active) { border-color: var(--gw-muted); }
+/* Ausverkaufte Addon-Variante: ausgegraut & nicht wählbar */
+.gw-bead-btn.is-unavailable { opacity: 0.45; cursor: not-allowed; }
+.gw-bead-btn.is-unavailable:hover { border-color: transparent; }
+.gw-bead-btn.is-unavailable .gw-bead-btn__img img { filter: grayscale(1); }
+.gw-product-radio.is-unavailable { opacity: 0.45; cursor: not-allowed; }
 .gw-bead-btn__img { aspect-ratio: 1; overflow: hidden; background: var(--gw-sand-light); }
 .gw-bead-btn__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .gw-bead-btn__none { width: 100%; height: 100%; display: grid; place-items: center; font-size: 11px; color: var(--gw-muted); }

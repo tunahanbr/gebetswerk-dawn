@@ -1,5 +1,6 @@
 {%- comment -%} ══ DYNAMISCHE ADD-ONS ══ {%- endcomment -%}
 {%- assign rendered_choice_groups = '' -%}
+{%- assign gw_soldout = section.settings.soldout_label | default: 'Ausverkauft' -%}
 {%- for block in section.blocks -%}
 
   {%- comment -%} ── Textfeld ── {%- endcomment -%}
@@ -150,8 +151,8 @@
               <option value="" data-price="0" data-variant="0">{{ block.settings.none_label | default: 'Keine' }}</option>
             {%- endif -%}
             {%- for v in linked_product.variants -%}
-              <option value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
-                {{ v.title }} (+{{ v.price | money_without_currency }}€)
+              <option value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}"{% unless v.available %} disabled{% endunless %}>
+                {%- if v.available -%}{{ v.title }} (+{{ v.price | money_without_currency }}€){%- else -%}{{ v.title }} – {{ gw_soldout }}{%- endif -%}
               </option>
             {%- endfor -%}
           </select>
@@ -167,12 +168,12 @@
               </label>
             {%- endif -%}
             {%- for v in linked_product.variants -%}
-              <label class="gw-product-radio">
+              <label class="gw-product-radio{% unless v.available %} is-unavailable{% endunless %}">
                 <input type="radio" name="opt-p-{{ block.id }}" value="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}"
                   data-addon="product-radio" data-block="{{ block.id }}"
                   data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
-                  data-separate="{{ block.settings.separate_line_item }}">
-                {{ v.title }} (+{{ v.price | money_without_currency }}€)
+                  data-separate="{{ block.settings.separate_line_item }}"{% unless v.available %} disabled{% endunless %}>
+                {%- if v.available -%}{{ v.title }} (+{{ v.price | money_without_currency }}€){%- else -%}{{ v.title }} – {{ gw_soldout }}{%- endif -%}
               </label>
             {%- endfor -%}
           </div>
@@ -198,11 +199,12 @@
               </button>
             {%- endif -%}
             {%- for v in linked_product.variants -%}
-              <button type="button" class="gw-bead-btn"
+              <button type="button" class="gw-bead-btn{% unless v.available %} is-unavailable{% endunless %}"
                 data-addon="product-card" data-block="{{ block.id }}"
                 data-fkey="{{ block.settings.field_key | default: block.settings.label | escape }}"
                 data-separate="{{ block.settings.separate_line_item }}"
-                data-val="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}">
+                data-val="{{ v.title | escape }}" data-price="{{ v.price }}" data-variant="{{ v.id }}"
+                {% unless v.available %}disabled title="{{ v.title | escape }} – {{ gw_soldout }}"{% endunless %}>
                 <div class="gw-bead-btn__img">
                   {%- if v.featured_image -%}
                     <img src="{{ v.featured_image | image_url: width: 200 }}" alt="{{ v.title | escape }}" loading="lazy" width="200" height="{{ 200 | divided_by: v.featured_image.aspect_ratio | round }}">
@@ -214,7 +216,7 @@
                 </div>
                 <div class="gw-bead-btn__info">
                   <span class="gw-bead-btn__name">{{ v.title }}</span>
-                  <span class="gw-bead-btn__price">+{{ v.price | money_without_currency }}€</span>
+                  <span class="gw-bead-btn__price">{% if v.available %}+{{ v.price | money_without_currency }}€{% else %}{{ gw_soldout }}{% endif %}</span>
                 </div>
               </button>
             {%- endfor -%}

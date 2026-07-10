@@ -1527,5 +1527,21 @@
         "default": "scheme-1"
       }
     ]
+  },
+  {
+    "name": "🔒 Versteckte Produkte",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Interne Produkte (z. B. Aufpreise, Gebetsketten als Zusatzoption), deren eigene Produktseite Kunden nicht sehen sollen. Wer die URL direkt aufruft, wird zur Startseite umgeleitet."
+      },
+      {
+        "type": "text",
+        "id": "hidden_product_handles",
+        "label": "Produkt-Handles (durch Komma getrennt)",
+        "default": "aufpreise,gebetsketten",
+        "info": "Der Handle ist der letzte Teil der Produkt-URL, z. B. 'aufpreise' bei /products/aufpreise. Leer lassen, um die Umleitung zu deaktivieren."
+      }
+    ]
   }
 ]

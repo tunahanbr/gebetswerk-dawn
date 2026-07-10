@@ -8,6 +8,17 @@
     <meta name="theme-color" content="{{ first_scheme.settings.background | default: '#F9F6F0' }}">
     <link rel="canonical" href="{{ canonical_url }}">
 
+    {%- comment -%} Versteckte Produkte (Aufpreise, Gebetsketten …): Kunden zur Startseite
+        umleiten. Im Theme-Editor bleibt die Seite erreichbar. {%- endcomment -%}
+    {%- if request.page_type == 'product' and settings.hidden_product_handles != blank and request.design_mode == false -%}
+      {%- assign gw_hidden_handles = settings.hidden_product_handles | downcase | replace: ' ', '' | split: ',' -%}
+      {%- if gw_hidden_handles contains product.handle -%}
+        <meta name="robots" content="noindex, nofollow">
+        <meta http-equiv="refresh" content="0; url={{ routes.root_url }}">
+        <script>window.location.replace({{ routes.root_url | json }});</script>
+      {%- endif -%}
+    {%- endif -%}
+
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
