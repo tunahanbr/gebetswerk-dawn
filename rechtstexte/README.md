@@ -31,6 +31,12 @@ ausfüll- und druckbaren Muster-Widerrufsformular:
 3. Im **Theme-Editor** dieser Seite die Firmendaten (Empfänger) im Abschnitt „Widerrufsformular“ eintragen.
 4. URL wird dann `/pages/widerrufsformular` — darauf verweist die Widerrufsbelehrung bereits.
 
+Das Online-Formular verwendet Shopifys natives Kontaktformular. Die Nachrichten
+gehen an **Einstellungen → Benachrichtigungen → Absender-E-Mail**. Diese Adresse
+vor dem Livegang prüfen und die Domain möglichst authentifizieren. Shopify sendet
+über das native Formular keine automatische Kopie an die Kundin bzw. den Kunden;
+den Eingang daher manuell oder über eine geeignete Shopify-Automation bestätigen.
+
 ## Kontaktseite
 
 `templates/page.contact.json` ist vorbereitet. Im Admin eine Seite „Kontakt“ anlegen
@@ -55,8 +61,8 @@ Für jeden dieser Dienste solltet ihr einen Auftragsverarbeitungsvertrag (AV-Ver
 
 ## Wichtige inhaltliche Entscheidungen (bereits eingearbeitet)
 
-- **Personalisierte Teppiche sind vom Widerruf ausgeschlossen**
-  (§ 312g Abs. 2 Nr. 1 BGB) — das steht so auch schon im
+- **Personalisierte Teppiche sind vom Rücktritt ausgeschlossen**
+  (§ 18 Abs. 1 Z 3 FAGG) — das steht so auch schon im
   Produktseiten-Accordion des Themes. Nicht personalisierte Artikel
   (z. B. Gebetskette ohne Teppich, Teppich ohne Namen) bleiben widerrufbar.
 - **Kein Link zur EU-ODR-Plattform** — die Plattform wurde im Juli 2025

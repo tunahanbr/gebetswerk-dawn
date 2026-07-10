@@ -65,6 +65,7 @@
     el.querySelectorAll('[data-state]').forEach(function (row) {
       row.hidden = (row.dataset.state === 'express') !== express;
     });
+    el.dataset.gwDeliveryReady = 'true';
   }
 
   /* Produktseite: Express-Checkbox beobachten (field_key = "Expressanfertigung"). */
@@ -81,14 +82,41 @@
 
   function boot() {
     document.querySelectorAll('.gw-delivery').forEach(function (el) {
-      render(el);
-      if (el.dataset.autoExpress === 'true') bindExpressToggle(el);
+      if (el.dataset.gwDeliveryReady !== 'true') {
+        render(el);
+        if (el.dataset.autoExpress === 'true') bindExpressToggle(el);
+      }
     });
   }
 
-  if (window.GW_DELIVERY_INIT) return;
+  /*
+   * Cart Drawer sections are replaced by Shopify after add/remove/quantity
+   * updates. Scripts inside those HTML fragments are not reliably executed,
+   * so the original one-time boot left the date at "…". Keep one observer
+   * alive and initialize only newly inserted delivery boxes.
+   */
+  if (window.GW_DELIVERY_INIT) {
+    if (window.GW_DELIVERY_BOOT) window.GW_DELIVERY_BOOT();
+    return;
+  }
   window.GW_DELIVERY_INIT = true;
+  window.GW_DELIVERY_BOOT = boot;
 
   if (document.readyState !== 'loading') boot();
   else document.addEventListener('DOMContentLoaded', boot);
+
+  var observer = new MutationObserver(function (mutations) {
+    var hasNewNodes = mutations.some(function (mutation) {
+      return Array.prototype.some.call(mutation.addedNodes, function (node) {
+        return node.nodeType === 1;
+      });
+    });
+    if (hasNewNodes) boot();
+  });
+
+  function observe() {
+    if (document.body) observer.observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState !== 'loading') observe();
+  else document.addEventListener('DOMContentLoaded', observe);
 })();

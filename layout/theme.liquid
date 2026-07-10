@@ -45,6 +45,7 @@
     {{ 'gebetswerk.css' | asset_url | stylesheet_tag }}
     {{ 'gebetswerk-cart.css' | asset_url | stylesheet_tag }}
     <script src="{{ 'gebetswerk-cart-sync.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'gebetswerk-discount.js' | asset_url }}" defer="defer"></script>
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'

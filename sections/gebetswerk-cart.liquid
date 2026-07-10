@@ -166,6 +166,23 @@
             </div>
           {%- endif -%}
 
+          <div class="gw-cart-discount">
+            <p class="gw-cart-discount__label">Gutscheincode</p>
+            <form class="gw-discount-form" data-gw-discount-form data-discount-base-url="{{ routes.root_url }}discount/" data-discount-redirect="{{ routes.cart_url }}">
+              <label class="visually-hidden" for="gw-cart-discount-code">Gutscheincode eingeben</label>
+              <input id="gw-cart-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
+              <button class="gw-discount-form__button" type="submit">Einlösen</button>
+            </form>
+            {%- if cart.cart_level_discount_applications.size > 0 -%}
+              <ul class="gw-cart-discount__applied" role="list" aria-label="Angewendete Gutscheine">
+                {%- for discount in cart.cart_level_discount_applications -%}
+                  <li>{{ discount.title | escape }} <span>−{{ discount.total_allocated_amount | money }}</span></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            <p class="gw-discount-form__status" data-discount-status hidden role="status"></p>
+          </div>
+
           <div class="gw-cart-summary__total">
             <span>{{ section.settings.total_label | default: 'Gesamt' }}</span>
             <span id="gw-cart-total">{{ cart.total_price | money }}</span>

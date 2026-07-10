@@ -168,6 +168,15 @@ cart-remove-button button:hover,
   color: var(--gw-gold) !important;
 }
 
+/* Discount code in the cart drawer */
+.gw-drawer-discount { margin: 14px 0 16px; padding: 14px 0 0; border-top: 1px solid var(--gw-border); }
+.gw-drawer-discount__label { margin: 0 0 8px; color: var(--gw-ink); font-size: 12px; font-weight: 600; }
+.gw-drawer-discount .gw-discount-form { display: flex; gap: 7px; }
+.gw-drawer-discount .gw-discount-form__input { min-width: 0; flex: 1; width: 100%; padding: 10px 11px; border: 1px solid var(--gw-border); border-radius: 8px; background: var(--gw-ivory); color: var(--gw-ink); font: inherit; font-size: 12px; }
+.gw-drawer-discount .gw-discount-form__button { flex: none; padding: 0 12px; border: 1px solid var(--gw-ink); border-radius: 8px; background: var(--gw-ink); color: var(--gw-ivory); cursor: pointer; font: inherit; font-size: 11px; font-weight: 600; }
+.gw-drawer-discount .gw-discount-form__button:disabled { cursor: wait; opacity: .65; }
+.gw-drawer-discount .gw-discount-form__status { margin: 7px 0 0; color: #8a2f22; font-size: 11px; }
+
 /* ── Cart notification popup (added to cart banner) ─────────── */
 .cart-notification {
   background: var(--gw-ivory) !important;
