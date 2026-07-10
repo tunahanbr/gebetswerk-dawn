@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "logo": "shopify://shop_images/gebetswerk-logo-white.png",
+    "logo": "shopify://shop_images/gebetswerk-logo.svg",
     "logo_width": 60,
     "favicon": "shopify://shop_images/gebetswerk-logo-header.png",
     "type_header_font": "fraunces_n4",
