@@ -270,7 +270,7 @@
         "delivery_ship_min": 1,
         "delivery_ship_max": 3,
         "delivery_exp_ship_min": 1,
-        "delivery_exp_ship_max": 2,
+        "delivery_exp_ship_max": 3,
         "delivery_sat_delivery": true,
         "addon_product": "aufpreise",
         "price_name1": 1000,
