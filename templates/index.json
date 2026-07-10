@@ -24,7 +24,7 @@
           "type": "button",
           "settings": {
             "label": "Kollektion ansehen",
-            "url": "#shopify-section-featured_collection",
+            "url": "shopify://collections/gebetsteppiche-neu",
             "style": "secondary"
           }
         },
