@@ -14,7 +14,12 @@
       <p class="gw-widerruf__intro">{{ section.settings.intro }}</p>
     {%- endif -%}
 
-    <div class="gw-widerruf__card">
+    <details class="gw-widerruf__print-details">
+      <summary>
+        <span class="gw-widerruf__print-summary-title">Muster-Widerrufsformular zum Drucken</span>
+        <span class="gw-widerruf__print-summary-note">Optional – nur nötig, wenn du den Widerruf per Papier oder selbst per E-Mail senden möchtest.</span>
+      </summary>
+      <div class="gw-widerruf__card">
       <p class="gw-widerruf__hint">Wenn du den Vertrag widerrufen möchtest, fülle bitte dieses Formular aus und sende es an uns zurück.</p>
 
       <div class="gw-widerruf__to">
@@ -65,7 +70,8 @@
           <a class="gw-widerruf__mail" href="mailto:{{ section.settings.email }}?subject=Widerruf%20meiner%20Bestellung">Alternativ per E-Mail widerrufen</a>
         {%- endif -%}
       </div>
-    </div>
+      </div>
+    </details>
 
     <div class="gw-widerruf__contact-card">
       <div class="gw-widerruf__contact-intro">
@@ -140,6 +146,16 @@
   .gw-widerruf__heading { font-family: var(--gw-font-heading, serif); font-size: clamp(24px, 4vw, 34px); font-weight: 400; margin: 0 0 12px; }
   .gw-widerruf__intro { color: var(--gw-muted, #6b6459); line-height: 1.6; margin: 0 0 24px; }
   .gw-widerruf__card, .gw-widerruf__contact-card { border: 1px solid var(--gw-border, #e3ddd2); border-radius: 20px; padding: clamp(22px, 4vw, 38px); background: #fffdf9; box-shadow: 0 12px 40px rgba(43, 38, 32, .05); }
+  .gw-widerruf__print-details { margin-bottom: 24px; }
+  .gw-widerruf__print-details summary { display: grid; gap: 5px; padding: 18px 22px; border: 1px solid var(--gw-border, #e3ddd2); border-radius: 14px; background: #fffdf9; color: var(--gw-ink, #2b2620); cursor: pointer; list-style: none; box-shadow: 0 8px 24px rgba(43, 38, 32, .04); }
+  .gw-widerruf__print-details summary::-webkit-details-marker { display: none; }
+  .gw-widerruf__print-details summary::after { content: '+'; position: absolute; right: 22px; font-size: 24px; font-weight: 300; line-height: 1; }
+  .gw-widerruf__print-details summary { position: relative; padding-right: 54px; }
+  .gw-widerruf__print-details[open] summary { border-radius: 14px 14px 0 0; border-bottom-color: transparent; }
+  .gw-widerruf__print-details[open] summary::after { content: '−'; }
+  .gw-widerruf__print-summary-title { font-size: 14px; font-weight: 700; }
+  .gw-widerruf__print-summary-note { color: var(--gw-muted, #6b6459); font-size: 12px; line-height: 1.45; }
+  .gw-widerruf__print-details[open] .gw-widerruf__card { border-radius: 0 0 14px 14px; border-top: 0; box-shadow: none; }
   .gw-widerruf__hint { font-size: 13px; color: var(--gw-muted, #6b6459); margin: 0 0 20px; font-style: italic; }
   .gw-widerruf__label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--gw-muted, #6b6459); }
   .gw-widerruf__address { font-style: normal; line-height: 1.5; margin: 4px 0 22px; }
@@ -180,13 +196,18 @@
     body * { visibility: hidden; }
     .gw-widerruf, .gw-widerruf * { visibility: visible; }
     .gw-widerruf { position: absolute; inset: 0; padding: 0; }
+    .gw-widerruf__print-details { display: block; }
+    .gw-widerruf__print-details > summary { display: none; }
     .gw-widerruf__card { border: none; padding: 0; }
     .gw-widerruf__actions { display: none; }
   }
 </style>
 
 <script>
-  document.getElementById('gw-wf-print')?.addEventListener('click', function () { window.print(); });
+  document.getElementById('gw-wf-print')?.addEventListener('click', function () {
+    document.querySelector('.gw-widerruf__print-details')?.setAttribute('open', '');
+    window.print();
+  });
 </script>
 
 {% schema %}
