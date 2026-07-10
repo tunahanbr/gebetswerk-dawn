@@ -285,7 +285,7 @@
 .gw-cart-discount__label::-webkit-details-marker { display: none; }
 .gw-cart-discount__label::after { content: '+'; color: var(--gw-muted, #6b6560); font-size: 18px; font-weight: 400; line-height: 1; }
 .gw-cart-discount[open] .gw-cart-discount__label::after { content: '−'; }
-.gw-cart-discount__content { padding-top: 10px; }
+.gw-cart-discount__content { padding-top: 10px; padding-inline-end: 8px; }
 .gw-discount-form { display: flex; flex-wrap: wrap; gap: 8px; }
 .gw-discount-form__input { min-width: 0; flex: 1; width: 100%; padding: 11px 12px; border: 1px solid var(--gw-border, #d9d2c6); border-radius: 8px; background: var(--gw-ivory, #faf8f3); color: var(--gw-ink, #1a1613); font: inherit; font-size: 13px; }
 .gw-discount-form__input:focus { outline: 2px solid var(--gw-gold, #c9a24a); outline-offset: 1px; }

@@ -633,9 +633,10 @@
   left: 0;
   right: 0;
   z-index: 100;
+  box-sizing: border-box;
   background: var(--gw-ivory);
   border-top: 1px solid var(--gw-border);
-  padding: 12px 20px env(safe-area-inset-bottom, 0);
+  padding: 12px 20px max(12px, env(safe-area-inset-bottom, 0px));
   box-shadow: 0 -4px 24px rgba(26,22,19,0.1);
 }
 @media (min-width: 990px) { .gw-sticky-atc { display: none !important; } }
@@ -657,6 +658,6 @@
   .gw-beads-grid { gap: 6px; }
   .gw-trust-badges { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .gw-trust-badge { padding: 12px 8px; font-size: 10px; }
-  .gw-sticky-atc { padding: 14px 16px env(safe-area-inset-bottom, 12px); }
+  .gw-sticky-atc { padding: 14px 16px max(12px, env(safe-area-inset-bottom, 0px)); }
   .gw-sticky-atc__inner { gap: 12px; }
 }

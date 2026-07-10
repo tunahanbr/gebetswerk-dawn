@@ -4,6 +4,11 @@ class CartDrawer extends HTMLElement {
 
     this.addEventListener('keyup', (evt) => evt.code === 'Escape' && this.close());
     this.querySelector('#CartDrawer-Overlay').addEventListener('click', this.close.bind(this));
+    this.addEventListener('touchmove', (event) => {
+      if (this.classList.contains('active') && !event.target.closest('.drawer__inner')) {
+        event.preventDefault();
+      }
+    }, { passive: false });
     this.setHeaderCartIconAccessibility();
   }
 
@@ -46,13 +51,54 @@ class CartDrawer extends HTMLElement {
       { once: true }
     );
 
-    document.body.classList.add('overflow-hidden');
+    this.lockPageScroll();
   }
 
   close() {
     this.classList.remove('active');
     removeTrapFocus(this.activeElement);
-    document.body.classList.remove('overflow-hidden');
+    this.unlockPageScroll();
+  }
+
+  lockPageScroll() {
+    if (this.gwScrollLock) return;
+
+    const body = document.body;
+    const html = document.documentElement;
+    this.gwScrollLock = {
+      scrollY: window.scrollY,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyWidth: body.style.width,
+      bodyLeft: body.style.left,
+      bodyHadOverflowClass: body.classList.contains('overflow-hidden'),
+      htmlHadOverflowClass: html.classList.contains('gw-cart-scroll-locked'),
+    };
+
+    html.classList.add('gw-cart-scroll-locked');
+    body.classList.add('overflow-hidden', 'gw-cart-scroll-locked');
+    body.style.position = 'fixed';
+    body.style.top = `-${this.gwScrollLock.scrollY}px`;
+    body.style.left = '0';
+    body.style.width = '100%';
+  }
+
+  unlockPageScroll() {
+    if (!this.gwScrollLock) return;
+
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = this.gwScrollLock.scrollY;
+
+    body.style.position = this.gwScrollLock.bodyPosition;
+    body.style.top = this.gwScrollLock.bodyTop;
+    body.style.width = this.gwScrollLock.bodyWidth;
+    body.style.left = this.gwScrollLock.bodyLeft;
+    if (!this.gwScrollLock.bodyHadOverflowClass) body.classList.remove('overflow-hidden');
+    body.classList.remove('gw-cart-scroll-locked');
+    if (!this.gwScrollLock.htmlHadOverflowClass) html.classList.remove('gw-cart-scroll-locked');
+    this.gwScrollLock = null;
+    window.scrollTo(0, scrollY);
   }
 
   setSummaryAccessibility(cartDrawerNote) {

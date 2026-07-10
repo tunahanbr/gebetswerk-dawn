@@ -12,6 +12,8 @@
 
   function updateDiscount(code, source) {
     var updateUrl = source.dataset.discountUpdateUrl || '/cart/update.js';
+    var discountDetails = source.closest ? source.closest('details') : null;
+    var wasOpen = discountDetails ? discountDetails.open : false;
     var button = source.matches && source.matches('button')
       ? source
       : source.querySelector('button[type="submit"]');
@@ -28,9 +30,7 @@
       if (!response.ok) throw new Error('Discount update failed');
       return response.json();
     }).then(function () {
-      /* Auf der aktuellen Seite bleiben; insbesondere nie aus dem Warenkorb
-         direkt in den Checkout springen. */
-      window.location.reload();
+      return refreshCartDrawer(wasOpen);
     }).catch(function () {
       if (button) {
         button.disabled = false;
@@ -38,6 +38,35 @@
       }
       if (source.tagName === 'FORM') setStatus(source, 'Der Gutscheincode konnte nicht aktualisiert werden.', true);
     });
+  }
+
+  function refreshCartDrawer(wasOpen) {
+    var drawer = document.querySelector('cart-drawer');
+    if (!drawer || typeof drawer.renderContents !== 'function') {
+      /* Auf der normalen Warenkorb-Seite bleibt der bestehende Seiten-Refresh
+         als Fallback aktiv; im Drawer wird nur dessen Inhalt ersetzt. */
+      window.location.reload();
+      return;
+    }
+
+    var sectionIds = drawer.getSectionsToRender().map(function (section) { return section.id; });
+    var root = window.Shopify && window.Shopify.routes && window.Shopify.routes.root
+      ? window.Shopify.routes.root
+      : '/';
+    var url = root + '?sections=' + encodeURIComponent(sectionIds.join(','));
+
+    return fetch(url, { headers: { Accept: 'application/json' } })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Cart refresh failed');
+        return response.json();
+      })
+      .then(function (sections) {
+        drawer.renderContents({ sections: sections });
+        if (wasOpen) {
+          var updatedDetails = drawer.querySelector('.gw-drawer-discount');
+          if (updatedDetails) updatedDetails.open = true;
+        }
+      });
   }
 
   document.addEventListener('click', function (event) {
