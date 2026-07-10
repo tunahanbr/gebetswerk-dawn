@@ -38,6 +38,8 @@
   padding-top: 18px !important;
   padding-bottom: max(28px, env(safe-area-inset-bottom, 0px)) !important;
 }
+.drawer__footer .gw-delivery { margin: 24px 0 24px; }
+.cart-drawer .cart__ctas { margin-bottom: 18px; }
 
 /* Scrollbar */
 cart-drawer-items::-webkit-scrollbar { width: 2px; }
@@ -176,6 +178,9 @@ cart-remove-button button:hover,
 .gw-drawer-discount .gw-discount-form__button { flex: none; padding: 0 12px; border: 1px solid var(--gw-ink); border-radius: 8px; background: var(--gw-ink); color: var(--gw-ivory); cursor: pointer; font: inherit; font-size: 11px; font-weight: 600; }
 .gw-drawer-discount .gw-discount-form__button:disabled { cursor: wait; opacity: .65; }
 .gw-drawer-discount .gw-discount-form__status { margin: 7px 0 0; color: #8a2f22; font-size: 11px; }
+.gw-drawer-applied-discount { display: flex; align-items: center; gap: 7px; }
+.gw-drawer-applied-discount > span { min-width: 0; flex: 1; }
+.gw-drawer-applied-discount .gw-discount-remove { color: var(--gw-gold-deep); font-size: 10px; }
 
 /* ── Cart notification popup (added to cart banner) ─────────── */
 .cart-notification {

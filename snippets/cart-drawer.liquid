@@ -372,7 +372,7 @@
           {%- endif -%}
           <div class="gw-drawer-discount">
             <p class="gw-drawer-discount__label">Gutscheincode</p>
-            <form class="gw-discount-form" data-gw-discount-form data-discount-base-url="{{ routes.root_url }}discount/" data-discount-redirect="{{ routes.cart_url }}">
+            <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js" data-discount-redirect="{{ routes.cart_url }}">
               <label class="visually-hidden" for="gw-drawer-discount-code">Gutscheincode eingeben</label>
               <input id="gw-drawer-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
               <button class="gw-discount-form__button" type="submit">Einlösen</button>
@@ -383,10 +383,10 @@
             {%- if cart.cart_level_discount_applications.size > 0 -%}
               <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                 {%- for discount in cart.cart_level_discount_applications -%}
-                  <li class="discounts__discount discounts__discount--end">
+                  <li class="discounts__discount discounts__discount--end gw-drawer-applied-discount">
                     {{- 'icon-discount.svg' | inline_asset_content -}}
-                    {{ discount.title | escape }}
-                    (-{{ discount.total_allocated_amount | money }})
+                    <span>{{ discount.title | escape }} (-{{ discount.total_allocated_amount | money }})</span>
+                    <button type="button" class="gw-discount-remove" data-gw-remove-discount data-discount-update-url="{{ routes.cart_update_url }}.js" data-discount-redirect="{{ routes.cart_url }}">Entfernen</button>
                   </li>
                 {%- endfor -%}
               </ul>

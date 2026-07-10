@@ -1,4 +1,4 @@
-/* Gebetswerk — Gutscheincodes über Shopifys native Discount-Route anwenden. */
+/* Gebetswerk — Gutscheincodes über Shopifys Cart-Ajax-API verwalten. */
 (function () {
   'use strict';
 
@@ -9,6 +9,42 @@
     status.textContent = message;
     status.dataset.state = isError ? 'error' : 'success';
   }
+
+  function updateDiscount(code, source) {
+    var updateUrl = source.dataset.discountUpdateUrl || '/cart/update.js';
+    var redirect = source.dataset.discountRedirect || '/cart';
+    var button = source.matches && source.matches('button')
+      ? source
+      : source.querySelector('button[type="submit"]');
+    if (button) {
+      button.disabled = true;
+      button.textContent = code ? 'Wird geprüft …' : 'Wird entfernt …';
+    }
+
+    return fetch(updateUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ discount: code })
+    }).then(function (response) {
+      if (!response.ok) throw new Error('Discount update failed');
+      return response.json();
+    }).then(function () {
+      window.location.assign(redirect);
+    }).catch(function () {
+      if (button) {
+        button.disabled = false;
+        button.textContent = code ? 'Einlösen' : 'Entfernen';
+      }
+      if (source.tagName === 'FORM') setStatus(source, 'Der Gutscheincode konnte nicht aktualisiert werden.', true);
+    });
+  }
+
+  document.addEventListener('click', function (event) {
+    var removeButton = event.target.closest('[data-gw-remove-discount]');
+    if (!removeButton) return;
+    event.preventDefault();
+    updateDiscount('', removeButton);
+  });
 
   document.addEventListener('submit', function (event) {
     var form = event.target.closest('[data-gw-discount-form]');
@@ -23,15 +59,6 @@
       return;
     }
 
-    var baseUrl = form.dataset.discountBaseUrl || '/discount/';
-    var redirect = form.dataset.discountRedirect || '/cart';
-    var separator = redirect.indexOf('?') === -1 ? '?' : '&';
-    var target = baseUrl + encodeURIComponent(code) + separator + 'redirect=' + encodeURIComponent(redirect);
-    var button = form.querySelector('button[type="submit"]');
-    if (button) {
-      button.disabled = true;
-      button.textContent = 'Wird geprüft …';
-    }
-    window.location.assign(target);
+    updateDiscount(code, form);
   });
 })();
