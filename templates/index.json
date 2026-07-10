@@ -240,7 +240,7 @@
           "type": "item",
           "settings": {
             "question": "Versendet ihr international?",
-            "answer": "Nerin, wir liefern nur nach Österreich und Deutschland. Versand nach Österreich und Deutschland kostet pauschal 4,99€, und ab 80 € Bestellwert kostenlos."
+            "answer": "Nein, wir liefern nur nach Österreich und Deutschland. Versand nach Österreich und Deutschland kostet pauschal 4,99€, und ab 80 € Bestellwert kostenlos."
           }
         }
       },
