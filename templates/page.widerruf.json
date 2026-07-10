@@ -18,6 +18,8 @@
       "settings": {
         "heading": "Vertrag widerrufen",
         "intro": "Über diese Seite kannst du deinen Vertrag online widerrufen. Für personalisierte Gebetsteppiche besteht grundsätzlich kein gesetzliches Rücktrittsrecht.",
+        "contact_heading": "Vertrag widerrufen",
+        "contact_intro": "Fülle die Angaben vollständig aus. Deine Erklärung wird über das sichere Shopify-Kontaktformular an die Shop-Absenderadresse gesendet.",
         "company": "[Firmenname / Inhaber]",
         "address": "[Straße Nr.]\n[PLZ Ort], Österreich",
         "email": "gebetswerk@gmail.com"

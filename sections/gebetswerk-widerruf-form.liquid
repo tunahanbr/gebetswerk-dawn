@@ -76,8 +76,8 @@
     <div class="gw-widerruf__contact-card">
       <div class="gw-widerruf__contact-intro">
         <span class="gw-widerruf__contact-kicker">Online übermitteln</span>
-        <h3>Vertrag widerrufen</h3>
-        <p>Fülle die Angaben vollständig aus. Deine Erklärung wird über das sichere Shopify-Kontaktformular an die Shop-Absenderadresse gesendet.</p>
+        <h3>{{ section.settings.contact_heading | default: 'Vertrag widerrufen' }}</h3>
+        <p>{{ section.settings.contact_intro | default: 'Fülle die Angaben vollständig aus. Deine Erklärung wird über das sichere Shopify-Kontaktformular an die Shop-Absenderadresse gesendet.' }}</p>
       </div>
 
       {%- form 'contact', id: 'GwWiderrufContactForm', class: 'gw-widerruf__contact-form' -%}
@@ -149,7 +149,7 @@
   .gw-widerruf__print-details { margin-bottom: 24px; }
   .gw-widerruf__print-details summary { display: grid; gap: 5px; padding: 18px 22px; border: 1px solid var(--gw-border, #e3ddd2); border-radius: 14px; background: #fffdf9; color: var(--gw-ink, #2b2620); cursor: pointer; list-style: none; box-shadow: 0 8px 24px rgba(43, 38, 32, .04); }
   .gw-widerruf__print-details summary::-webkit-details-marker { display: none; }
-  .gw-widerruf__print-details summary::after { content: '+'; position: absolute; right: 22px; font-size: 24px; font-weight: 300; line-height: 1; }
+  .gw-widerruf__print-details summary::after { content: '+'; position: absolute; top: 50%; right: 22px; transform: translateY(-50%); font-size: 24px; font-weight: 300; line-height: 1; }
   .gw-widerruf__print-details summary { position: relative; padding-right: 54px; }
   .gw-widerruf__print-details[open] summary { border-radius: 14px 14px 0 0; border-bottom-color: transparent; }
   .gw-widerruf__print-details[open] summary::after { content: '−'; }
@@ -217,6 +217,8 @@
   "settings": [
     { "type": "text", "id": "heading", "label": "Überschrift", "default": "Muster-Widerrufsformular" },
     { "type": "textarea", "id": "intro", "label": "Einleitung", "default": "Dieses Formular ist gesetzlich vorgegeben. Beachte: Für personalisierte Gebetsteppiche besteht kein Widerrufsrecht – das Formular gilt für nicht personalisierte Artikel." },
+    { "type": "text", "id": "contact_heading", "label": "Überschrift Online-Formular", "default": "Vertrag widerrufen" },
+    { "type": "textarea", "id": "contact_intro", "label": "Einleitung Online-Formular", "default": "Fülle die Angaben vollständig aus. Deine Erklärung wird über das sichere Shopify-Kontaktformular an die Shop-Absenderadresse gesendet." },
     { "type": "header", "content": "Empfänger (deine Firmendaten)" },
     { "type": "textarea", "id": "company", "label": "Firma / Name", "default": "[Firmenname / Inhaber]" },
     { "type": "textarea", "id": "address", "label": "Anschrift", "default": "[Straße Nr.]\n[PLZ Ort], Österreich" },
