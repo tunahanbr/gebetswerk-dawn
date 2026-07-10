@@ -12,7 +12,6 @@
 
   function updateDiscount(code, source) {
     var updateUrl = source.dataset.discountUpdateUrl || '/cart/update.js';
-    var redirect = source.dataset.discountRedirect || '/cart';
     var button = source.matches && source.matches('button')
       ? source
       : source.querySelector('button[type="submit"]');
@@ -29,7 +28,9 @@
       if (!response.ok) throw new Error('Discount update failed');
       return response.json();
     }).then(function () {
-      window.location.assign(redirect);
+      /* Auf der aktuellen Seite bleiben; insbesondere nie aus dem Warenkorb
+         direkt in den Checkout springen. */
+      window.location.reload();
     }).catch(function () {
       if (button) {
         button.disabled = false;

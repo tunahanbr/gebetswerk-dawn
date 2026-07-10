@@ -184,7 +184,7 @@
           "type": "accordion",
           "settings": {
             "title": "Lieferung & Rückgabe",
-            "content": "<p><strong>Versandkosten:</strong> Österreich kostenlos, Deutschland ab 100 € Bestellwert kostenlos. Das voraussichtliche Lieferdatum siehst du oben.</p><p>Zu Stoßzeiten wie Ramadan oder Eid kann es vereinzelt zu längeren Bearbeitungszeiten kommen – mit der <strong>Expressanfertigung</strong> starten wir sofort.</p><p><strong>Rückgabe:</strong> Standardartikel innerhalb von 14 Tagen. Personalisierte Produkte werden eigens für dich angefertigt – ein Widerruf ist hier ausgeschlossen. Bitte prüfe deine Angaben vor dem Kauf sorgfältig.</p>"
+            "content": "<p><strong>Versandkosten:</strong> Österreich kostenlos, Deutschland ab 100 € Bestellwert kostenlos. Das voraussichtliche Lieferdatum siehst du oben.</p><p>Zu Stoßzeiten wie Ramadan oder Eid kann es vereinzelt zu längeren Bearbeitungszeiten kommen – mit der <strong>Expressanfertigung</strong> starten wir sofort.</p><p><strong>Rücktritt:</strong> Nicht personalisierte Artikel kannst du innerhalb von 14 Tagen widerrufen. Personalisierte Produkte werden eigens für dich angefertigt – hier besteht kein gesetzliches Rücktrittsrecht. Gesetzliche Gewährleistungsrechte bleiben unberührt. Bitte prüfe deine Angaben vor dem Kauf sorgfältig.</p>"
           }
         },
         "acc-hint": {
@@ -334,7 +334,7 @@
           "type": "item",
           "settings": {
             "question": "Kann ich personalisierte Artikel zurückgeben?",
-            "answer": "Für Standardartikel gilt das 14-tägige Rückgaberecht. Personalisierte Produkte werden eigens für dich angefertigt – hier ist ein Widerruf ausgeschlossen. Bitte prüfe deine Angaben (Schreibweise, Reihenfolge) vor dem Kauf sorgfältig."
+            "answer": "Für nicht personalisierte Artikel gilt grundsätzlich ein 14-tägiges Rücktrittsrecht. Personalisierte Produkte werden eigens für dich angefertigt – hier besteht kein gesetzliches Rücktrittsrecht. Gesetzliche Gewährleistungsrechte bleiben unberührt. Bitte prüfe deine Angaben (Schreibweise, Reihenfolge) vor dem Kauf sorgfältig."
           }
         },
         "f8": {

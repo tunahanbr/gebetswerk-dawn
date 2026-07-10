@@ -39,6 +39,10 @@ Du hast die Waren unverzüglich und in jedem Fall spätestens binnen vierzehn Ta
 **Du trägst die unmittelbaren Kosten der Rücksendung der Waren.**
 [ALTERNATIVE — falls ihr die Rücksendekosten übernehmt: „Wir tragen die Kosten der Rücksendung der Waren.“]
 
+Bitte sende die Ware an folgende Rücksendeadresse:
+
+**[RÜCKSENDEADRESSE — Straße, Hausnummer, PLZ, Ort, Land]**
+
 Du musst für einen etwaigen Wertverlust der Waren nur aufkommen, wenn dieser Wertverlust auf einen zur Prüfung der Beschaffenheit, Eigenschaften und Funktionsweise der Waren nicht notwendigen Umgang mit ihnen zurückzuführen ist.
 
 ## Muster-Widerrufsformular

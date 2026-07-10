@@ -168,7 +168,7 @@
 
           <div class="gw-cart-discount">
             <p class="gw-cart-discount__label">Gutscheincode</p>
-            <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js" data-discount-redirect="{{ routes.cart_url }}">
+            <form class="gw-discount-form" data-gw-discount-form data-discount-update-url="{{ routes.cart_update_url }}.js">
               <label class="visually-hidden" for="gw-cart-discount-code">Gutscheincode eingeben</label>
               <input id="gw-cart-discount-code" class="gw-discount-form__input" type="text" name="discount" autocomplete="off" placeholder="Code eingeben">
               <button class="gw-discount-form__button" type="submit">Einlösen</button>
@@ -178,7 +178,7 @@
                 {%- for discount in cart.cart_level_discount_applications -%}
                   <li>
                     <span>{{ discount.title | escape }} <span>−{{ discount.total_allocated_amount | money }}</span></span>
-                    <button type="button" class="gw-discount-remove" data-gw-remove-discount data-discount-update-url="{{ routes.cart_update_url }}.js" data-discount-redirect="{{ routes.cart_url }}">Entfernen</button>
+                    <button type="button" class="gw-discount-remove" data-gw-remove-discount data-discount-update-url="{{ routes.cart_update_url }}.js">Entfernen</button>
                   </li>
                 {%- endfor -%}
               </ul>
