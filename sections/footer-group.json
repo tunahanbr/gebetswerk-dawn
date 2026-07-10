@@ -92,6 +92,13 @@
             "url": "/policies/refund-policy"
           }
         },
+        "hilfe-widerruf": {
+          "type": "link",
+          "settings": {
+            "label": "Vertrag widerrufen",
+            "url": "/pages/vertrag-widerrufen"
+          }
+        },
         "hilfe-5": {
           "type": "link",
           "settings": {
@@ -145,6 +152,7 @@
         "hilfe-2",
         "hilfe-3",
         "hilfe-4",
+        "hilfe-widerruf",
         "hilfe-5",
         "col-recht",
         "recht-1",

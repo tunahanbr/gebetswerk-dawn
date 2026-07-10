@@ -28,6 +28,8 @@ mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief od
 
 Zur Wahrung der Rücktrittsfrist reicht es aus, dass du die Mitteilung über die Ausübung des Rücktrittsrechts vor Ablauf der Rücktrittsfrist absendest.
 
+Du kannst deinen Rücktritt auch über unsere Online-Rücktrittsfunktion unter [Vertrag widerrufen](/pages/vertrag-widerrufen) erklären. Wenn du diese Online-Funktion nutzt, übermitteln wir dir unverzüglich eine Eingangsbestätigung auf einem dauerhaften Datenträger (z. B. per E-Mail) mit dem Inhalt deiner Erklärung sowie Datum und Uhrzeit des Eingangs.
+
 ## Folgen des Rücktritts
 
 Wenn du von diesem Vertrag zurücktrittst, haben wir dir alle Zahlungen, die wir von dir erhalten haben, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass du eine andere Art der Lieferung als die von uns angebotene, günstigste Standardlieferung gewählt hast), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über deinen Rücktritt bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das du bei der ursprünglichen Transaktion eingesetzt hast, es sei denn, mit dir wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden dir wegen dieser Rückzahlung Entgelte berechnet.
@@ -47,7 +49,7 @@ Du musst für einen etwaigen Wertverlust der Waren nur aufkommen, wenn dieser We
 
 ## Muster-Widerrufsformular
 
-*(Wenn du den Vertrag widerrufen willst, dann fülle bitte dieses Formular aus und sende es zurück. Du kannst dafür auch das ausfüllbare Formular auf der Seite [Widerrufsformular](/pages/widerrufsformular) nutzen.)*
+*(Wenn du den Vertrag widerrufen willst, dann fülle bitte dieses Formular aus und sende es zurück. Du kannst dafür auch die Online-Rücktrittsfunktion auf der Seite [Vertrag widerrufen](/pages/vertrag-widerrufen) nutzen.)*
 
 > An
 > [FIRMENNAME]

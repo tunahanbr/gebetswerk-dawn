@@ -16,8 +16,8 @@
     "widerruf_form": {
       "type": "gebetswerk-widerruf-form",
       "settings": {
-        "heading": "Rücktritt online erklären",
-        "intro": "Für nicht personalisierte Artikel kannst du deine Rücktrittserklärung direkt online übermitteln. Personalisierte Gebetsteppiche werden nach deinen Vorgaben angefertigt und sind vom gesetzlichen Rücktrittsrecht ausgenommen.",
+        "heading": "Vertrag widerrufen",
+        "intro": "Über diese Seite kannst du deinen Vertrag online widerrufen. Für personalisierte Gebetsteppiche besteht grundsätzlich kein gesetzliches Rücktrittsrecht.",
         "company": "[Firmenname / Inhaber]",
         "address": "[Straße Nr.]\n[PLZ Ort], Österreich",
         "email": "gebetswerk@gmail.com"

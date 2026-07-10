@@ -18,6 +18,10 @@ Shopify-Admin → **Einstellungen → Richtlinien** ("Policies"). Dort gibt es j
 | `impressum.md` | Impressum / Rechtliche Hinweise | `/policies/legal-notice` |
 | `versandrichtlinie.md` | Versandrichtlinie | `/policies/shipping-policy` |
 
+Für die Shopify-Richtlinie liegt zusätzlich `widerrufsbelehrung-shopify.html`
+als formatierte Rich-Text-Version vor. Den HTML-Inhalt kannst du im Rich-Text-/HTML-
+Editor der Richtlinie einfügen; die Platzhalter müssen vorher ersetzt werden.
+
 Die Footer-Links des Themes zeigen bereits auf diese URLs — sobald die Felder
 befüllt sind, funktioniert alles automatisch.
 
@@ -26,10 +30,10 @@ befüllt sind, funktioniert alles automatisch.
 Zusätzlich zur Widerrufsbelehrung gibt es eine eigene Seite mit dem gesetzlichen,
 ausfüll- und druckbaren Muster-Widerrufsformular:
 
-1. Shopify-Admin → **Onlineshop → Seiten → Seite hinzufügen**, Titel z. B. „Widerrufsformular“.
+1. Shopify-Admin → **Onlineshop → Seiten → Seite hinzufügen**, Titel exakt **„Vertrag widerrufen“**.
 2. Rechts unter **Theme-Vorlage** die Vorlage **`widerruf`** auswählen (Datei `templates/page.widerruf.json`).
 3. Im **Theme-Editor** dieser Seite die Firmendaten (Empfänger) im Abschnitt „Widerrufsformular“ eintragen.
-4. URL wird dann `/pages/widerrufsformular` — darauf verweist die Widerrufsbelehrung bereits.
+4. URL/Handle auf `/pages/vertrag-widerrufen` setzen — darauf verweist die Widerrufsbelehrung.
 
 Das Online-Formular verwendet Shopifys natives Kontaktformular. Die Nachrichten
 gehen an **Einstellungen → Benachrichtigungen → Absender-E-Mail**. Diese Adresse

@@ -32,6 +32,9 @@
               <a href="{{ shop.refund_policy.url }}">Widerrufsrecht & Rückgabe</a>
             </li>
           {%- endif -%}
+          <li>
+            <a href="/pages/vertrag-widerrufen">Vertrag widerrufen</a>
+          </li>
           {%- if shop.terms_of_service != blank -%}
             <li class="{% if policy.url == shop.terms_of_service.url %}gw-policy-sidebar__item--active{% endif %}">
               <a href="{{ shop.terms_of_service.url }}">AGB</a>
