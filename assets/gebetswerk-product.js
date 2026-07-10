@@ -458,6 +458,10 @@
     state.variantPrice = price;
     state.available    = btn.dataset.variantAvailable === 'true';
 
+    /* Ausverkauft-Zustand: Seite ausgrauen (Bild, Badge, Optionen) */
+    const page = document.getElementById('gw-product-page');
+    if (page) page.classList.toggle('is-soldout', !state.available);
+
     /* Update form input */
     const input = $('gw-variant-id');
     if (input) input.value = id;

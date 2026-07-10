@@ -24,6 +24,26 @@
 /* Frame als Positionskontext für die Pfeile */
 .gw-gallery__frame { position: relative; }
 
+/* Ausverkauft: Bilder ausgrauen, Badge über dem Bild, Optionen dimmen */
+.gw-product-page.is-soldout .gw-gallery__slide img { filter: grayscale(1); opacity: 0.55; }
+.gw-gallery__soldout-badge {
+  display: none;
+  position: absolute;
+  top: 16px; left: 16px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(26, 22, 19, 0.82);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  z-index: 2;
+  pointer-events: none;
+}
+.gw-product-page.is-soldout .gw-gallery__soldout-badge { display: inline-flex; }
+.gw-product-page.is-soldout .gw-personalize-box { opacity: 0.5; pointer-events: none; }
+
 /* Pfeile links/rechts — signalisieren Wischbarkeit */
 .gw-gallery__arrow {
   position: absolute;

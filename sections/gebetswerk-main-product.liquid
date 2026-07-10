@@ -156,7 +156,7 @@
 }
 </script>
 
-<div class="gw-product-page">
+<div class="gw-product-page{% unless current_variant.available %} is-soldout{% endunless %}" id="gw-product-page">
   <div class="gw-product-page__inner">
 
     {%- comment -%} Breadcrumb {%- endcomment -%}
@@ -214,6 +214,8 @@
             </div>
           {%- endfor -%}
         </div>
+
+          <span class="gw-gallery__soldout-badge" aria-hidden="true">{{ soldout_label }}</span>
 
           <button type="button" class="gw-gallery__arrow gw-gallery__arrow--prev" id="gw-gallery-prev" aria-label="Vorheriges Bild">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
