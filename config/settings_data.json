@@ -123,6 +123,7 @@
     "show_cart_note": false,
     "free_shipping_de_threshold_cents": 8000,
     "cart_drawer_collection": "",
+    "hidden_product_handles": "aufpreise,gebetskette",
     "content_for_index": [],
     "blocks": {
       "judgeme_core_embed": {
