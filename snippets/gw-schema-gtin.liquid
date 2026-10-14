@@ -1,0 +1,29 @@
+{%- comment -%}Emit only numeric GTIN-8/12/13/14 with a valid GS1 check digit. SKU is not MPN.{%- endcomment -%}
+{%- liquid
+  assign gtin = barcode | strip
+  assign gtin_length = gtin | size
+  assign non_digits = gtin | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+  assign non_zero_digits = gtin | remove: '0'
+  assign valid_length = false
+  if gtin_length == 8 or gtin_length == 12 or gtin_length == 13 or gtin_length == 14
+    assign valid_length = true
+  endif
+  assign valid_gtin = false
+  if valid_length and non_digits == blank and non_zero_digits != blank
+    assign digits = gtin | split: '' | reverse
+    assign checksum = 0
+    for digit in digits
+      assign parity = forloop.index0 | modulo: 2
+      assign weighted_digit = digit | plus: 0
+      if parity == 1
+        assign weighted_digit = weighted_digit | times: 3
+      endif
+      assign checksum = checksum | plus: weighted_digit
+    endfor
+    assign remainder = checksum | modulo: 10
+    if remainder == 0
+      assign valid_gtin = true
+    endif
+  endif
+-%}
+{%- if valid_gtin -%}"gtin{{ gtin_length }}": {{ gtin | json }},{%- endif -%}
