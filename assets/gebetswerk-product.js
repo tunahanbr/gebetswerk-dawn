@@ -81,7 +81,11 @@
 
   /* ── Helpers ──────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
-  const fmt = cents => '€' + (cents / 100).toFixed(2).replace('.', ',');
+  const moneyFormatter = new Intl.NumberFormat(window.GW_MONEY?.locale || 'de-AT', {
+    style: 'currency',
+    currency: window.GW_MONEY?.currency || 'EUR',
+  });
+  const fmt = cents => moneyFormatter.format(cents / 100);
 
   function totalCents() {
     let t = state.variantPrice;
@@ -884,6 +888,7 @@
       let initBtn = urlVariantId
         ? document.querySelector('.gw-color-swatch[data-variant-id="' + urlVariantId + '"]')
         : null;
+      if (!initBtn) initBtn = document.querySelector('.gw-color-swatch[data-variant-id].is-active');
       if (!initBtn) initBtn = document.querySelector('.gw-color-swatch[data-variant-id]');
       if (initBtn) selectVariant(initBtn);
       else { state.variantPrice = VARIANTS[0].price; }

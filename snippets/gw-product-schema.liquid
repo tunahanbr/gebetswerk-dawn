@@ -1,0 +1,140 @@
+{%- comment -%}
+  One theme-owned Product, describing the selected Shopify base variant.
+  Personalization is a separate cart line item, not a Shopify product variant.
+  Judge.me owns review schema by default. Only opt into theme ratings AFTER
+  disabling app schema and verifying the source of ALL reviews in the aggregate.
+  Metafield contracts and deployment checks: docs/structured-data-audit.md.
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign product_url = canonical_url | split: '?' | first
+  assign offer_url = product_url | append: '?variant=' | append: variant.id
+  assign currency = cart.currency.iso_code | default: localization.country.currency.iso_code | default: shop.currency
+  assign primary_image = variant.featured_image | default: product.featured_image
+  assign return_policy = variant.metafields.seo.return_policy.value | default: product.metafields.seo.return_policy.value
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | plus: 0
+  assign rating_count_integer = rating_count | floor
+  assign rating_value = rating.rating | plus: 0.0
+  assign rating_min = rating.scale_min | plus: 0.0
+  assign rating_max = rating.scale_max | plus: 0.0
+  assign valid_rating = false
+  if product.metafields.seo.theme_rating_enabled.value == true and rating.rating != blank and rating.scale_min != blank and rating.scale_max != blank and rating_count > 0 and rating_count == rating_count_integer
+    if rating_max > rating_min and rating_value >= rating_min and rating_value <= rating_max
+      assign valid_rating = true
+    endif
+  endif
+-%}
+{%- capture product_json -%}
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "@id": {{ product_url | append: '#product' | json }},
+  "name": {{ product.title | json }},
+  "description": {{ product.description | strip_html | strip | json }},
+  "url": {{ product_url | json }},
+  {%- if product.vendor != blank %}
+  "brand": { "@type": "Brand", "name": {{ product.vendor | json }} },
+  {%- endif %}
+  {%- if primary_image != blank %}
+  "image": [
+    {%- assign image_url = primary_image | image_url: width: 1200 -%}
+    {%- assign image_prefix = image_url | slice: 0, 2 -%}
+    {%- if image_prefix == '//' -%}{%- assign image_url = image_url | prepend: 'https:' -%}{%- endif -%}
+    {{ image_url | json }}
+    {%- for image in product.images -%}
+      {%- unless image.id == primary_image.id -%}
+        {%- assign image_url = image | image_url: width: 1200 -%}
+        {%- assign image_prefix = image_url | slice: 0, 2 -%}
+        {%- if image_prefix == '//' -%}{%- assign image_url = image_url | prepend: 'https:' -%}{%- endif -%}
+        ,{{ image_url | json }}
+      {%- endunless -%}
+    {%- endfor -%}
+  ],
+  {%- endif %}
+  {%- if variant.sku != blank %}
+  "sku": {{ variant.sku | json }},
+  {%- endif %}
+  {%- render 'gw-schema-gtin', barcode: variant.barcode -%}
+  {%- if valid_rating %}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": {{ rating_value | json }},
+    "ratingCount": {{ rating_count | json }},
+    "bestRating": {{ rating_max | json }},
+    "worstRating": {{ rating_min | json }}
+  },
+  {%- endif %}
+  "offers": {
+    "@type": "Offer",
+    "@id": {{ offer_url | append: '#offer' | json }},
+    "url": {{ offer_url | json }},
+    "priceCurrency": {{ currency | json }},
+    "price": {{ variant.price | divided_by: 100.0 | json }},
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": "{% if variant.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "seller": {
+      "@type": "Organization",
+      "@id": {{ request.origin | append: '/#organization' | json }},
+      "name": {{ shop.name | json }}
+    }
+    {%- if variant.compare_at_price > variant.price -%}
+      {%- liquid
+        assign starts_at = variant.metafields.seo.sale_starts_at
+        assign ends_at = variant.metafields.seo.sale_ends_at
+        assign now_seconds = 'now' | date: '%s' | plus: 0
+        assign start_seconds = starts_at.value | date: '%s' | plus: 0
+        assign end_seconds = ends_at.value | date: '%s' | plus: 0
+        assign valid_period = false
+        if starts_at.type == 'date_time' and starts_at.value != blank and start_seconds <= now_seconds
+          if ends_at == blank
+            assign valid_period = true
+          elsif ends_at.type == 'date_time' and ends_at.value != blank and end_seconds >= now_seconds and end_seconds >= start_seconds
+            assign valid_period = true
+          endif
+        endif
+      -%}
+      {%- if valid_period -%}
+        ,"validFrom": {{ starts_at.value | json }}
+        {%- if ends_at.value != blank -%},"priceValidUntil": {{ ends_at.value | json }}{%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- comment -%}
+      Public AT/DE tariff: at most EUR 4.99, with cart-dependent free shipping.
+      maxValue does not promise an unconditional rate or invent the disputed
+      exact EUR 80 threshold. Do not convert this tariff into other currencies.
+      Handling times vary with personalization/express; omit unverified times.
+    {%- endcomment -%}
+    {%- if currency == 'EUR' and variant.requires_shipping -%}
+    ,"shippingDetails": [
+      {%- assign shipping_countries = 'AT,DE' | split: ',' -%}
+      {%- for country in shipping_countries -%}
+      {
+        "@type": "OfferShippingDetails",
+        "shippingDestination": { "@type": "DefinedRegion", "addressCountry": {{ country | json }} },
+        "shippingRate": { "@type": "MonetaryAmount", "maxValue": 4.99, "currency": "EUR" }
+      }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+    {%- endif -%}
+    {%- comment -%}
+      Mixed/optional personalization cannot be classified from the title or
+      client-side checkbox. Only explicitly classified offers get a policy.
+    {%- endcomment -%}
+    {%- if return_policy == 'non_personalized' or return_policy == 'personalized' -%}
+    ,"hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": ["AT", "DE"],
+      "returnPolicyCategory": {% if return_policy == 'personalized' %}"https://schema.org/MerchantReturnNotPermitted"{% else %}"https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 14,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"{% endif %}
+    }
+    {%- endif %}
+  }
+}
+{%- endcapture -%}
+{%- capture json_lt -%}\u003c{%- endcapture -%}
+<script type="application/ld+json" id="gw-product-schema">
+  {{ product_json | replace: '<', json_lt }}
+</script>
